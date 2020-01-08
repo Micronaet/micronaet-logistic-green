@@ -33,20 +33,20 @@
     'license': 'AGPL-3',
     'depends': [
         'base',
-        'connector_web_base',
-        'connector_web_product',
-        'product_image_base', # for image management
-        'excel_export', 
+        #'connector_web_base',
+        #'connector_web_product',
+        #'product_image_base', # for image management
+        #'excel_export', 
         ],
     'init_xml': [],
     'demo': [],
     'data': [
-        'security/wp_group.xml',
-        'security/ir.model.access.csv',    
+        #'security/wp_group.xml',
+        #'security/ir.model.access.csv',    
         
-        'wp_view.xml',
-        'wizard/select_view.xml',
-        'wizard/category_wizard_view.xml',
+        #'wp_view.xml',
+        #'wizard/select_view.xml',
+        #'wizard/category_wizard_view.xml',
         ],
     'active': False,
     'installable': True,

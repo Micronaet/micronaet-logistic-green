@@ -2,7 +2,12 @@
   <dictionary name="thebrush">
     <words>
       <w>agpl</w>
+      <w>dropbox</w>
       <w>micronaet</w>
+      <w>nodestroy</w>
+      <w>odoo</w>
+      <w>woocommerce</w>
+      <w>wordpress</w>
     </words>
   </dictionary>
 </component>
