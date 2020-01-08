@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<openerp>
+    <data noupdate="1">
+         <!-- ir.config_parameter -->
+         <record model="ir.config_parameter" id="view_product_image_quotation">
+             <field name="key">product.image.quotation</field>
+             <field name="value">QUOTATION</field>
+         </record>
+         <record model="ir.config_parameter" id="view_product_image_product">
+             <field name="key">product.image.product</field>
+             <field name="value">PRODUCT</field>
+         </record>
+
+         <!-- product.image.album -->
+         <record model="product.image.album" id="view_product_image_album_quotation">
+             <field name="code">QUOTATION</field>
+             <field name="name">Quotation</field>
+             <field name="path">~/photo/quotation/company</field>
+             <field name="extension_image">jpg</field>
+             <field name="empty_image">0.jpg</field>
+             <field name="upper_code">1</field>
+             <field name="has_variant">1</field>
+         </record>
+         <record model="product.image.album" id="view_product_image_album_product">
+             <field name="code">PRODUCT</field>
+             <field name="name">Product</field>
+             <field name="path">~/photo/product/company</field>
+             <field name="extension_image">jpg</field>
+             <field name="empty_image">0.jpg</field>
+             <field name="upper_code">1</field>
+             <field name="has_variant">1</field>
+         </record>         
+         <record model="product.image.album" id="view_product_image_album_environment">
+             <field name="code">ENVIRONMENT</field>
+             <field name="name">Environment</field>
+             <field name="path">~/photo/environment/company</field>
+             <field name="extension_image">jpg</field>
+             <field name="empty_image">0.jpg</field>
+             <field name="upper_code">1</field>
+             <field name="has_variant">1</field>
+         </record>
+         <record model="product.image.album" id="view_product_image_album_chroma">
+             <field name="code">CHROMA</field>
+             <field name="name">Chroma</field>
+             <field name="path">~/photo/chroma/company</field>
+             <field name="extension_image">jpg</field>
+             <field name="empty_image">0.jpg</field>
+             <field name="upper_code">1</field>
+             <field name="has_variant">1</field>
+         </record>
+         <record model="product.image.album" id="view_product_image_album_video">
+             <field name="code">VIDEO</field>
+             <field name="name">Video</field>
+             <field name="path">~/photo/video/company</field>
+             <field name="extension_image">jpg</field>
+             <field name="empty_image">0.jpg</field>
+             <field name="upper_code">1</field>
+             <field name="has_variant">1</field>
+         </record>
+         <record model="product.image.album" id="view_product_image_album_360">
+             <field name="code">360</field>
+             <field name="name">360</field>
+             <field name="path">~/photo/360/company</field>
+             <field name="extension_image">jpg</field>
+             <field name="empty_image">0.jpg</field>
+             <field name="upper_code">1</field>
+             <field name="has_variant">1</field>
+         </record>
+    </data>
+</openerp>
+
