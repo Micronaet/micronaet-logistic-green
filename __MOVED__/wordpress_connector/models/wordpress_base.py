@@ -626,16 +626,16 @@ class ProductProductWebServer(models.Model):
 
     weight = fields.Float(
         _get_product_detail_items, method=True, readonly=True,
-        type='float', string='Peso lordo', multi=True,
+        type='float', string='Gross weight', multi=True,
         )
     weight_net = fields.Float(
         _get_product_detail_items, method=True, readonly=True,
-        type='float', string='Peso netto', multi=True,
+        type='float', string='NEt weight', multi=True,
         )
 
     lst_price = fields.Float(
         _get_product_detail_items, method=True, readonly=True,
-        type='float', string='Listino', multi=True,
+        type='float', string='Pricelist', multi=True,
         )
 
     q_x_pack = fields.Float(
