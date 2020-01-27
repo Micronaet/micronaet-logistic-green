@@ -148,6 +148,7 @@ class ProductTemplate(models.Model):
         """
         connector = self[0].company_id.wp_connector_ids[0]
         path = connector.image_path
+        extension = connector.image_extension or 'png'
 
         for product in self:
             if not path:
@@ -157,7 +158,7 @@ class ProductTemplate(models.Model):
             default_code = (product.default_code or '').replace(' ', '&nbsp;')
             filename = os.path.join(
                 path,
-                '%s.png' % default_code,
+                '%s.%s' % (default_code, extension),
                 )
             try:
                 f_data = open(filename, 'rb')
