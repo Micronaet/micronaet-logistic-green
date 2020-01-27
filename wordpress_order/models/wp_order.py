@@ -15,5 +15,9 @@ class SaleOrder(models.Model):
     # -------------------------------------------------------------------------
     #                                   COLUMNS:
     # -------------------------------------------------------------------------
-    
+    wp_id = fields.Integer(string='Wp ID')
+    connector_id = fields.Many2one(
+        comodel_name='wp.connector',
+        string='Connector')
+
 

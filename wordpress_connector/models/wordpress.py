@@ -168,6 +168,8 @@ class ProductTemplate(models.Model):
     # -------------------------------------------------------------------------
     #                                   COLUMNS:
     # -------------------------------------------------------------------------
+    wp_published = fields.Boolean(
+        string='WP published', help='Product present on Wordpress site')
     wp_master = fields.Boolean(
         string='Is master', help='Wordpress master product')
     wp_master_id = fields.Many2one(
