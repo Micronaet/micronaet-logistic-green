@@ -28,7 +28,6 @@ class ProductProductExcelReportWizard(models.TransientModel):
         products = product_pool.search(domain)
 
         # Excel file configuration:
-        title = ('', 'Product pricelist', )
         header = (
             'Nome', 'Codice', 'Categoria', 'Listini', 'Nuovo')
 
@@ -48,6 +47,7 @@ class ProductProductExcelReportWizard(models.TransientModel):
 
             # Title:
             row = 0
+            title = ('Elenco prodotti fornitore: %s' % supplier.name)
             report_pool.write_xls_line(
                 ws_name, row, title, style_code='title')
 
