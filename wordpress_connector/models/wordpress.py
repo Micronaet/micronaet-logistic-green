@@ -60,6 +60,7 @@ class WPConnector(models.Model):
         'WP Version', size=10, default='wc/v3', required=True)
 
     image_path = fields.Char('Image path', size=180)
+    image_extension = fields.Char('Image extension', size=5)
     timeout = fields.Integer('Timeout', default=600)
 
     # album_ids = fields.Many2many(

@@ -30,7 +30,8 @@
                     <field name="api"/>
                     <field name="version"/>
                     <field name="timeout"/>
-                    <field name="image_path" colspan="4"/>
+                    <field name="image_path" />
+                    <field name="image_extension" />
                 </group>
             </form>
         </field>
