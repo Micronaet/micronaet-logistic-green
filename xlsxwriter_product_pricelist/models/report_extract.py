@@ -48,10 +48,9 @@ class ProductProductExcelReportWizard(models.TransientModel):
 
         # Data lines:
         for supplierinfo in sorted(products,
-                key=lambda x: (x.name, x.product_id.default_code)):
+                key=lambda x: (x.name, x.product_id.name)):
             row += 1
 
-            #product = supplierinfo.product_id
             product = supplierinfo.product_tmpl_id
 
             # Write data:
