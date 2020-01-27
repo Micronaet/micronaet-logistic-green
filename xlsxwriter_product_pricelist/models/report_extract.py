@@ -41,7 +41,7 @@ class ProductProductExcelReportWizard(models.TransientModel):
             data_report[supplierinfo.name].append(supplierinfo)
 
         for supplier in sorted(data_report, key=lambda x: x.name):
-            ws_name = _(supplier.name or '/')
+            ws_name = _(supplier.name or '/', )
             report_pool.create_worksheet(ws_name, format_code='DEFAULT')
             report_pool.column_width(ws_name, column_width)
 
