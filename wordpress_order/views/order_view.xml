@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<odoo>
+<record model="ir.actions.act_window" id="action_open_view_form">
+    <field name="name">Untitled</field>
+    <field name="res_model">openerp.model</field>
+    <field name="view_type">form</field>
+    <field name="view_mode">tree,form</field>
+    <field name="view_id" ref="view_model_name_form"/>
+    <field name="context">{}</field>
+    <field name="domain">[]</field>
+</record>
+</odoo>

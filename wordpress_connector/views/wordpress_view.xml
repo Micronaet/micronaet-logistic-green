@@ -120,6 +120,9 @@
         <field name="model">product.template</field>
         <field name="inherit_id" ref="product.product_template_form_view"/>
         <field name="arch" type="xml">
+            <field name="image_medium" position="replace">
+                <field name="wp_image" widget="image" class="oe_avatar" />
+            </field>
             <xpath expr="//notebook" postion="inside">
                 <page name="Wordpress" string="Wordpress">
                     <group colspan="4" col="4">
@@ -139,7 +142,7 @@
             </xpath>
         </field>
     </record>
-    <record id="product_product_view_tree" model="ir.ui.view">
+    <record id="product_product_view_search" model="ir.ui.view">
         <field name="name">Master product search</field>
         <field name="model">product.template</field>
         <field name="inherit_id" ref="product.product_template_search_view"/>
@@ -167,7 +170,32 @@
         </field>
     </record>
 
+    <record id="wp_product_template_all_action" model="ir.actions.act_window">
+        <field name="name">Product all</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">product.template</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    <record id="wp_product_template_master_action" model="ir.actions.act_window">
+        <field name="name">Master product</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">product.template</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('wp_master', '=', True)]</field>
+    </record>
+    <record id="wp_product_template_slave_action" model="ir.actions.act_window">
+        <field name="name">Slave product</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">product.template</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('wp_master', '=', False)]</field>
+    </record>
+
     <menuitem id="wordpress_root" name="Wordpress" sequence="10"/>
+        <menuitem id="wordpress_product_root" name="Product" parent="wordpress_root" sequence="10"/>
+            <menuitem id="wp_product_template_all_menu" name="All product" parent="wordpress_product_root" action="wp_product_template_all_action" sequence="10"/>
+                <menuitem id="wp_product_template_master_menu" name="Master product" parent="wp_product_template_all_menu" action="wp_product_template_master_action" sequence="20"/>
+                <menuitem id="wp_product_template_slave_menu" name="Slave product" parent="wp_product_template_all_menu" action="wp_product_template_slave_action" sequence="30"/>
         <menuitem id="wordpress_configuration_root" name="Configuration" parent="wordpress_root" sequence="99"/>
             <menuitem id="wordpress_configuration_connector" name="Connector" parent="wordpress_configuration_root" action="wp_connector_action" sequence="10"/>
             <menuitem id="wordpress_configuration_attribute" name="Attribute" parent="wordpress_configuration_root" action="wp_attribute_action" sequence="20"/>
