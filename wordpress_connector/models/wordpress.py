@@ -153,9 +153,11 @@ class ProductTemplate(models.Model):
                 product.wp_image = False
                 _logger.info('Missed path, check connector parameter')
                 continue
-
-            filename = os.path(
-                path, product.default_code.replace(' ', '&nbsp;'))
+            default_code = (product.default_code or '').replace(' ', '&nbsp;')
+            filename = os.path.join(
+                path,
+                '%s.png' % default_code,
+                )
             try:
                 f_data = open(filename, 'rb')
                 product.wp_image = base64.encodebytes(f_data.read())
