@@ -1,4 +1,24 @@
 <?xml version="1.0"?>
 <odoo>
+    <record id="wp_connector_view_tree" model="ir.ui.view">
+        <field name="name">wp_connector_view_tree</field>
+        <field name="model">wp.connector</field>
+        <field name="inherit_id" ref="wordpress_connector.wp_connector_view_tree" />
+        <field name="arch" type="xml">
+            <field name="timeout" position="after">
+                <button name="button_load_order" type="object" string="Load order" icon="fa-stack-overflow fa-2x"/>
+            </field>
+        </field>
+    </record>
+    <record id="wp_connector_view_form" model="ir.ui.view">
+        <field name="name">wp_connector_view_form</field>
+        <field name="model">wp.connector</field>
+        <field name="inherit_id" ref="wordpress_connector.wp_connector_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="button_load_order" type="object" string="Load order" icon="fa-stack-overflow fa-2x"/>
+            </xpath>
+        </field>
+    </record>
 
 </odoo>

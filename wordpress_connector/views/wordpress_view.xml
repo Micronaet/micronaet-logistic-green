@@ -21,18 +21,23 @@
         <field name="model">wp.connector</field>
         <field name="arch" type="xml">
             <form string="Wordpress Attribute">
-                <group colspan="4" col="4">
-                    <field name="company_id"/>
-                    <separator string="Connection:" colspan="4"/>
-                    <field name="url"/>
-                    <field name="key"/>
-                    <field name="secret"/>
-                    <field name="api"/>
-                    <field name="version"/>
-                    <field name="timeout"/>
-                    <field name="image_path" />
-                    <field name="image_extension" />
-                </group>
+                <header>
+
+                </header>
+                <sheet>
+                    <group colspan="4" col="4">
+                        <field name="company_id"/>
+                        <separator string="Connection:" colspan="4"/>
+                        <field name="url"/>
+                        <field name="key"/>
+                        <field name="secret"/>
+                        <field name="api"/>
+                        <field name="version"/>
+                        <field name="timeout"/>
+                        <field name="image_path" />
+                        <field name="image_extension" />
+                    </group>
+                </sheet>
             </form>
         </field>
     </record>
