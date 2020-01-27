@@ -30,38 +30,46 @@ class ProductProductExcelReportWizard(models.TransientModel):
         # Excel file configuration:
         title = ('', 'Product pricelist', )
         header = (
-            'Nome', 'Codice', 'Categoria', 'Fornitore', 'Listini', 'Nuovo')
+            'Nome', 'Codice', 'Categoria', 'Listini', 'Nuovo')
 
-        column_width = (40, 30, 20, 30, 10, 10)
+        column_width = (50, 30, 20, 10, 10)
 
-        ws_name = _(supplier.name or '/')
-        report_pool.create_worksheet(ws_name, format_code='DEFAULT')
-        report_pool.column_width(ws_name, column_width)
-
-        # Title:
-        row = 0
-        report_pool.write_xls_line(ws_name, row, title, style_code='title')
-
-        # Header:
-        row += 1
-        report_pool.write_xls_line(ws_name, row, header, style_code='header')
-
-        # Data lines:
+        data_report = {}
         for supplierinfo in sorted(products,
-                key=lambda x: (x.name, x.product_id.name)):
+               key=lambda x: (x.name, x.product_id.name)):
+            if supplierinfo.name not in data_report:
+                data_report[supplierinfo.name] = []
+            data_report[supplierinfo.name].append(supplierinfo)
+
+        for supplier in sorted(data_report, key=lambda x: x.name):
+            ws_name = _(supplier.name or '/')
+            report_pool.create_worksheet(ws_name, format_code='DEFAULT')
+            report_pool.column_width(ws_name, column_width)
+
+            # Title:
+            row = 0
+            report_pool.write_xls_line(
+                ws_name, row, title, style_code='title')
+
+            # Header:
             row += 1
+            report_pool.write_xls_line(
+                ws_name, row, header, style_code='header')
 
-            product = supplierinfo.product_tmpl_id
+            # Data lines:
+            for supplierinfo in sorted(data_report[supplier],
+                    key=lambda x: x.product_id.name):
+                row += 1
+                product = supplierinfo.product_tmpl_id
 
-            # Write data:
-            report_pool.write_xls_line(ws_name, row, (
-                product.name,
-                product.default_code or '',
-                product.categ_id.name or '',
-                supplierinfo.name.name or '',
-                (product.list_price, 'number'),
-                ('', 'number'),
-                ), style_code='text')
+                # Write data:
+                report_pool.write_xls_line(ws_name, row, (
+                    product.name,
+                    product.default_code or '',
+                    product.categ_id.name or '',
+                    (product.list_price, 'number'),
+                    ('', 'number'),
+                    ), style_code='text')
 
         # Save file:
         return report_pool.return_attachment('Report_Product')
