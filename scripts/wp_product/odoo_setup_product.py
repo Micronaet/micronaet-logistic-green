@@ -121,7 +121,6 @@ for default_code in check_product:
     for supplier in product.seller_ids:
         supplier_set.remove(supplier.name.id)
 
-    import pdb; pdb.set_trace()
     for supplier_id in supplier_set:
         print 'Create Code %s, SKU %s' % (default_code, sku)
         supplinfo_pool.create({
