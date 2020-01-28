@@ -92,7 +92,6 @@ check_product = pickle.load(pickle_file)
 # Update supplier:
 # -----------------------------------------------------------------------------
 i = 0
-import pdb; pdb.set_trace()
 for default_code in check_product:
     i += 1
     if not default_code:
@@ -122,8 +121,10 @@ for default_code in check_product:
     for supplier in product.seller_ids:
         supplier_set.remove(supplier.name.id)
 
+    import pdb; pdb.set_trace()
     for supplier_id in supplier_set:
-        supplier_info.create({
+        print 'Create Code %s, SKU %s' % (default_code, sku)
+        supplinfo_pool.create({
             'name': supplier_id,
             'product_tmpl_id': product.id,
             'min_qty': 1,
