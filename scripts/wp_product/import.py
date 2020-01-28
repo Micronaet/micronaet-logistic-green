@@ -130,7 +130,7 @@ while True:
         else:
             check_product[default_code] = []
 
-        check_product[default_code].append(sku)    
+        check_product[default_code].append(sku)
 
         # ---------------------------------------------------------------------
         # Prepare data:
