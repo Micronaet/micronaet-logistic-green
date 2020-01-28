@@ -119,7 +119,7 @@ while True:
         # ---------------------------------------------------------------------
         # Clean sku for default_code
         # ---------------------------------------------------------------------
-        sku, default_code, supplier, child, ean13 = clean_code(sku) 
+        sku, default_code, supplier, child, barcode = clean_code(sku) 
 
         # ---------------------------------------------------------------------
         # Prepare data:
@@ -134,6 +134,8 @@ while True:
             'description_sale': description,
             'weight': weight,
             }
+        if barcode:
+            data['barcode'] = barcode
 
         # ---------------------------------------------------------------------
         # Update ODOO:
@@ -148,10 +150,10 @@ while True:
                 ])
                     
         if product_ids:
-            print 'Update product %s' % default_code
+            print 'Update product %s [%s]' % (default_code, sku)
             product_pool.write(product_ids, data)
         else:    
-            print 'Create product %s' % default_code
+            print 'Create product %s [%s]' % (default_code, sku)
             product_pool.create(data)
             
         # ---------------------------------------------------------------------
@@ -160,15 +162,14 @@ while True:
         if not sku:
             print '   > Product %s without code!' % name            
             continue  # No download image!
-        counter = 0
+        counter = -1
         for image in images:
-            image_src = urllib.quote(image['src'].encode('utf8'), ':/')
-            # image_name = image['name']
-            # image_id = image['id']
-            
-            urllib.urlretrieve(
-                image_src,
-                os.path.join(
-                    image_path, '%s.%03d.jpg' % (default_code, counter)))
             counter += 1
+            image_src = urllib.quote(image['src'].encode('utf8'), ':/')
+            filename = '%s.%03d.jpg' % (default_code, counter)            
+            fullname = os.path.join(image_path, filename)
+            if os.path.isfile(fullname):
+                print 'Yet present: %s' % filename    
+            else:            
+                urllib.urlretrieve(image_src, fullname)                
 
