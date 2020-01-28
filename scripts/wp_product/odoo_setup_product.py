@@ -92,6 +92,7 @@ check_product = pickle.load(pickle_file)
 # Update supplier:
 # -----------------------------------------------------------------------------
 i = 0
+not_found = []
 for default_code in check_product:
     i += 1
     if not default_code:
@@ -108,8 +109,9 @@ for default_code in check_product:
             continue
         supplier_id = supplier_db.get(supplier, False)
         if not supplier_id:
+            not_found.append(supplier_id)
             print 'Not found supplier code: %s' % supplier
-            sys.exit()
+            continue
             
         supplier_set.add(supplier_id)
 
@@ -132,4 +134,4 @@ for default_code in check_product:
 
     # TODO manage child association!    
                 
-
+print 'Supplier not found: %s' % (not_found, )
