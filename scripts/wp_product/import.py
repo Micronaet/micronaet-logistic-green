@@ -6,12 +6,6 @@ import sys
 import erppeek
 import ConfigParser
 
-# Local:
-image_path = '/home/thebrush/ETL/Georgiche/Images'
-
-# Server:
-#image_path = './images'
-
 # -----------------------------------------------------------------------------
 # Utility:
 # -----------------------------------------------------------------------------
@@ -63,6 +57,7 @@ user = config.get('dbaccess', 'user')
 pwd = config.get('dbaccess', 'pwd')
 server = config.get('dbaccess', 'server')
 port = config.get('dbaccess', 'port')   # verify if it's necessary: getint
+image_path = config.get('dbaccess', 'image_path')
 
 # -----------------------------------------------------------------------------
 # Connect to ODOO:
