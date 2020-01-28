@@ -87,6 +87,8 @@ parameter = {'per_page': 30, 'page': 1}
 while True:
     reply = wcapi.get('products', params=parameter)
     parameter['page'] += 1    
+    print '\n Page %s, Record: %s' % (
+        parameter['page'], parameter['page'] * parameter['per_page'])
 
     try:
         if reply.status_code >= 300:
