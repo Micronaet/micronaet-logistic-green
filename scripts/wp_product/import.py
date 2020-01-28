@@ -124,8 +124,12 @@ while True:
         sku, default_code, supplier, child, barcode = clean_code(sku) 
         
         # Check product
-        if default_code not in check_product:
+        if default_code in check_product:
+            print '  >>>> DOPPIONE: %s, %s' % (
+                default_code, check_product[default_code])
+        else:
             check_product[default_code] = []
+
         check_product[default_code].append(sku)    
 
         # ---------------------------------------------------------------------
