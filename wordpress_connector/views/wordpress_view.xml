@@ -144,8 +144,8 @@
                         <field name="wp_master_id" attrs="{'invisible': [('wp_master', '=', True)]}"/>
                         <field name="wp_variation_term_id" attrs="{'invisible': [('wp_master', '=', True)]}"/>
 
-                        <separator string="Slave" colspan="4" attrs="{'invisible': [('wp_master', '=', True)]}"/>
-                        <field name="wp_slave_ids" attrs="{'invisible': [('wp_master', '=', True)]}" colspan="4" nolabel="1"/>
+                        <separator string="Slave" colspan="4" attrs="{'invisible': [('wp_master', '=', False)]}"/>
+                        <field name="wp_slave_ids" attrs="{'invisible': [('wp_master', '=', False)]}" colspan="4" nolabel="1"/>
                     </group>
                 </page>
             </xpath>
