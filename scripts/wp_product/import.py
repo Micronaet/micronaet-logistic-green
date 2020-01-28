@@ -5,6 +5,7 @@ import urllib
 import sys
 import erppeek
 import ConfigParser
+import pickle
 
 # -----------------------------------------------------------------------------
 # Utility:
@@ -186,8 +187,13 @@ while True:
             else:            
                 urllib.urlretrieve(image_src, fullname)                
 
+pickle_file = open('product.supplier.pik', 'wb')
+pickle.dump(check_product, pickle_file)
+sys.exit()
+
 print '\n\n\nCheck product'
 for default_code in check_product:
     data = check_product[default_code]
     if len(data) > 1:
         print 'Doppioni: %s [%s]' % (default_code, data)
+        
