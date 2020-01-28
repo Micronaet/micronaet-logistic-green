@@ -158,7 +158,8 @@ class ProductTemplate(models.Model):
             default_code = (product.default_code or '').replace(' ', '&nbsp;')
             filename = os.path.join(
                 path,
-                '%s.%s' % (default_code, extension),
+                #  Default image is .000
+                '%s.000.%s' % (default_code, extension),
                 )
             try:
                 f_data = open(filename, 'rb')
@@ -170,7 +171,8 @@ class ProductTemplate(models.Model):
     # -------------------------------------------------------------------------
     #                                   COLUMNS:
     # -------------------------------------------------------------------------
-    wp_sku = fields.Char('SKU', size=25)
+    wp_id = fields.Integer(string='Wp ID', readonly=True)
+    wp_sku = fields.Char('SKU', size=25, readonly=True)
     wp_published = fields.Boolean(
         string='WP published', help='Product present on Wordpress site')
     wp_master = fields.Boolean(
