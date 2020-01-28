@@ -129,7 +129,6 @@ while True:
         # Check product
         if default_code not in check_product:
             check_product[default_code] = []
-
         check_product[default_code].append(sku)
 
         # ---------------------------------------------------------------------

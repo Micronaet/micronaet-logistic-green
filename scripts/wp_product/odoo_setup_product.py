@@ -119,7 +119,7 @@ for default_code in check_product:
         ('default_code', '=', default_code),
         ])
     product = product_pool.browse(product_ids)[0]
-    for supplier in product.supplierinfo:
+    for supplier in product.seller_ids:
         supplier_set.remove(supplier.name.id)
 
     for supplier_id in supplier_set:
