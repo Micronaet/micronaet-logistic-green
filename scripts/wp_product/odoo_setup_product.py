@@ -108,7 +108,7 @@ for default_code in check_product:
         if not supplier:
             continue
         supplier_id = supplier_db.get(supplier, False)
-        if not supplier_id
+        if not supplier_id:
             print 'Not found supplier code: %s' % supplier
             sys.exit()
             
