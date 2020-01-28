@@ -81,7 +81,7 @@ wcapi = woocommerce.API(
     )
 
 # load from file:
-parameter = {'per_page': 10, 'page': 1}
+parameter = {'per_page': 30, 'page': 1}
 while True:
     reply = wcapi.get('products', params=parameter)
     parameter['page'] += 1    
@@ -160,6 +160,8 @@ while True:
         # ---------------------------------------------------------------------
         # Image download:
         # ---------------------------------------------------------------------
+        continue # XXX remove after
+        
         if not sku:
             print '   > Product %s without code!' % name            
             continue  # No download image!
