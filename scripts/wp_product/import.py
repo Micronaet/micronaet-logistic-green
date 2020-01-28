@@ -173,13 +173,11 @@ while True:
         # ---------------------------------------------------------------------
         continue # XXX remove after
         
-        if not sku:
-            print '   > Product %s without code!' % name            
-            continue  # No download image!
         counter = -1
         for image in images:
             counter += 1
             image_src = urllib.quote(image['src'].encode('utf8'), ':/')
+
             if sku:
                 filename = '%s.%03d.jpg' % (default_code, counter)
             else:

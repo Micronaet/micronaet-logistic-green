@@ -85,7 +85,7 @@ for supplier in partner_pool.browse(supplier_ids):
 # -----------------------------------------------------------------------------
 # Load previous export data:
 # -----------------------------------------------------------------------------
-pickle_file = open('product.supplier.pik', 'wb')
+pickle_file = open('product.supplier.pik', 'rb')
 check_product = pickle.load(pickle_file)
 
 # -----------------------------------------------------------------------------
