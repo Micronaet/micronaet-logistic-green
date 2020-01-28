@@ -29,25 +29,34 @@ class ProductProductExcelReportWizard(models.TransientModel):
 
         # Excel file configuration:
         header = (
-            'Nome', 'Codice', 'Categoria', 'Listini', 'Nuovo')
+            'Ref.', 'Nome', 'Codice', 'Categoria', 'Listino',
+            'Nome (f)', 'Codice (f)', 'Q. min (f)', 'T. cons.', 'Costo (f)',
+            'Nuovo',
+            )
 
-        column_width = (50, 30, 20, 10, 10)
+        column_width = (
+            0, 50, 30, 20, 10,
+            50, 30, 10, 10, 10,
+            10,
+            )
 
         data_report = {}
-        for supplierinfo in sorted(products,
+        for detail in sorted(products,
                key=lambda x: (x.name, x.product_id.name)):
-            if supplierinfo.name not in data_report:
-                data_report[supplierinfo.name] = []
-            data_report[supplierinfo.name].append(supplierinfo)
+            if detail.name not in data_report:
+                data_report[detail.name] = []
+            data_report[detail.name].append(detail)
 
         for supplier in sorted(data_report, key=lambda x: x.name):
             ws_name = _(supplier.name or '/')
             report_pool.create_worksheet(ws_name, format_code='DEFAULT')
             report_pool.column_width(ws_name, column_width)
+            report_pool.column_hidden(ws_name, [0])  # Hide 1st column
 
             # Title:
             row = 0
-            title = ('Elenco prodotti fornitore: %s' % supplier.name, )
+            title = (
+                supplier.id, 'Elenco prodotti fornitore: %s' % supplier.name)
             report_pool.write_xls_line(
                 ws_name, row, title, style_code='title')
 
@@ -57,17 +66,23 @@ class ProductProductExcelReportWizard(models.TransientModel):
                 ws_name, row, header, style_code='header')
 
             # Data lines:
-            for supplierinfo in sorted(data_report[supplier],
-                    key=lambda x: x.product_id.name):
+            for detail in sorted(data_report[supplier],
+                    key=lambda x: x.product_tmpl_id.name):
                 row += 1
-                product = supplierinfo.product_tmpl_id
+                product = detail.product_tmpl_id
 
                 # Write data:
                 report_pool.write_xls_line(ws_name, row, (
+                    product.id,
                     product.name,
                     product.default_code or '',
                     product.categ_id.name or '',
                     (product.list_price, 'number'),
+                    detail.product_name or '',
+                    detail.product_code or '',
+                    detail.min_qty or '',
+                    detail.delay or '',
+                    detail.price or '',
                     ('', 'number'),
                     ), style_code='text')
 
