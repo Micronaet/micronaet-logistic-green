@@ -169,7 +169,7 @@ while True:
         # ---------------------------------------------------------------------
         # Image download:
         # ---------------------------------------------------------------------
-        continue # XXX remove after
+        #continue # XXX remove after
         
         counter = -1
         for image in images:
@@ -185,6 +185,6 @@ while True:
             if not os.path.isfile(fullname):
                 urllib.urlretrieve(image_src, fullname)                
 
-pickle_file = open('product.supplier.pik', 'wb')
+pickle_file = open('product.supplier.data.pik', 'wb')
 pickle.dump(check_product, pickle_file)
 
