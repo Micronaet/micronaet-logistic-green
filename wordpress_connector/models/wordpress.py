@@ -170,6 +170,7 @@ class ProductTemplate(models.Model):
     # -------------------------------------------------------------------------
     #                                   COLUMNS:
     # -------------------------------------------------------------------------
+    wp_sku = fields.Char('SKU', size=25)
     wp_published = fields.Boolean(
         string='WP published', help='Product present on Wordpress site')
     wp_master = fields.Boolean(
