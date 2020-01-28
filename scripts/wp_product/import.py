@@ -180,20 +180,15 @@ while True:
         for image in images:
             counter += 1
             image_src = urllib.quote(image['src'].encode('utf8'), ':/')
-            filename = '%s.%03d.jpg' % (default_code, counter)            
+            if sku:
+                filename = '%s.%03d.jpg' % (default_code, counter)
+            else:
+                filename = 'ID%s.%03d.jpg' % (wp_id, counter)
+                
             fullname = os.path.join(image_path, filename)
-            if os.path.isfile(fullname):
-                print '   > Yet present: %s' % filename    
-            else:            
+            if not os.path.isfile(fullname):
                 urllib.urlretrieve(image_src, fullname)                
 
 pickle_file = open('product.supplier.pik', 'wb')
 pickle.dump(check_product, pickle_file)
-sys.exit()
 
-print '\n\n\nCheck product'
-for default_code in check_product:
-    data = check_product[default_code]
-    if len(data) > 1:
-        print 'Doppioni: %s [%s]' % (default_code, data)
-        
