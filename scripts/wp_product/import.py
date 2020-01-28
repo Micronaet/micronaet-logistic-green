@@ -81,6 +81,7 @@ wcapi = woocommerce.API(
     )
 
 # load from file:
+check_product = {}
 parameter = {'per_page': 30, 'page': 1}
 while True:
     reply = wcapi.get('products', params=parameter)
@@ -121,6 +122,11 @@ while True:
         # Clean sku for default_code
         # ---------------------------------------------------------------------
         sku, default_code, supplier, child, barcode = clean_code(sku) 
+        
+        # Check product
+        if default_code not in check_product:
+            check_product[default_code] = []
+        check_product[default_code].append(sku)    
 
         # ---------------------------------------------------------------------
         # Prepare data:
@@ -176,3 +182,8 @@ while True:
             else:            
                 urllib.urlretrieve(image_src, fullname)                
 
+print '\n\n\nCheck product'
+for default_code in check_product:
+    data = check_product[default_code]
+    if len(data) > 1:
+        print 'Doppioni: %s [%s]' % (default_code, data)
