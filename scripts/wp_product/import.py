@@ -77,6 +77,7 @@ wcapi = woocommerce.API(
     wp_api=True,
     version='wc/v3',
     query_string_auth=True,
+    timeout=600,
     )
 
 # load from file:
@@ -169,7 +170,7 @@ while True:
             filename = '%s.%03d.jpg' % (default_code, counter)            
             fullname = os.path.join(image_path, filename)
             if os.path.isfile(fullname):
-                print 'Yet present: %s' % filename    
+                print '   > Yet present: %s' % filename    
             else:            
                 urllib.urlretrieve(image_src, fullname)                
 
