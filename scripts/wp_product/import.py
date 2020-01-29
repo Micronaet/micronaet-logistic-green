@@ -110,6 +110,7 @@ while True:
         sku = record['sku']
         name = record['name']
         images = record['images']
+        variations = record['variations']
         regular_price = record['regular_price']
         related_ids = record['related_ids']
         tags = record['tags']
@@ -122,6 +123,9 @@ while True:
         slug = record['slug']
         categories = record['categories']
 
+        if variations:
+            print record
+            import pdb; pdb.set_trace()
         # ---------------------------------------------------------------------
         # Clean sku for default_code
         # ---------------------------------------------------------------------
