@@ -83,7 +83,7 @@ wcapi = woocommerce.API(
 
 # load from file:
 check_product = {}
-parameter = {'per_page': 100, 'page': 1}
+parameter = {'per_page': 10, 'page': 1}
 while True:
     reply = wcapi.get('products', params=parameter)
     print '\n\n\n Page %s, Record: %s' % (
@@ -103,6 +103,8 @@ while True:
         break
 
     for record in records:
+        print record
+        import pdb; pdb.set_trace()
         # ---------------------------------------------------------------------
         # Extract data from record:
         # ---------------------------------------------------------------------
