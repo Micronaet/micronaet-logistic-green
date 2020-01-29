@@ -84,7 +84,6 @@ wcapi = woocommerce.API(
 # load from file:
 check_product = {}
 parameter = {'per_page': 100, 'page': 1}
-variation_param = {'per_page': 20, 'page': 1}
 while True:
     reply = wcapi.get('products', params=parameter)
     print '\n\n\n Page %s, Record: %s' % (
@@ -178,11 +177,13 @@ while True:
         #                        VARIATIONS
         # ---------------------------------------------------------------------
         if variations:
+            variation_param = {'per_page': 20, 'page': 1}
             while True:        
                 var_reply = wcapi.get(
                     'products/%s/variations' % wp_id, 
                     params=variation_param,
                     )
+                variation_param['page'] += 1    
 
                 if var_reply.status_code >= 300:
                     print 'Error getting category list', var_reply
