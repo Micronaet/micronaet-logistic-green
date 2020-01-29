@@ -51,6 +51,7 @@ while True:
         if parent_id not in parent_db:
             parent_db[parent_id] = []
         parent_db[parent_id].append(wp_id)
+        print 'ID %s  >  Parent %s' % (wp_id, parent_id)
 
 pickle_file = open('parent.data.pik', 'wb')
 pickle.dump(parent_db, pickle_file)
