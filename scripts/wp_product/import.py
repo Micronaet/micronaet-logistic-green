@@ -193,19 +193,19 @@ while True:
                     break
 
                 for variant in variants:
-                    #variant_image = record['image']
-                    #stock_status = record['stock_status']
-                    #product_type = record['type']
-                    #status = record['status']
+                    #variant_image = variant['image']
+                    #stock_status = variant['stock_status']
+                    #product_type = variant['type']
+                    #status = variant['status']
                     
                     variant_data = {
                         'name': variant['name'],
-                        'wp_id': record['id'],
-                        'default_code': record['sku'],
-                        'wp_sku': record['sku'],
-                        'lst_price': record['regular_price'],
-                        'description_sale': record['description'],
-                        'weight': record['weight'],
+                        'wp_id': variant['id'],
+                        'default_code': variant['sku'],
+                        'wp_sku': variant['sku'],
+                        'lst_price': variant['regular_price'],
+                        'description_sale': variant['description'],
+                        'weight': variant['weight'],
                         'wp_master_id': product_id,
                         # TODO attribute terms!
                         }                        
