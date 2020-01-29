@@ -83,7 +83,7 @@ wcapi = woocommerce.API(
 
 # load from file:
 check_product = {}
-parameter = {'per_page': 10, 'page': 1}
+parameter = {'per_page': 100, 'page': 1}
 variation_param = {'per_page': 20, 'page': 1}
 while True:
     reply = wcapi.get('products', params=parameter)
@@ -161,8 +161,8 @@ while True:
         # Update ODOO:
         # ---------------------------------------------------------------------
         product_ids = product_pool.search([
-                ('wp_id', '=', wp_id),
-                ])
+            ('wp_id', '=', wp_id),
+            ])
                     
         if product_ids:
             print 'Update product %s [%s]' % (default_code, sku)
@@ -210,7 +210,7 @@ while True:
                         # TODO attribute terms!
                         }                        
                     variant_ids = product_pool.search([
-                            ('wp_id', '=', record['id']),
+                            ('wp_id', '=', variant['id']),
                             ])
                                 
                     if variant_ids:
