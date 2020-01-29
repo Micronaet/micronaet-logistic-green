@@ -195,6 +195,7 @@ while True:
                     break
 
                 for variant in variants:
+                    variant_sku = variant['sku']
                     #variant_images = variant['image']
                     #stock_status = variant['stock_status']
                     #product_type = variant['type']
@@ -204,11 +205,10 @@ while True:
                         'wp_published': True,
                         'name': name,
                         'wp_id': variant['id'],
-                        'default_code': variant['sku'],
-                        'wp_sku': variant['sku'],
+                        'default_code': variant_sku,
+                        'wp_sku': variant_sku,
                         'lst_price': variant['regular_price'],
-                        'description_sale': 
-                            variant['description'] or description,
+                        'description_sale': variant['description'],
                         'weight': variant['weight'],
                         'wp_master_id': product_id,
                         # TODO attribute terms!
@@ -220,8 +220,10 @@ while True:
                     if variant_ids:
                         product_pool.write(variant_ids, variant_data)
                         variant_id = product_ids[0]
+                        print '   >> Update %s variants' % variant_sku
                     else:    
                         variant_id = product_pool.create(variant_data).id
+                        print '   >> Create %s variants' % variant_sku
                     
                     # TODO variant image
             
