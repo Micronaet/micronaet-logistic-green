@@ -29,13 +29,15 @@ class ProductProductExcelReportWizard(models.TransientModel):
 
         # Excel file configuration:
         header = (
-            'Ref.', 'Nome', 'Codice', 'Categoria', 'Listino',
+            'Ref.', 'Nome', 'Codice', 'Vecchio SKU',
+            'Categoria', 'Listino',
             'Nome (f)', 'Codice (f)', 'Q. min (f)', 'T. cons.', 'Costo (f)',
             'Nuovo',
             )
 
         column_width = (
-            0, 50, 30, 20, 10,
+            5, 55, 15, 15
+            20, 10,
             50, 30, 10, 10, 10,
             10,
             )
@@ -76,8 +78,11 @@ class ProductProductExcelReportWizard(models.TransientModel):
                     product.id,
                     product.name,
                     product.default_code or '',
+                    product.wp_sku or '',
+
                     product.categ_id.name or '',
                     (product.list_price, 'number'),
+
                     detail.product_name or '',
                     detail.product_code or '',
                     detail.min_qty or '',
