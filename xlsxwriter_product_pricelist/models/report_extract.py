@@ -37,7 +37,7 @@ class ProductProductExcelReportWizard(models.TransientModel):
             )
 
         column_width = (
-            5, 55, 15, 15
+            5, 55, 15, 15,
             20, 10,
             55, 15,
             10, 10, 10,
