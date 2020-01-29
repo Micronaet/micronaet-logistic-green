@@ -29,7 +29,7 @@ class ProductProductExcelReportWizard(models.TransientModel):
 
         # Excel file configuration:
         header = (
-            'Ref.', 'Nome', 'Codice', #'Vecchio SKU',
+            'Ref.', 'Nome', 'Codice',
             'Categoria', 'Listino',
             'Nome (f)', 'Codice (f)',
             'Q. min (f)', 'T. cons.', 'Costo (f)',
@@ -37,7 +37,7 @@ class ProductProductExcelReportWizard(models.TransientModel):
             )
 
         column_width = (
-            5, 55, 15, #15,
+            5, 55, 15,
             20, 10,
             55, 15,
             10, 10, 10,
@@ -59,7 +59,8 @@ class ProductProductExcelReportWizard(models.TransientModel):
             # Title:
             row = 0
             title = (
-                supplier.id, 'Elenco prodotti fornitore: %s' % supplier.name)
+                supplier.id, 'Elenco prodotti fornitore: %s [%s]' % (
+                    supplier.name, supplier.ref))
             report_pool.write_xls_line(
                 ws_name, row, title, style_code='title')
 
@@ -80,7 +81,6 @@ class ProductProductExcelReportWizard(models.TransientModel):
                     product.id,
                     product.name,
                     product.default_code or '',
-                    #product.wp_sku or '',
 
                     product.categ_id.name or '',
                     (product.list_price, 'number'),
