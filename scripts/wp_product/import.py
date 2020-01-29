@@ -103,8 +103,6 @@ while True:
         break
 
     for record in records:
-        print record
-        import pdb; pdb.set_trace()
         # ---------------------------------------------------------------------
         # Extract data from record:
         # ---------------------------------------------------------------------
