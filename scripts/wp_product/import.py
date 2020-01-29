@@ -188,12 +188,12 @@ while True:
                     print 'Error getting category list', var_reply
                     break
                             
-                variants = reply.json()            
+                variants = var_reply.json()            
                 if not variants:
                     break
 
                 for variant in variants:
-                    #variant_image = variant['image']
+                    #variant_images = variant['image']
                     #stock_status = variant['stock_status']
                     #product_type = variant['type']
                     #status = variant['status']
