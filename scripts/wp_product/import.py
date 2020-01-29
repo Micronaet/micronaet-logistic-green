@@ -180,7 +180,7 @@ while True:
             import pdb; pdb.set_trace()
             while True:        
                 var_reply = wcapi.get(
-                    wcapi.get('products/%s/variations' % wp_id), 
+                    'products/%s/variations' % wp_id, 
                     params=variation_param,
                     )
 
