@@ -178,8 +178,6 @@ while True:
         #                        VARIATIONS
         # ---------------------------------------------------------------------
         if variations:
-            print variations
-            import pdb; pdb.set_trace()
             while True:        
                 var_reply = wcapi.get(
                     'products/%s/variations' % wp_id, 
