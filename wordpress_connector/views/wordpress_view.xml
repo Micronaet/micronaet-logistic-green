@@ -116,8 +116,9 @@
         <field name="inherit_id" ref="product.product_template_tree_view"/>
         <field name="arch" type="xml">
             <field name="default_code" position="before">
-                 <field name="wp_published"/>
-                 <field name="wp_master"/>
+                <field name="wp_published"/>
+                <field name="wp_master"/>
+                <field name="wp_sku" groups=""/>
             </field>
         </field>
     </record>

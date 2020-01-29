@@ -16,7 +16,7 @@ class ProductProductExcelReportWizard(models.TransientModel):
     @api.multi
     def excel_product_report(self, ):
         report_pool = self.env['excel.report']
-        product_pool = self.env['product.supplierinfo']
+        detail_pool = self.env['product.supplierinfo']
 
         supplier = self.supplier_id
 
@@ -25,7 +25,7 @@ class ProductProductExcelReportWizard(models.TransientModel):
         if supplier:
             domain.append(
                 ('name', '=', supplier.id))
-        products = product_pool.search(domain)
+        details = detail_pool.search(domain)
 
         # Excel file configuration:
         header = (
@@ -41,8 +41,7 @@ class ProductProductExcelReportWizard(models.TransientModel):
             )
 
         data_report = {}
-        for detail in sorted(products,
-               key=lambda x: (x.name, x.product_id.name)):
+        for detail in details:
             if detail.name not in data_report:
                 data_report[detail.name] = []
             data_report[detail.name].append(detail)
@@ -66,8 +65,9 @@ class ProductProductExcelReportWizard(models.TransientModel):
                 ws_name, row, header, style_code='header')
 
             # Data lines:
-            for detail in sorted(data_report[supplier],
-                    key=lambda x: x.product_tmpl_id.name):
+            for detail in sorted(
+                    data_report[supplier],
+                    key=lambda d: d.product_tmpl_id.name):
                 row += 1
                 product = detail.product_tmpl_id
 
