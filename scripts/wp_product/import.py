@@ -83,7 +83,7 @@ wcapi = woocommerce.API(
 
 # load from file:
 check_product = {}
-parameter = {'per_page': 200, 'page': 1}
+parameter = {'per_page': 100, 'page': 1}
 while True:
     reply = wcapi.get('products', params=parameter)
     parameter['page'] += 1    
