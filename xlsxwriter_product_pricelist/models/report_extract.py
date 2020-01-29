@@ -31,14 +31,16 @@ class ProductProductExcelReportWizard(models.TransientModel):
         header = (
             'Ref.', 'Nome', 'Codice', 'Vecchio SKU',
             'Categoria', 'Listino',
-            'Nome (f)', 'Codice (f)', 'Q. min (f)', 'T. cons.', 'Costo (f)',
+            'Nome (f)', 'Codice (f)',
+            'Q. min (f)', 'T. cons.', 'Costo (f)',
             'Nuovo',
             )
 
         column_width = (
             5, 55, 15, 15
             20, 10,
-            50, 30, 10, 10, 10,
+            55, 15,
+            10, 10, 10,
             10,
             )
 
