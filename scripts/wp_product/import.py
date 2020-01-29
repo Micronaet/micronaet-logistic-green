@@ -84,6 +84,7 @@ wcapi = woocommerce.API(
 # load from file:
 check_product = {}
 parameter = {'per_page': 10, 'page': 1}
+variation_param = {'per_page': 20, 'page': 1}
 while True:
     reply = wcapi.get('products', params=parameter)
     print '\n\n\n Page %s, Record: %s' % (
@@ -123,11 +124,6 @@ while True:
         slug = record['slug']
         categories = record['categories']
 
-        if variations:
-            print record
-            import pdb; pdb.set_trace()
-        else:
-            continue    
         # ---------------------------------------------------------------------
         # Clean sku for default_code
         # ---------------------------------------------------------------------
@@ -150,18 +146,20 @@ while True:
             'lst_price': regular_price,
             'description_sale': description,
             'weight': weight,
+            # TODO wp_type: 'variable', #simple, grouped, external and variable. 
             }
         if barcode:
             data['barcode'] = barcode
 
+        if variations:
+            data['wp_master'] = True
+        else:    
+            data['wp_master'] = False
+            
+            
         # ---------------------------------------------------------------------
         # Update ODOO:
         # ---------------------------------------------------------------------
-        #if sku:
-        #    product_ids = product_pool.search([
-        #        ('default_code', '=', default_code),
-        #        ])
-        #else:
         product_ids = product_pool.search([
                 ('wp_id', '=', wp_id),
                 ])
@@ -169,13 +167,65 @@ while True:
         if product_ids:
             print 'Update product %s [%s]' % (default_code, sku)
             product_pool.write(product_ids, data)
+            product_id = product_ids[0]
         else:    
             print 'Create product %s [%s]' % (default_code, sku)
-            product_pool.create(data)
+            product_id = product_pool.create(data).id
+
+        # ---------------------------------------------------------------------
+        #                        VARIATIONS
+        # ---------------------------------------------------------------------
+        if variations:
+            print variations
+            import pdb; pdb.set_trace()
+            while True:        
+                var_reply = wcapi.get(
+                    wcapi.get('products/%s/variations' % wp_id), 
+                    params=variation_param,
+                    )
+
+                if var_reply.status_code >= 300:
+                    print 'Error getting category list', var_reply
+                    break
+                            
+                variants = reply.json()            
+                if not variants:
+                    break
+
+                for variant in variants:
+                    #variant_image = record['image']
+                    #stock_status = record['stock_status']
+                    #product_type = record['type']
+                    #status = record['status']
+                    
+                    variant_data = {
+                        'name': variant['name'],
+                        'wp_id': record['id'],
+                        'default_code': record['sku'],
+                        'wp_sku': record['sku'],
+                        'lst_price': record['regular_price'],
+                        'description_sale': record['description'],
+                        'weight': record['weight'],
+                        'wp_master_id': product_id,
+                        # TODO attribute terms!
+                        }                        
+                    variant_ids = product_pool.search([
+                            ('wp_id', '=', record['id']),
+                            ])
+                                
+                    if variant_ids:
+                        product_pool.write(variant_ids, variant_data)
+                        variant_id = product_ids[0]
+                    else:    
+                        variant_id = product_pool.create(variant_data).id
+                    
+                    # TODO variant image
             
         # ---------------------------------------------------------------------
         # Image download:
         # ---------------------------------------------------------------------
+        continue # TODO remove
+
         counter = -1
         for image in images:
             counter += 1
