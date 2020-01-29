@@ -54,7 +54,7 @@ class ProductProductExcelReportWizard(models.TransientModel):
 
         # Title:
         row = 0
-        title = ('Elenco prodotti con fornitori abbinati', )
+        title = ('', 'Elenco prodotti con fornitori abbinati')
         report_pool.write_xls_line(
             ws_name, row, title, style_code='title')
 
