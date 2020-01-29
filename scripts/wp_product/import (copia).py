@@ -83,7 +83,7 @@ wcapi = woocommerce.API(
 
 # load from file:
 check_product = {}
-parameter = {'per_page': 200, 'page': 1}
+parameter = {'per_page': 100, 'page': 1}
 while True:
     reply = wcapi.get('products', params=parameter)
     parameter['page'] += 1    
@@ -138,7 +138,7 @@ while True:
         data = {
             'name': name,
             'wp_id': wp_id,
-            'default_code': sku,
+            'default_code': default_code,
             'wp_sku': sku,
             'lst_price': regular_price,
             'description_sale': description,
@@ -150,12 +150,12 @@ while True:
         # ---------------------------------------------------------------------
         # Update ODOO:
         # ---------------------------------------------------------------------
-        #if sku:
-        #    product_ids = product_pool.search([
-        #        ('default_code', '=', default_code),
-        #        ])
-        #else:
-        product_ids = product_pool.search([
+        if sku:
+            product_ids = product_pool.search([
+                ('default_code', '=', default_code),
+                ])
+        else:
+            product_ids = product_pool.search([
                 ('wp_id', '=', wp_id),
                 ])
                     
@@ -169,7 +169,7 @@ while True:
         # ---------------------------------------------------------------------
         # Image download:
         # ---------------------------------------------------------------------
-        continue # XXX remove after
+        #continue # XXX remove after
         
         counter = -1
         for image in images:
