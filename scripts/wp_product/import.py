@@ -126,6 +126,8 @@ while True:
         if variations:
             print record
             import pdb; pdb.set_trace()
+        else:
+            continue    
         # ---------------------------------------------------------------------
         # Clean sku for default_code
         # ---------------------------------------------------------------------
