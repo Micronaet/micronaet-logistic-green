@@ -123,6 +123,7 @@ while True:
         attributes = record['attributes']
         slug = record['slug']
         categories = record['categories']
+        #default_attributes
 
         # ---------------------------------------------------------------------
         # Clean sku for default_code
@@ -139,6 +140,7 @@ while True:
         # ---------------------------------------------------------------------
         # A. Fixed data:
         data = {
+            'wp_published': True,
             'name': name,
             'wp_id': wp_id,
             'default_code': sku,
@@ -199,12 +201,14 @@ while True:
                     #status = variant['status']
                     
                     variant_data = {
-                        'name': variant['name'],
+                        'wp_published': True,
+                        'name': name,
                         'wp_id': variant['id'],
                         'default_code': variant['sku'],
                         'wp_sku': variant['sku'],
                         'lst_price': variant['regular_price'],
-                        'description_sale': variant['description'],
+                        'description_sale': 
+                            variant['description'] or description,
                         'weight': variant['weight'],
                         'wp_master_id': product_id,
                         # TODO attribute terms!
