@@ -8,6 +8,21 @@ import ConfigParser
 import pickle
 
 # -----------------------------------------------------------------------------
+# Read configuration parameter:
+# -----------------------------------------------------------------------------
+# From config file:
+cfg_file = os.path.expanduser('../openerp.cfg')
+
+config = ConfigParser.ConfigParser()
+config.read([cfg_file])
+dbname = config.get('dbaccess', 'dbname')
+user = config.get('dbaccess', 'user')
+pwd = config.get('dbaccess', 'pwd')
+server = config.get('dbaccess', 'server')
+port = config.get('dbaccess', 'port')   # verify if it's necessary: getint
+image_path = config.get('dbaccess', 'image_path')
+
+# -----------------------------------------------------------------------------
 # Utility:
 # -----------------------------------------------------------------------------
 def clean_code(sku):
@@ -45,21 +60,6 @@ def clean_code(sku):
     return sku, code, supplier, child, ean13
     
 # -----------------------------------------------------------------------------
-# Read configuration parameter:
-# -----------------------------------------------------------------------------
-# From config file:
-cfg_file = os.path.expanduser('../openerp.cfg')
-
-config = ConfigParser.ConfigParser()
-config.read([cfg_file])
-dbname = config.get('dbaccess', 'dbname')
-user = config.get('dbaccess', 'user')
-pwd = config.get('dbaccess', 'pwd')
-server = config.get('dbaccess', 'server')
-port = config.get('dbaccess', 'port')   # verify if it's necessary: getint
-image_path = config.get('dbaccess', 'image_path')
-
-# -----------------------------------------------------------------------------
 # Connect to ODOO:
 # -----------------------------------------------------------------------------
 odoo = erppeek.Client(
@@ -83,55 +83,32 @@ for supplier in partner_pool.browse(supplier_ids):
     supplier_db[supplier.ref] = supplier.id    
 
 # -----------------------------------------------------------------------------
-# Load previous export data:
-# -----------------------------------------------------------------------------
-pickle_file = open('product.supplier.data.pik', 'rb')
-check_product = pickle.load(pickle_file)
-
-# -----------------------------------------------------------------------------
 # Update supplier:
 # -----------------------------------------------------------------------------
 i = 0
 not_found = []
 import pdb; pdb.set_trace()
-for default_code in check_product:
+product_ids = product_pool.search([])
+products = product_pool.browse(product_ids)
+for product in products:
+    sku = product.wp_sku
+    sku, code, supplier, child, ean13 = clean_code(sku)
+    
     i += 1
-    if not default_code:
+    if not sku:
         print '%s. Jump empty code!' % i
         continue
 
-    supplier_set = set()
-
-    # Extract set of supplier from pickle data:    
-    for sku in check_product[default_code]:
-        sku, default_code, supplier, child, ean13 = clean_code(sku)
-        
-        if not supplier:
-            continue
+    if not product.seller_ids:
+        print 'Create Code SKU %s' % sku
         supplier_id = supplier_db.get(supplier, False)
-        if not supplier_id and supplier_id not in not_found:
-            not_found.append(supplier)
-            print 'Not found supplier code: %s' % supplier
-            continue
-            
-        supplier_set.add(supplier_id)
-
-    # Extract set of supplier from ODOO:
-    product_ids = product_pool.search([
-        ('default_code', '=', sku),  # XXX default_code),
-        ])
-    product = product_pool.browse(product_ids)[0]
-    for supplier in product.seller_ids:
-        supplier_set.remove(supplier.name.id)
-
-    for supplier_id in supplier_set:
-        print 'Create Code %s, SKU %s' % (default_code, sku)
-        supplinfo_pool.create({
-            'name': supplier_id,
-            'product_tmpl_id': product.id,
-            'min_qty': 1,
-            'price': 0.0,            
-            })
+        if supplier_id:
+            supplinfo_pool.create({
+                'name': supplier_id,
+                'product_tmpl_id': product.id,
+                'min_qty': 1,
+                'price': 0.0,            
+                })
 
     # TODO manage child association!    
                 
