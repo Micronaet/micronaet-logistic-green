@@ -85,7 +85,7 @@ for supplier in partner_pool.browse(supplier_ids):
 # -----------------------------------------------------------------------------
 # Load previous export data:
 # -----------------------------------------------------------------------------
-pickle_file = open('product.supplier.data.pik', 'rb')
+pickle_file = open('product.supplier.pik', 'rb')
 check_product = pickle.load(pickle_file)
 
 # -----------------------------------------------------------------------------
@@ -93,7 +93,6 @@ check_product = pickle.load(pickle_file)
 # -----------------------------------------------------------------------------
 i = 0
 not_found = []
-import pdb; pdb.set_trace()
 for default_code in check_product:
     i += 1
     if not default_code:
@@ -118,7 +117,7 @@ for default_code in check_product:
 
     # Extract set of supplier from ODOO:
     product_ids = product_pool.search([
-        ('default_code', '=', sku),  # XXX default_code),
+        ('default_code', '=', default_code),
         ])
     product = product_pool.browse(product_ids)[0]
     for supplier in product.seller_ids:
