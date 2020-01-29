@@ -86,9 +86,10 @@ check_product = {}
 parameter = {'per_page': 100, 'page': 1}
 while True:
     reply = wcapi.get('products', params=parameter)
-    parameter['page'] += 1    
     print '\n\n\n Page %s, Record: %s' % (
         parameter['page'], parameter['page'] * parameter['per_page'])
+
+    parameter['page'] += 1    
 
     try:
         if reply.status_code >= 300:
@@ -169,17 +170,15 @@ while True:
         # ---------------------------------------------------------------------
         # Image download:
         # ---------------------------------------------------------------------
-        continue # XXX remove after
-        
         counter = -1
         for image in images:
             counter += 1
             image_src = urllib.quote(image['src'].encode('utf8'), ':/')
 
-            if sku:
-                filename = '%s.%03d.jpg' % (default_code, counter)
-            else:
-                filename = 'ID%s.%03d.jpg' % (wp_id, counter)
+            #if sku:
+            #    filename = '%s.%03d.jpg' % (default_code, counter)
+            #else:
+            filename = 'ID%s.%03d.jpg' % (wp_id, counter)
                 
             fullname = os.path.join(image_path, filename)
             if not os.path.isfile(fullname):
