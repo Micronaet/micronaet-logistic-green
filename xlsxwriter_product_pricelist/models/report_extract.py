@@ -65,10 +65,13 @@ class ProductProductExcelReportWizard(models.TransientModel):
 
         max_level = 0
         # Loop only simple and master product
-        for product in sorted(
-                product_pool.search([('wp_master_id', '!=', False)]),
-                key=lambda x: (x.wp_master_id.name or '', x.name or '')):
+        simple_master_products = sorted(
+            product_pool.search([('wp_master_id', '!=', False)]),
+            key=lambda x: (x.wp_master_id.name or '', x.name or ''))
 
+        _logger.warning(
+            'Master and Simple product: %s' % len(simple_master_products))
+        for product in simple_master_products:
             # Extend product with child:
             product_list = [product]
             product_list.extend([child for child in product.wp_slave_ids])
