@@ -66,7 +66,7 @@ class ProductProductExcelReportWizard(models.TransientModel):
         max_level = 0
         for product in sorted(
                 product_pool.search([]),
-                key=lambda x: (x.wp_master_id.name, x.name)):
+                key=lambda x: (x.wp_master_id.name or '', x.name or '')):
             row += 1
             report_pool.write_xls_line(ws_name, row, (
                 product.id,
