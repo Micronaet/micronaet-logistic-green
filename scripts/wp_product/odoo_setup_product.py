@@ -52,10 +52,12 @@ def clean_code(sku):
             supplier = supplier[:3]
         
     if child:
-        code = '%s_%02d' % (
-            code,
-            ord(child) - 64,
-            )
+        try:
+            code = '%s_%02d' % (
+                code,
+                ord(child) - 64,
+                )
+        except:        
     return sku, code, supplier, child, ean13
     
 # -----------------------------------------------------------------------------
