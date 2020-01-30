@@ -94,7 +94,7 @@ class ProductProductExcelReportWizard(models.TransientModel):
                     product_item.default_code or '',
 
                     product_item.categ_id.name or '',
-                    (product_item.list_price, 'number'),
+                    (product_item.list_price or '', 'number'),
                     ('', 'number'),
                     )
                 report_pool.write_xls_line(
