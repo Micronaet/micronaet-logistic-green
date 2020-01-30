@@ -86,7 +86,6 @@ for supplier in partner_pool.browse(supplier_ids):
 # -----------------------------------------------------------------------------
 i = 0
 not_found = []
-import pdb; pdb.set_trace()
 product_ids = product_pool.search([])
 products = product_pool.browse(product_ids)
 for product in products:
