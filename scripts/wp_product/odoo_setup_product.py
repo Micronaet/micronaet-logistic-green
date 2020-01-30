@@ -113,7 +113,6 @@ for product in products:
                 'min_qty': 1,
                 'price': 0.0,            
                 })
-
     # TODO manage child association!    
                 
 print 'Supplier not found: %s' % (not_found, )

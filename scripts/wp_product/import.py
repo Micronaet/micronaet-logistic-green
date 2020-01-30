@@ -84,6 +84,7 @@ wcapi = woocommerce.API(
 # load from file:
 check_product = {}
 parameter = {'per_page': 100, 'page': 1}
+variation_param = {'per_page': 20, 'page': 1}
 while True:
     reply = wcapi.get('products', params=parameter)
     print '\n\n\n Page %s, Record: %s' % (
@@ -103,6 +104,8 @@ while True:
         break
 
     for record in records:
+        image_list = []
+
         # ---------------------------------------------------------------------
         # Extract data from record:
         # ---------------------------------------------------------------------
@@ -173,11 +176,14 @@ while True:
             print 'Create product %s [%s]' % (default_code, sku)
             product_id = product_pool.create(data).id
 
+        image_list.append((product_id, images))
+
         # ---------------------------------------------------------------------
         #                        VARIATIONS
         # ---------------------------------------------------------------------
         if variations:
-            variation_param = {'per_page': 20, 'page': 1}
+            variation_param['page'] = 1
+
             while True:        
                 var_reply = wcapi.get(
                     'products/%s/variations' % wp_id, 
@@ -195,7 +201,7 @@ while True:
 
                 for variant in variants:
                     variant_sku = variant['sku']
-                    #variant_images = variant['image']
+                    variant_images = variant['image']
                     #stock_status = variant['stock_status']
                     #product_type = variant['type']
                     #status = variant['status']
@@ -224,26 +230,28 @@ while True:
                         variant_id = product_pool.create(variant_data).id
                         print '   >> Create %s variants' % variant_sku
                     
+                    if variant_images:
+                        image_list.append((variant_id, variant_images))
+                        import pdb; pdb.set_trace()
+                    
                     # TODO variant image
             
         # ---------------------------------------------------------------------
         # Image download:
         # ---------------------------------------------------------------------
-        continue # TODO remove
-
-        counter = -1
-        for image in images:
-            counter += 1
-            image_src = urllib.quote(image['src'].encode('utf8'), ':/')
-
-            #if sku:
-            #    filename = '%s.%03d.jpg' % (default_code, counter)
-            #else:
-            filename = 'ID%s.%03d.jpg' % (wp_id, counter)
-                
-            fullname = os.path.join(image_path, filename)
-            if not os.path.isfile(fullname):
-                urllib.urlretrieve(image_src, fullname)                
+        for reference_id, images in image_list:
+            counter = -1        
+            for image in images:
+                counter += 1
+                image_src = urllib.quote(image['src'].encode('utf8'), ':/')
+                filename = 'ID%s.%03d.jpg' % (
+                    reference_id,
+                    counter,
+                    )
+                    
+                fullname = os.path.join(image_path, filename)
+                if not os.path.isfile(fullname):
+                    urllib.urlretrieve(image_src, fullname)                
 
 pickle_file = open('product.supplier.data.pik', 'wb')
 pickle.dump(check_product, pickle_file)
