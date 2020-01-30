@@ -159,7 +159,10 @@ class ProductTemplate(models.Model):
             filename = os.path.join(
                 path,
                 #  Default image is .000
-                '%s.000.%s' % (default_code, extension),
+                '%s.000.%s' % (
+                    product.id, #default_code,
+                    extension,
+                    ),
                 )
             try:
                 f_data = open(filename, 'rb')
