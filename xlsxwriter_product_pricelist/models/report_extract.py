@@ -38,11 +38,11 @@ class ProductProductExcelReportWizard(models.TransientModel):
 
         # Excel file configuration:
         header = (
-            'Ref.', 'Nome', 'Codice',
+            'Ref.', 'Padre', 'Nome', 'Figlio',
             'Categoria', 'Listino',
             )
         column_width = (
-            5, 55, 15,
+            5, 15, 55, 15,
             20, 10,
             )
         from_col = len(header)
@@ -64,10 +64,13 @@ class ProductProductExcelReportWizard(models.TransientModel):
             ws_name, row, header, style_code='header')
 
         max_level = 0
-        for product in product_pool.search([]):
+        for product in sorted(
+                product_pool.search([]),
+                key=lambda x: (x.wp_master_id.name, x.name)):
             row += 1
             report_pool.write_xls_line(ws_name, row, (
                 product.id,
+                product.wp_master_id.default_code or '',
                 product.name,
                 product.default_code or '',
 
