@@ -68,7 +68,7 @@ class ProductProductExcelReportWizard(models.TransientModel):
                 product_pool.search([]),
                 key=lambda x: (x.wp_master_id.name or '', x.name or '')):
             row += 1
-            if product.wp_msater_id:
+            if product.wp_master_id:
                 product_type = 'Figlio'
             elif product.wp_master:
                 product_type = 'Padre'
