@@ -176,7 +176,7 @@ while True:
             print 'Create product %s [%s]' % (default_code, sku)
             product_id = product_pool.create(data).id
 
-        image_list.append((product_id, images))
+        image_list.append((wp_id, images))
 
         # ---------------------------------------------------------------------
         #                        VARIATIONS
@@ -200,11 +200,16 @@ while True:
                     break
 
                 for variant in variants:
+                    variant_id = variant['id']
                     variant_sku = variant['sku']
                     variant_images = variant['image']
                     #stock_status = variant['stock_status']
                     #product_type = variant['type']
                     #status = variant['status']
+
+                    if variant_images:
+                        # Only one:
+                        image_list.append((variant_id, [variant_images]))
                     
                     variant_data = {
                         'wp_published': True,
@@ -219,7 +224,7 @@ while True:
                         # TODO attribute terms!
                         }                        
                     variant_ids = product_pool.search([
-                            ('wp_id', '=', variant['id']),
+                            ('wp_id', '=', variant_id),
                             ])
                                 
                     if variant_ids:
@@ -229,12 +234,6 @@ while True:
                     else:    
                         variant_id = product_pool.create(variant_data).id
                         print '   >> Create %s variants' % variant_sku
-                    
-                    if variant_images:
-                        # Only one:
-                        image_list.append((variant_id, [variant_images]))
-                    
-                    # TODO variant image
             
         # ---------------------------------------------------------------------
         # Image download:
@@ -244,7 +243,7 @@ while True:
             for image in images:
                 counter += 1
                 image_src = urllib.quote(image['src'].encode('utf8'), ':/')
-                filename = 'ID%s.%03d.jpg' % (
+                filename = '%s.%03d.jpg' % (
                     reference_id,
                     counter,
                     )

@@ -159,8 +159,8 @@ class ProductTemplate(models.Model):
             filename = os.path.join(
                 path,
                 #  Default image is .000
-                'ID%s.000.%s' % (
-                    product.id, #default_code,
+                '%s.000.%s' % (
+                    product.wp_id, #default_code,
                     extension,
                     ),
                 )
