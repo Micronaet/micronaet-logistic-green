@@ -72,6 +72,8 @@ class ProductProductExcelReportWizard(models.TransientModel):
                 product_type = 'Figlio'
             elif product.wp_master:
                 product_type = 'Padre'
+            else:
+                product_type = 'Semplice'
 
             report_pool.write_xls_line(ws_name, row, (
                 product.id,
