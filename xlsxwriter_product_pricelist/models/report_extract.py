@@ -86,7 +86,7 @@ class ProductProductExcelReportWizard(models.TransientModel):
                 else:
                     product_type = 'Semplice'
 
-                report_pool.write_xls_line(ws_name, row, (
+                excel_line = (
                     product_item.id,
                     product_type,
                     product_item.wp_master_id.default_code or '',
@@ -96,7 +96,10 @@ class ProductProductExcelReportWizard(models.TransientModel):
                     product_item.categ_id.name or '',
                     (product_item.list_price, 'number'),
                     ('', 'number'),
-                ), style_code='text')
+                    )
+                report_pool.write_xls_line(
+                    ws_name, row, excel_line,
+                    style_code='text')
 
                 supplier_block = []
                 supplier_total = len(product_item.seller_ids)
@@ -112,17 +115,17 @@ class ProductProductExcelReportWizard(models.TransientModel):
                     ws_name, row, supplier_block, style_code='text',
                     col=from_col)
 
-            # ---------------------------------------------------------------------
-            # Setup columns for extra header:
-            # ---------------------------------------------------------------------
-            row = 1
-            for i in range(max_level):
-                header_col = from_col + 2 * i
-                report_pool.column_width(ws_name, (30, 8), col=header_col)
-                report_pool.write_xls_line(
-                    ws_name, row,
-                    ('Fornitore %s' % (i + 1), 'Costo %s' % (i + 1)),
-                    style_code='header', col=header_col)
+        # ---------------------------------------------------------------------
+        # Setup columns for extra header:
+        # ---------------------------------------------------------------------
+        row = 1
+        for i in range(max_level):
+            header_col = from_col + 2 * i
+            report_pool.column_width(ws_name, (30, 8), col=header_col)
+            report_pool.write_xls_line(
+                ws_name, row,
+                ('Fornitore %s' % (i + 1), 'Costo %s' % (i + 1)),
+                style_code='header', col=header_col)
 
         # ---------------------------------------------------------------------
         # Return file:
