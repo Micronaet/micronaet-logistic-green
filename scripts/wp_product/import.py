@@ -233,7 +233,6 @@ while True:
                     if variant_images:
                         # Only one:
                         image_list.append((variant_id, [variant_images]))
-                        import pdb; pdb.set_trace()
                     
                     # TODO variant image
             
