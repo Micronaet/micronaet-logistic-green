@@ -78,6 +78,7 @@ class ProductProductExcelReportWizard(models.TransientModel):
 
             for product_item in product_list:
                 row += 1
+
                 if product_item.wp_master_id:
                     product_type = 'Figlio'
                 elif product_item.wp_master:
