@@ -252,6 +252,7 @@ while True:
                 fullname = os.path.join(image_path, filename)
                 if not os.path.isfile(fullname):
                     urllib.urlretrieve(image_src, fullname)                
+                    print '          >> Get image saved as%s' % filename
 
 pickle_file = open('product.supplier.data.pik', 'wb')
 pickle.dump(check_product, pickle_file)
