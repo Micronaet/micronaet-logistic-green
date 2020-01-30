@@ -66,7 +66,7 @@ class ProductProductExcelReportWizard(models.TransientModel):
         max_level = 0
         # Loop only simple and master product
         simple_master_products = sorted(
-            product_pool.search([('wp_master_id', '!=', False)]),
+            product_pool.search([('wp_master_id', '=', False)]),
             key=lambda x: (x.wp_master_id.name or '', x.name or ''))
 
         _logger.warning(
