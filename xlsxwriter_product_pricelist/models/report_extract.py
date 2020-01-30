@@ -38,11 +38,11 @@ class ProductProductExcelReportWizard(models.TransientModel):
 
         # Excel file configuration:
         header = (
-            'Ref.', 'Padre', 'Nome', 'Figlio',
+            'Ref.', 'Tipo', 'Padre', 'Nome', 'Figlio',
             'Categoria', 'Listino',
             )
         column_width = (
-            5, 5, 15, 55, 15,
+            5, 7, 15, 55, 15,
             20, 10,
             )
         from_col = len(header)
@@ -54,7 +54,7 @@ class ProductProductExcelReportWizard(models.TransientModel):
 
         # Title:
         row = 0
-        title = ('', 'Tipo', 'Elenco prodotti con fornitori abbinati')
+        title = ('', 'Elenco prodotti con fornitori abbinati')
         report_pool.write_xls_line(
             ws_name, row, title, style_code='title')
 
@@ -64,53 +64,61 @@ class ProductProductExcelReportWizard(models.TransientModel):
             ws_name, row, header, style_code='header')
 
         max_level = 0
+        # Loop only simple and master product
         for product in sorted(
-                product_pool.search([]),
+                product_pool.search([('wp_master_id', '=', False)]),
                 key=lambda x: (x.wp_master_id.name or '', x.name or '')):
-            row += 1
-            if product.wp_master_id:
-                product_type = 'Figlio'
-            elif product.wp_master:
-                product_type = 'Padre'
-            else:
-                product_type = 'Semplice'
 
-            report_pool.write_xls_line(ws_name, row, (
-                product.id,
-                product_type,
-                product.wp_master_id.default_code or '',
-                product.name,
-                product.default_code or '',
+            # Extend product with child:
+            product_list = [product]
+            product_list.extend([child for child in product.wp_slave_ids])
 
-                product.categ_id.name or '',
-                (product.list_price, 'number'),
-                ('', 'number'),
-            ), style_code='text')
+            for product_item in product_list:
+                row += 1
+                if product_item.wp_master_id:
+                    product_type = 'Figlio'
+                elif product_item.wp_master:
+                    product_type = 'Padre'
+                else:
+                    product_type = 'Semplice'
 
-            supplier_block = []
-            supplier_total = len(product.seller_ids)
-            if supplier_total > max_level:
-                max_level = supplier_total
+                report_pool.write_xls_line(ws_name, row, (
+                    product_item.id,
+                    product_item,
+                    product_item.wp_master_id.default_code or '',
+                    product_item.name,
+                    product_item.default_code or '',
 
-            for supplier in product.seller_ids:
-                supplier_block.extend([
-                    supplier.name.name,
-                    (supplier.price, 'number')])
+                    product_item.categ_id.name or '',
+                    (product_item.list_price, 'number'),
+                    ('', 'number'),
+                ), style_code='text')
 
-            report_pool.write_xls_line(
-                ws_name, row, supplier_block, style_code='text', col=from_col)
+                supplier_block = []
+                supplier_total = len(product_item.seller_ids)
+                if supplier_total > max_level:
+                    max_level = supplier_total
 
-        # ---------------------------------------------------------------------
-        # Setup columns for extra header:
-        # ---------------------------------------------------------------------
-        row = 1
-        for i in range(max_level):
-            header_col = from_col + 2 * i
-            report_pool.column_width(ws_name, (30, 8), col=header_col)
-            report_pool.write_xls_line(
-                ws_name, row,
-                ('Fornitore %s' % (i + 1), 'Costo %s' % (i + 1)),
-                style_code='header', col=header_col)
+                for supplier in product_item.seller_ids:
+                    supplier_block.extend([
+                        supplier.name.name,
+                        (supplier.price, 'number')])
+
+                report_pool.write_xls_line(
+                    ws_name, row, supplier_block, style_code='text',
+                    col=from_col)
+
+            # ---------------------------------------------------------------------
+            # Setup columns for extra header:
+            # ---------------------------------------------------------------------
+            row = 1
+            for i in range(max_level):
+                header_col = from_col + 2 * i
+                report_pool.column_width(ws_name, (30, 8), col=header_col)
+                report_pool.write_xls_line(
+                    ws_name, row,
+                    ('Fornitore %s' % (i + 1), 'Costo %s' % (i + 1)),
+                    style_code='header', col=header_col)
 
         # ---------------------------------------------------------------------
         # Return file:
