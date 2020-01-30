@@ -51,6 +51,7 @@ def clean_code(sku):
             child = supplier[3:]
             supplier = supplier[:3]
         
+    '''
     if child:
         if len(child) > 1:
             print 'SKU child error: %s' % sku            
@@ -60,7 +61,7 @@ def clean_code(sku):
                 code,
                 ord(child) - 64,
                 )
-
+    '''
     return sku, code, supplier, child, ean13
     
 # -----------------------------------------------------------------------------
