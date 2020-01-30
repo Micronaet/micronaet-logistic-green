@@ -71,7 +71,6 @@ class ProductProductExcelReportWizard(models.TransientModel):
 
             # Extend product with child:
             product_list = [product]
-            import pdb; pdb.set_trace()
             product_list.extend([child for child in product.wp_slave_ids])
 
             for product_item in product_list:
@@ -85,7 +84,7 @@ class ProductProductExcelReportWizard(models.TransientModel):
 
                 report_pool.write_xls_line(ws_name, row, (
                     product_item.id,
-                    product_item,
+                    product_type,
                     product_item.wp_master_id.default_code or '',
                     product_item.name,
                     product_item.default_code or '',
