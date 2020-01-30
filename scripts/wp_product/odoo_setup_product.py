@@ -52,12 +52,15 @@ def clean_code(sku):
             supplier = supplier[:3]
         
     if child:
-        try:
+        if len(child) > 1:
+            print 'SKU child error: %s' % sku            
+            import pdb; pdb.set_trace()
+        else:    
             code = '%s_%02d' % (
                 code,
                 ord(child) - 64,
                 )
-        except:        
+
     return sku, code, supplier, child, ean13
     
 # -----------------------------------------------------------------------------
