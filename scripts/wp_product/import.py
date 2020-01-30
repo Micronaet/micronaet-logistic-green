@@ -231,7 +231,8 @@ while True:
                         print '   >> Create %s variants' % variant_sku
                     
                     if variant_images:
-                        image_list.append((variant_id, variant_images))
+                        # Only one:
+                        image_list.append((variant_id, [variant_images]))
                         import pdb; pdb.set_trace()
                     
                     # TODO variant image
