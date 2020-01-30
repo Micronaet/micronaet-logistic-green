@@ -42,7 +42,7 @@ class ProductProductExcelReportWizard(models.TransientModel):
             'Categoria', 'Listino',
             )
         column_width = (
-            5, 15, 55, 15,
+            5, 5, 15, 55, 15,
             20, 10,
             )
         from_col = len(header)
@@ -54,7 +54,7 @@ class ProductProductExcelReportWizard(models.TransientModel):
 
         # Title:
         row = 0
-        title = ('', 'Elenco prodotti con fornitori abbinati')
+        title = ('', 'Tipo', 'Elenco prodotti con fornitori abbinati')
         report_pool.write_xls_line(
             ws_name, row, title, style_code='title')
 
@@ -68,8 +68,14 @@ class ProductProductExcelReportWizard(models.TransientModel):
                 product_pool.search([]),
                 key=lambda x: (x.wp_master_id.name or '', x.name or '')):
             row += 1
+            if product.wp_msater_id:
+                product_type = 'Figlio'
+            elif product.wp_master:
+                product_type = 'Padre'
+
             report_pool.write_xls_line(ws_name, row, (
                 product.id,
+                product_type,
                 product.wp_master_id.default_code or '',
                 product.name,
                 product.default_code or '',
