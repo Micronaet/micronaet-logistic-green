@@ -98,7 +98,7 @@ for product in products:
         continue
 
     if not product.seller_ids:
-        print 'Create Code SKU %s' % sku
+        print 'Add supplier to SKU %s' % sku
         supplier_id = supplier_db.get(supplier, False)
         if supplier_id:
             supplinfo_pool.create({
