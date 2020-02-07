@@ -258,6 +258,7 @@ class WPConnector(models.Model):
                     try:
                         order = sale_pool.create(order_data)
                     except:
+                        print order_data
                         _logger.error('Problem create: %s order' % number)
                         continue
                     order_id = order.id
