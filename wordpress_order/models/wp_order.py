@@ -151,14 +151,17 @@ class WPConnector(models.Model):
         wcapi = self.get_connector()
 
         connector_id = self.id
-        params = {'per_page': 30, 'page': 1}
-        call = 'orders'
+        start_page = 1
+        end_page = 50
+        params = {'per_page': 50, 'page': start_page}
+
         while True:
-            _logger.info('Reading orders from %s [Record %s]' % (
+            _logger.info('Reading orders from %s [Record %s-%s]' % (
                 self.name,
+                params['per_page'] * (params['page'] - 1)
                 params['per_page'] * params['page']
                 ))
-            reply = wcapi.get(call, params=params)
+            reply = wcapi.get('orders', params=params)
             params['page'] += 1
             if not reply.ok:  # status_code >= 300:
                 _logger.error('Error: %s' % reply.text)
@@ -367,7 +370,7 @@ class WPConnector(models.Model):
                                 })
 
                     _logger.warning('Create  order: %s' % number)
-            if params['page'] > 1:
+            if params['page'] >= end_page:
                  break  # TODO remove (for testing)
         return True
 
