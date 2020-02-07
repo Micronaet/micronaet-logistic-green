@@ -31,13 +31,13 @@
             </field>
             <xpath expr="//page[1]" position="after" attrs="{'invisible': [('connector_id', '=', False)]}">
                 <page string="Wordpress">
-                    <groups colspan="4" col="4">
+                    <group colspan="4" col="4">
                         <field name="wp_id"/>
+                        <field name="wp_status"/>
                         <field name="wp_date_created"/>
                         <field name="wp_date_modified"/>
                         <field name="wp_date_completed"/>
-                        <field name="wp_status"/>
-                    </groups>
+                    </group>
                 </page>
             </xpath>
         </field>
