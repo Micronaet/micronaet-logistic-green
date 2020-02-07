@@ -248,7 +248,8 @@ class WPConnector(models.Model):
                     }
                 created = False
                 if sales:
-                    _logger.warning('Yet present order: %s' % number)
+                    _logger.warning(
+                        'Yet present order: %s (not updated)' % number)
                     # TODO Update (or state update only)
                     # sales.write(order_data)
                     order = sales[0]
@@ -369,7 +370,7 @@ class WPConnector(models.Model):
                                 'price_unit': shipping_total,
                                 })
 
-                    _logger.warning('Create  order: %s' % number)
+                    _logger.info('Create  order: %s' % number)
             if params['page'] >= end_page:
                  break  # TODO remove (for testing)
         return True
