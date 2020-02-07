@@ -2,6 +2,7 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl.html).
 
 import logging
+import sys
 from odoo import models, fields, api
 from openerp.tools.translate import _
 
@@ -260,6 +261,7 @@ class WPConnector(models.Model):
                     except:
                         _logger.error('Problem create: %s order [%s]\n%s' % (
                             number, order_data, sys.exc_info()))
+                        import pdb; pdb.set_trace()
                         continue
                     order_id = order.id
 
