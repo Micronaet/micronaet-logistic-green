@@ -158,8 +158,8 @@ class WPConnector(models.Model):
         while True:
             _logger.info('Reading orders from %s [Record %s-%s]' % (
                 self.name,
-                params['per_page'] * (params['page'] - 1)
-                params['per_page'] * params['page']
+                params['per_page'] * (params['page'] - 1),
+                params['per_page'] * params['page'],
                 ))
             reply = wcapi.get('orders', params=params)
             params['page'] += 1
