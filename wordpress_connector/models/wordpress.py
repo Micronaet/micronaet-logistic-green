@@ -46,6 +46,7 @@ class WPConnector(models.Model):
     # -------------------------------------------------------------------------
     #                                   COLUMNS:
     # -------------------------------------------------------------------------
+    name = fields.Char(string='Name', required=True, size=50)
     company_id = fields.Many2one(
         comodel_name='res.company',
         string='Company',
