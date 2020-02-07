@@ -65,7 +65,8 @@ class WPConnector(models.Model):
         odoo_data = {}
         for mode in ('billing', 'shipping'):
             partner_block = record[mode]
-            # TODO state_id
+
+            # This records are generated with all fields to check same:
             odoo_data[mode] = {
                 'is_company': True,
                 'customer': True,
@@ -75,7 +76,8 @@ class WPConnector(models.Model):
                 'street2': partner_block['address_2'],
                 'city': partner_block['city'],
                 'zip': partner_block['postcode'],
-                # 'property_account_position_id': 1,
+                # TODO 'property_account_position_id': 1,
+                # TODO state_id
 
                 # Billing only (keep also in shipping):
                 'email': record['billing']['email'].lower(),
@@ -83,9 +85,8 @@ class WPConnector(models.Model):
                 }
         is_same = same_partner_check(odoo_data)
 
-        import pdb; pdb.set_trace()
         # Email is the key:
-        email = odoo_data['billing']
+        email = odoo_data['billing']['email']
         partners = partner_pool.search([
             ('email', '=', email),
             ])
@@ -101,7 +102,12 @@ class WPConnector(models.Model):
         partner_id = partner_invoice_id  # TODO for now is same!
 
         # Add Extra data for link partner:
-        odoo_data['shipping']['parent_id'] = partner_id
+        odoo_data['shipping'].update({
+            'parent_id': partner_id,
+            'type': 'delivery',
+            })
+
+        del(odoo_data['shipping']['email'])  # Removed no more used
 
         # Destination:
         if is_same:
@@ -111,18 +117,21 @@ class WPConnector(models.Model):
             destinations = partner_pool.search([
                 ('parent_id', '=', partner_id),
                 ('city', '=', odoo_data['shipping']['city']),
-                ('street', '=', odoo_data['shipping']['address_1']),
-                ('street2', '=', odoo_data['shipping']['address_2']),
-                ('zip', '=', odoo_data['shipping']['postcode']),
+                ('street', '=', odoo_data['shipping']['street']),
+                ('street2', '=', odoo_data['shipping']['street2']),
+                ('zip', '=', odoo_data['shipping']['zip']),
+                ('country_id', '=', odoo_data['shipping']['country_id']),
                 # TODO add other check:
                 #('state_id.name', '=', odoo_data['shipping']['state']),
                 ])
 
             if destinations:
+                # Not updated for now:
+                # destinations.write(odoo_data['shipping'])
                 partner_shipping_id = destinations[0].id
             else:
                 partner_shipping_id = partner_pool.create(
-                    odoo_data['billing']).id
+                    odoo_data['shipping']).id
 
         # For now no alternative invoice partner:
         return partner_id, partner_invoice_id, partner_shipping_id
@@ -144,7 +153,6 @@ class WPConnector(models.Model):
         connector_id = self.id
         params = {'per_page': 30, 'page': 1}
         call = 'orders'
-        import pdb; pdb.set_trace()
         while True:
             _logger.info('Reading orders from %s [Record %s]' % (
                 self.name,
@@ -228,6 +236,8 @@ class WPConnector(models.Model):
                     'name': number,
                     'date_order': date_created,
                     'partner_id': partner_id,
+                    'partner_shipping_id': partner_shipping_id,
+                    'partner_invoice_id': partner_invoice_id,
                     'wp_status': status,
                     'wp_date_created': date_created,
                     'wp_date_modified': date_modified,
@@ -237,6 +247,7 @@ class WPConnector(models.Model):
                 if sales:
                     _logger.warning('Yet present order: %s' % number)
                     # TODO Update (or state update only)
+                    # sales.write(order_data)
                     order = sales[0]
                 else:  # Create
                     created = True
