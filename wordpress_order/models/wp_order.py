@@ -30,12 +30,12 @@ class WPConnector(models.Model):
                     partner_block['last_name'],
                     )
 
-        def get_country_id(record):
+        def get_country_id(partner_block):
             """ Extract name from record
                 record: wordpress partner block
             """
             country_pool = self.env['res.country']
-            country_code = record['country']
+            country_code = partner_block['country']
             countries = country_pool.search([
                 ('code', '=', country_code),
                 ])
@@ -70,17 +70,20 @@ class WPConnector(models.Model):
                 'is_company': True,
                 'customer': True,
                 'name': get_name(partner_block),
-                'country_id': get_country_id(record),
+                'country_id': get_country_id(partner_block),
                 'street': partner_block['address_1'],
                 'street2': partner_block['address_2'],
                 'city': partner_block['city'],
                 'zip': partner_block['postcode'],
-                'email': partner_block['email'].lower(),
-
-                'phone': partner_block['phone'],
                 # 'property_account_position_id': 1,
-                }
 
+                # Billing only (keep also in shipping):
+                'email': record['billing']['email'].lower(),
+                'phone': record['billing']['phone'],
+                }
+        is_same = same_partner_check(odoo_data)
+
+        import pdb; pdb.set_trace()
         # Email is the key:
         email = odoo_data['billing']
         partners = partner_pool.search([
@@ -88,25 +91,31 @@ class WPConnector(models.Model):
             ])
 
         if partners:
-            partner_id = partners[0].id
+            partner_invoice_id = partners[0].id
         else:
-            partner_id = partner_pool.create(odoo_data['billing']).id
-        partner_invoice_id = partner_id
+            partner_invoice_id = partner_pool.create(odoo_data['billing']).id
 
         # ---------------------------------------------------------------------
         # B. Shipping partner:
         # ---------------------------------------------------------------------
+        partner_id = partner_invoice_id  # TODO for now is same!
+
+        # Add Extra data for link partner:
+        odoo_data['shipping']['parent_id'] = partner_id
+
         # Destination:
-        if same_partner_check(odoo_data):
-            partner_shipping_id = partner_id
+        if is_same:
+            partner_shipping_id = partner_invoice_id
         else:
             #  Not same partner
             destinations = partner_pool.search([
+                ('parent_id', '=', partner_id),
                 ('city', '=', odoo_data['shipping']['city']),
-                ('address_1', '=', odoo_data['shipping']['address_1']),
-                ('address_2', '=', odoo_data['shipping']['address_2']),
+                ('street', '=', odoo_data['shipping']['address_1']),
+                ('street2', '=', odoo_data['shipping']['address_2']),
                 ('zip', '=', odoo_data['shipping']['postcode']),
-                ('state_id.name', '=', odoo_data['shipping']['state']),
+                # TODO add other check:
+                #('state_id.name', '=', odoo_data['shipping']['state']),
                 ])
 
             if destinations:
@@ -115,6 +124,7 @@ class WPConnector(models.Model):
                 partner_shipping_id = partner_pool.create(
                     odoo_data['billing']).id
 
+        # For now no alternative invoice partner:
         return partner_id, partner_invoice_id, partner_shipping_id
 
     # -------------------------------------------------------------------------
@@ -134,6 +144,7 @@ class WPConnector(models.Model):
         connector_id = self.id
         params = {'per_page': 30, 'page': 1}
         call = 'orders'
+        import pdb; pdb.set_trace()
         while True:
             _logger.info('Reading orders from %s [Record %s]' % (
                 self.name,
@@ -345,8 +356,8 @@ class WPConnector(models.Model):
                                 })
 
                     _logger.warning('Create  order: %s' % number)
-            # if params['page'] > 5:
-            #     break  # TODO remove (for testing)
+            if params['page'] > 1:
+                 break  # TODO remove (for testing)
         return True
 
 
