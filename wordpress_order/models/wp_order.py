@@ -152,8 +152,8 @@ class WPConnector(models.Model):
         wcapi = self.get_connector()
 
         connector_id = self.id
-        start_page = 1
-        end_page = 10
+        start_page = 10
+        end_page = 20
         params = {'per_page': 50, 'page': start_page}
 
         while True:
@@ -261,7 +261,6 @@ class WPConnector(models.Model):
                     except:
                         _logger.error('Problem create: %s order [%s]\n%s' % (
                             number, order_data, sys.exc_info()))
-                        import pdb; pdb.set_trace()
                         continue
                     order_id = order.id
 
@@ -374,7 +373,7 @@ class WPConnector(models.Model):
                                 })
 
                     _logger.info('Create  order: %s' % number)
-            if params['page'] >= end_page:
+            if end_page and params['page'] >= end_page:
                  break  # TODO remove (for testing)
         return True
 
