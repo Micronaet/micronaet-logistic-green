@@ -152,7 +152,7 @@ class WPConnector(models.Model):
 
         connector_id = self.id
         start_page = 1
-        end_page = 50
+        end_page = 10
         params = {'per_page': 50, 'page': start_page}
 
         while True:
