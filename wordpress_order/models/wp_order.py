@@ -412,6 +412,7 @@ class SaleOrder(models.Model):
             ('pending', 'Pending'),
             ('processing', 'Processing'),
             ('on-hold', 'On hold'),
+            ('delivered', 'Delivered'),
             ('completed', 'Completed'),
             ('cancelled', 'Cancelled'),
             ('refunded', 'Refunded'),
