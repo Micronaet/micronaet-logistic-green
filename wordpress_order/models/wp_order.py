@@ -152,8 +152,8 @@ class WPConnector(models.Model):
         wcapi = self.get_connector()
 
         connector_id = self.id
-        start_page = 198
-        end_page = 500
+        start_page = 498
+        end_page = 1000
         params = {'per_page': 50, 'page': start_page}
 
         while True:
