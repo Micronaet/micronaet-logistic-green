@@ -153,7 +153,7 @@ class WPConnector(models.Model):
 
         connector_id = self.id
         start_page = 1
-        #end_page = 1500
+        end_page = 50
         params = {'per_page': 50, 'page': start_page}
 
         while True:
@@ -373,8 +373,8 @@ class WPConnector(models.Model):
                                 })
 
                     _logger.info('Create  order: %s' % number)
-            #if end_page and params['page'] >= end_page:
-            #     break  # TODO remove (for testing)
+            if end_page and params['page'] >= end_page:
+                 break  # TODO remove (for testing)
         return True
 
 
