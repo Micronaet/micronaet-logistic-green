@@ -167,17 +167,24 @@ class WPAttribute(models.Model):
     def load_attributes(self, connector):
         """ Load attributes from Wordpress
         """
+        term_pool = self.env['wp.attribute.term']
+
+        # ---------------------------------------------------------------------
         # Load current attribute:
+        # ---------------------------------------------------------------------
         attributes = self.search([
             ('connector_id', '=', connector.id),
             ])
         attributes_db = {}
+        terms_db = {}
         for attribute in attributes:
             attributes_db[attribute.name] = attribute.id
+            wp_id = attribute.wp_id
+            for term in attribute.term_ids:
+                terms_db[(wp_id, term.name)] = term.id
 
         wcapi = connector.get_connector()
-        start_page = 1
-        params = {'per_page': 50, 'page': start_page}
+        params = {'per_page': 100, 'page': 1}
         while True:
             _logger.info('Reading attribute from %s [Record %s-%s]' % (
                 connector.name,
@@ -196,24 +203,52 @@ class WPAttribute(models.Model):
             for record in records:
                 wp_id = record['id']
                 name = record['name']
-                if name in attributes_db:  # Update?
-                    pass
+                if name in attributes_db:  # TODO Update?
+                    _logger.info('Update: %s' % name)
+                    attribute_id = attributes[name]
                 else:
-                    self.create({
+                    _logger.info('Create: %s' % name)
+                    attribute_id = self.create({
                         'connector_id': connector.id,
                         'wp_id': wp_id,
                         'name': name,
-                    })
+                    }).id
 
+                # -------------------------------------------------------------
+                # Add terms for attributes:
+                # -------------------------------------------------------------
+                term_params = {'per_page': 100, 'page': 1}
+                while True:
+                    term_reply = wcapi.get(
+                        'products/attributes/%s/terms' % wp_id,
+                        params=term_params)
+                    term_params['page'] += 1
+                    if not term_reply.ok:
+                        _logger.error('Error in terms: %s' % term_reply.text)
+                        break
+
+                    term_records = term_reply.json()
+                    if not term_records:
+                        break
+                    for term in term_records:
+                        term_name = term['name']
+                        if (wp_id, term_name) not in terms_db:
+                            term_pool.create({
+                                'attribute_id': attribute_id,
+                                'name': term_name,
+                                'wp_id': term['id'],
+                            })
+                        _logger.info(' -- > %s' % term_name)
+            break  # TODO problem with page to browse
     # -------------------------------------------------------------------------
     #                                   COLUMNS:
     # -------------------------------------------------------------------------
     name = fields.Char('Name', size=64, required=True)
-    wp_id = fields.Integer(string='Wp ID', readonly=True)
-    description = fields.Text('Description')
-    is_variation = fields.Boolean('Is variation')
-    is_visible = fields.Boolean('Is visible')
     connector_id = fields.Many2one('wp.connector', 'Connector')
+    wp_id = fields.Integer(string='Wp ID', readonly=True)
+    # is_variation = fields.Boolean('Is variation')
+    # is_visible = fields.Boolean('Is visible')
+    unused = fields.Boolean('Removed', help='No more present on WP')
     # order_by: menu_order
     # type: select
     # TODO Image?
@@ -231,10 +266,7 @@ class WPAttributeTerm(models.Model):
     # -------------------------------------------------------------------------
     name = fields.Char('Name', size=64, required=True)
     wp_id = fields.Integer(string='Wp ID', readonly=True)
-    attribute_id = fields.Many2one(
-        comodel_name='wp.attribute',
-        string='Attribute',
-        )
+    attribute_id = fields.Many2one('wp.attribute', 'Attribute')
     connector_id = fields.Many2one(
         'wp.connector', 'Connector',
         related='attribute_id.connector_id')
