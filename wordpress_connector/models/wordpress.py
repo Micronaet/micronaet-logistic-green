@@ -46,11 +46,17 @@ class WPConnector(models.Model):
     # -------------------------------------------------------------------------
     # Button:
     # -------------------------------------------------------------------------
-    @api.model
+    @api.multi
     def button_load_tags(self):
         """ Load all tags from website
         """
-        return self.env['wp.tag'].load_tags(self.id)
+        return self.env['wp.tag'].load_tags(connector=self)
+
+    @api.multi
+    def button_load_attributes(self):
+        """ Load all tags from website
+        """
+        return self.env['wp.attribute'].load_attributes(connector=self)
 
     # -------------------------------------------------------------------------
     #                               COLUMNS:
@@ -96,25 +102,25 @@ class WPTag(models.Model):
     _order = 'name'
 
     @api.model
-    def load_tags(self, connector_id):
+    def load_tags(self, connector):
         """ Load tags from Wordpress
         """
         # Load current tags:
         tags = self.search([
-            ('connector_id', '=', connector_id),
+            ('connector_id', '=', connector.id),
             ])
         # tags.write({'removed': True})
         tags_db = {}
         for tag in tags:
             tags_db[tag.name] = tag.id
 
-        wcapi = self.get_connector()
+        wcapi = connector.get_connector()
         start_page = 1
         params = {'per_page': 50, 'page': start_page}
-
+        import pdb; pdb.set_trace()
         while True:
             _logger.info('Reading tags from %s [Record %s-%s]' % (
-                self.name,
+                connector.name,
                 params['per_page'] * (params['page'] - 1),
                 params['per_page'] * params['page'],
                 ))
@@ -124,7 +130,7 @@ class WPTag(models.Model):
                 _logger.error('Error: %s' % reply.text)
                 break
 
-            records = reply.json()
+            recordtagss = reply.json()
             if not records:
                 break
             for record in records:
@@ -135,7 +141,7 @@ class WPTag(models.Model):
                     pass
                 else:
                     self.create({
-                        'connector_id': connector_id,
+                        'connector_id': connector.id,
                         'wp_id': wp_id,
                         'name': name,
                         'description': description
@@ -158,6 +164,51 @@ class WPAttribute(models.Model):
     _description = 'Wordpress Attribute'
     _order = 'name'
 
+    @api.model
+    def load_attributes(self, connector):
+        """ Load attributes from Wordpress
+        """
+        # Load current attribute:
+        attributes = self.search([
+            ('connector_id', '=', connector.id),
+            ])
+        attributes_db = {}
+        for attribute in attributes:
+            attributes_db[attribute.name] = attribute.id
+
+        wcapi = connector.get_connector()
+        start_page = 1
+        params = {'per_page': 50, 'page': start_page}
+        import pdb; pdb.set_trace()
+        while True:
+            _logger.info('Reading attribute from %s [Record %s-%s]' % (
+                connector.name,
+                params['per_page'] * (params['page'] - 1),
+                params['per_page'] * params['page'],
+                ))
+            reply = wcapi.get('products/attributes', params=params)
+            params['page'] += 1
+            if not reply.ok:
+                _logger.error('Error: %s' % reply.text)
+                break
+
+            records = reply.json()
+            if not records:
+                break
+            for record in records:
+                wp_id = record['id']
+                name = record['name']
+                description = record['description']
+                if name in attributes_db:  # Update?
+                    pass
+                else:
+                    self.create({
+                        'connector_id': connector.id,
+                        'wp_id': wp_id,
+                        'name': name,
+                        'description': description
+                    })
+
     # -------------------------------------------------------------------------
     #                                   COLUMNS:
     # -------------------------------------------------------------------------
@@ -167,6 +218,8 @@ class WPAttribute(models.Model):
     is_variation = fields.Boolean('Is variation')
     is_visible = fields.Boolean('Is visible')
     connector_id = fields.Many2one('wp.connector', 'Connector')
+    # order_by: menu_order
+    # type: select
     # TODO Image?
 
 

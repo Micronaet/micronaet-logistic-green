@@ -24,6 +24,7 @@
             <form string="Wordpress Attribute">
                 <header>
                     <button name="button_load_tags" type="object" string="Load tags" icon="fa-tags fa-2x"/>
+                    <button name="button_load_attributes" type="object" string="Load attributes" icon="fa-th-list fa-2x"/>
                 </header>
                 <sheet>
                     <group colspan="4" col="4">
@@ -48,6 +49,68 @@
         <field name="name">Wordpress Connector</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">wp.connector</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!--product.category-->
+    <record id="wp_product_category_action" model="ir.actions.act_window">
+        <field name="name">Wordpress product category</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">product.category</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    <!--TODO add WP data in product category-->
+
+    <!--wp.tag-->
+    <record model="ir.ui.view" id="view_wp_tag_search">
+        <field name="name">wp_tag.search</field>
+        <field name="model">wp.tag</field>
+        <field name="arch" type="xml">
+            <search string="Tags">
+                <field name="name" />
+                <filter name="unused_on" string="Unused" domain="[('unused','=',True)]"/>
+                <filter name="unused_off" string="Used" domain="[('unused','=',False)]"/>
+                <group expand="0" string="Group By...">
+                    <filter name="group_used" string="Used mode" context="{'group_by': 'unused'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    <record id="wp_tag_view_tree" model="ir.ui.view">
+        <field name="name">wp_tag_view_tree</field>
+        <field name="model">wp.tag</field>
+        <field name="arch" type="xml">
+            <tree string="Wordpress tags">
+                <field name="connector_id"/>
+                <field name="unused" />
+                <field name="name"/>
+                <field name="description"/>
+            </tree>
+        </field>
+    </record>
+    <record id="wp_tag_view_form" model="ir.ui.view">
+        <field name="name">wp_tag_view_form</field>
+        <field name="model">wp.tag</field>
+        <field name="arch" type="xml">
+            <form string="Wordpress Tag">
+                <sheet>
+                    <group colspan="4" col="4">
+                        <field name="unused"/>
+                        <newline/>
+                        <field name="connector_id"/>
+                        <field name="wp_id" />
+
+                        <field name="name"/>
+                        <field name="description"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="wp_tag_action" model="ir.actions.act_window">
+        <field name="name">Wordpress Tag</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">wp.tag</field>
         <field name="view_mode">tree,form</field>
     </record>
 
@@ -219,4 +282,8 @@
         <menuitem id="wordpress_configuration_root" name="Configuration" parent="wordpress_root" sequence="99"/>
             <menuitem id="wordpress_configuration_connector" name="Connector" parent="wordpress_configuration_root" action="wp_connector_action" sequence="10"/>
             <menuitem id="wordpress_configuration_attribute" name="Attribute" parent="wordpress_configuration_root" action="wp_attribute_action" sequence="20"/>
+            <menuitem id="wordpress_configuration_tags" name="Tags" parent="wordpress_configuration_root" action="wp_tag_action" sequence="30"/>
+            <menuitem id="wordpress_configuration_category" name="Category" parent="wordpress_configuration_root" action="wp_product_category_action" sequence="40"/>
+
+
 </odoo>
