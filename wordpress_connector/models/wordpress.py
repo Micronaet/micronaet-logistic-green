@@ -117,7 +117,6 @@ class WPTag(models.Model):
         wcapi = connector.get_connector()
         start_page = 1
         params = {'per_page': 50, 'page': start_page}
-        import pdb; pdb.set_trace()
         while True:
             _logger.info('Reading tags from %s [Record %s-%s]' % (
                 connector.name,
@@ -179,7 +178,6 @@ class WPAttribute(models.Model):
         wcapi = connector.get_connector()
         start_page = 1
         params = {'per_page': 50, 'page': start_page}
-        import pdb; pdb.set_trace()
         while True:
             _logger.info('Reading attribute from %s [Record %s-%s]' % (
                 connector.name,
@@ -198,7 +196,6 @@ class WPAttribute(models.Model):
             for record in records:
                 wp_id = record['id']
                 name = record['name']
-                description = record['description']
                 if name in attributes_db:  # Update?
                     pass
                 else:
@@ -206,7 +203,6 @@ class WPAttribute(models.Model):
                         'connector_id': connector.id,
                         'wp_id': wp_id,
                         'name': name,
-                        'description': description
                     })
 
     # -------------------------------------------------------------------------
