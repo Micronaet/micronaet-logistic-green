@@ -86,6 +86,56 @@ class ProductCategory(models.Model):
     """
     _inherit = 'product.category'
 
+    @api.model
+    def load_category(self, connector):
+        """ Load category from Wordpress
+        """
+        # Load current category:
+        categories = self.search([
+            ('connector_id', '=', connector.id),
+            ])
+        categories_db = {}
+        for category in categories:
+            parent = category.parent_id.wp_id
+            categories_db[(parent, tag.name)] = category.id
+
+        wcapi = connector.get_connector()
+        start_page = 1
+        params = {'per_page': 50, 'page': start_page}
+        """
+        while True:
+            _logger.info('Reading category from %s [Record %s-%s]' % (
+                connector.name,
+                params['per_page'] * (params['page'] - 1),
+                params['per_page'] * params['page'],
+                ))
+            reply = wcapi.get('products/categories', params=params)
+            params['page'] += 1
+            if not reply.ok:
+                _logger.error('Error: %s' % reply.text)
+                break
+
+            records = reply.json()
+            if not records:
+                break
+            for record in records:
+                wp_id = record['id']
+                name = record['name']
+                description = record['description']
+                parent = record['parent']
+                sequence = record['menu_order']  # TODO
+                image = record['image']  # TODO
+                if name in tags_db:  # Update?
+                    pass
+                else:
+                    self.create({
+                        'connector_id': connector.id,
+                        'wp_id': wp_id,
+                        'name': name,
+                        'description': description
+                    })
+        """
+
     # -------------------------------------------------------------------------
     #                                   COLUMNS:
     # -------------------------------------------------------------------------
