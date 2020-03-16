@@ -44,13 +44,19 @@ class WPConnector(models.Model):
             _logger.error('Cannot connect to Wordpress!!')
 
     # -------------------------------------------------------------------------
-    #                                   COLUMNS:
+    # Button:
+    # -------------------------------------------------------------------------
+    @api.model
+    def button_load_tags(self):
+        """ Load all tags from website
+        """
+        return self.env['wp.tag'].load_tags(self.id)
+
+    # -------------------------------------------------------------------------
+    #                               COLUMNS:
     # -------------------------------------------------------------------------
     name = fields.Char(string='Name', required=True, size=50)
-    company_id = fields.Many2one(
-        comodel_name='res.company',
-        string='Company',
-        required=True)
+    company_id = fields.Many2one('res.company', 'Company', required=True)
 
     url = fields.Char('WP URL', size=180, required=True)
     key = fields.Char('WP consumer key', size=180, required=True)
@@ -69,20 +75,80 @@ class WPConnector(models.Model):
     #    'connector_album_rel', 'server_id', 'album_id', 'Album')
 
 
-class WPCategory(models.Model):
-    """ Model name: Wordpress Category
+class ProductCategory(models.Model):
+    """ Model name: Wordpress > Product Category
     """
-    _name = 'wp.category'
-    _description = 'Wordpress Category'
-    _order = 'name'
+    _inherit = 'product.category'
 
     # -------------------------------------------------------------------------
     #                                   COLUMNS:
     # -------------------------------------------------------------------------
-    name = fields.Char('Name', size=64, required=True)
     wp_id = fields.Integer(string='Wp ID', readonly=True)
-    description = fields.Text('Description')
+    connector_id = fields.Many2one('wp.connector', 'Connector')
     # TODO Image
+
+
+class WPTag(models.Model):
+    """ Model name: Wordpress Tag
+    """
+    _name = 'wp.tag'
+    _description = 'Wordpress Tags'
+    _order = 'name'
+
+    @api.model
+    def load_tags(self, connector_id):
+        """ Load tags from Wordpress
+        """
+        # Load current tags:
+        tags = self.search([
+            ('connector_id', '=', connector_id),
+            ])
+        # tags.write({'removed': True})
+        tags_db = {}
+        for tag in tags:
+            tags_db[tag.name] = tag.id
+
+        wcapi = self.get_connector()
+        start_page = 1
+        params = {'per_page': 50, 'page': start_page}
+
+        while True:
+            _logger.info('Reading tags from %s [Record %s-%s]' % (
+                self.name,
+                params['per_page'] * (params['page'] - 1),
+                params['per_page'] * params['page'],
+                ))
+            reply = wcapi.get('products/tags', params=params)
+            params['page'] += 1
+            if not reply.ok:
+                _logger.error('Error: %s' % reply.text)
+                break
+
+            records = reply.json()
+            if not records:
+                break
+            for record in records:
+                wp_id = record['id']
+                name = record['name']
+                description = record['description']
+                if name in tags_db:  # Update?
+                    pass
+                else:
+                    self.create({
+                        'connector_id': connector_id,
+                        'wp_id': wp_id,
+                        'name': name,
+                        'description': description
+                    })
+
+    # -------------------------------------------------------------------------
+    #                                   COLUMNS:
+    # -------------------------------------------------------------------------
+    name = fields.Char('Tag name', size=64, required=True)
+    description = fields.Char('Description', size=80)
+    wp_id = fields.Integer(string='Wp ID', readonly=True)
+    connector_id = fields.Many2one('wp.connector', 'Connector')
+    unused = fields.Boolean('Removed', help='No more present on WP')
 
 
 class WPAttribute(models.Model):
@@ -99,6 +165,8 @@ class WPAttribute(models.Model):
     wp_id = fields.Integer(string='Wp ID', readonly=True)
     description = fields.Text('Description')
     is_variation = fields.Boolean('Is variation')
+    is_visible = fields.Boolean('Is visible')
+    connector_id = fields.Many2one('wp.connector', 'Connector')
     # TODO Image?
 
 
@@ -118,6 +186,9 @@ class WPAttributeTerm(models.Model):
         comodel_name='wp.attribute',
         string='Attribute',
         )
+    connector_id = fields.Many2one(
+        'wp.connector', 'Connector',
+        related='attribute_id.connector_id')
 
 
 class WPAttributeRelations(models.Model):
@@ -161,7 +232,7 @@ class ProductTemplate(models.Model):
                 path,
                 #  Default image is .000
                 '%s.000.%s' % (
-                    product.wp_id, #default_code,
+                    product.wp_id,  # default_code,
                     extension,
                     ),
                 )
@@ -177,8 +248,11 @@ class ProductTemplate(models.Model):
     # -------------------------------------------------------------------------
     wp_id = fields.Integer(string='Wp ID', readonly=True)
     wp_sku = fields.Char('SKU', size=25, readonly=True)
+    connector_id = fields.Many2one('wp.connector', 'Connector')
     wp_published = fields.Boolean(
         string='WP published', help='Product present on Wordpress site')
+
+    # Master slave management:
     wp_master = fields.Boolean(
         string='Is master', help='Wordpress master product')
     wp_master_id = fields.Many2one(
@@ -188,11 +262,23 @@ class ProductTemplate(models.Model):
         comodel_name='product.template',
         domain="[('wp_master_id', '=', active_id)]",
         string='Default')
+    # TODO many2many field needed:
     wp_variation_term_id = fields.Many2one(
         comodel_name='wp.attribute.term',
         string='Variation terms',
         help='Term used for this variation'
         )
+
+    # Link management:
+    # wp_up_sell_ids = fields.Many2many(
+    #    comodel_name='product.template',
+    #    string='Up sell product')
+    # wp_cross_sell_ids = fields.Many2many(
+    #    comodel_name='product.template',
+    #    string='Cross sell product')
+
+    # Tags:
+    wp_tag_ids = fields.Many2many('wp.tag', 'Tags')
 
     wp_image = fields.Binary(
          compute=_get_wp_image_file,

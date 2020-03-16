@@ -123,7 +123,7 @@ class WPConnector(models.Model):
                 ('zip', '=', odoo_data['shipping']['zip']),
                 ('country_id', '=', odoo_data['shipping']['country_id']),
                 # TODO add other check:
-                #('state_id.name', '=', odoo_data['shipping']['state']),
+                # ('state_id.name', '=', odoo_data['shipping']['state']),
                 ])
 
             if destinations:
@@ -397,14 +397,11 @@ class SaleOrder(models.Model):
     # -------------------------------------------------------------------------
     #                                   COLUMNS:
     # -------------------------------------------------------------------------
-    wp_id = fields.Integer(string='Wp ID')
-    connector_id = fields.Many2one(
-        comodel_name='wp.connector',
-        string='Connector')
-    wp_date_created = fields.Datetime(string='Wp date created')
-    wp_date_modified = fields.Datetime(string='Wp date modified')
-    wp_date_completed = fields.Datetime(string='Wp date completed')
-
+    wp_id = fields.Integer('Wp ID')
+    connector_id = fields.Many2one('wp.connector', 'Connector')
+    wp_date_created = fields.Datetime('Wp date created')
+    wp_date_modified = fields.Datetime('Wp date modified')
+    wp_date_completed = fields.Datetime('Wp date completed')
     wp_status = fields.Selection(
         string='Order status', default='pending',
         selection=[

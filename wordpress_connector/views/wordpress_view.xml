@@ -23,7 +23,7 @@
         <field name="arch" type="xml">
             <form string="Wordpress Attribute">
                 <header>
-
+                    <button name="button_load_tags" type="object" string="Load tags" icon="fa-tags fa-2x"/>
                 </header>
                 <sheet>
                     <group colspan="4" col="4">
@@ -138,6 +138,7 @@
                 <page name="Wordpress" string="Wordpress">
                     <group colspan="4" col="4">
                         <field name="wp_published"/>
+                        <field name="wp_tag_ids" colspan="4" widget="many2many_tags"/>
                     </group>
                     <group colspan="4" col="4" attrs="{'invisible': [('wp_published', '=', False)]}">
                         <!--Master part:-->
