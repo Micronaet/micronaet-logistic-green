@@ -129,7 +129,7 @@ class WPTag(models.Model):
                 _logger.error('Error: %s' % reply.text)
                 break
 
-            recordtagss = reply.json()
+            records = reply.json()
             if not records:
                 break
             for record in records:
