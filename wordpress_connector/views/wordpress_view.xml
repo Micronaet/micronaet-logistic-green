@@ -26,6 +26,8 @@
                     <button name="button_load_tags" type="object" string="Load tags" icon="fa-tags fa-2x"/>
                     <button name="button_load_attributes" type="object" string="Load attributes" icon="fa-th-list fa-2x"/>
                     <button name="button_load_category" type="object" string="Load category" icon="fa-th-list fa-2x"/>
+                    <button name="button_load_product_template_structure" type="object" string="Load product" icon="fa-th-list fa-2x"/>
+
                 </header>
                 <sheet>
                     <group colspan="4" col="4">

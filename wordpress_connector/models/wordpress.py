@@ -64,6 +64,13 @@ class WPConnector(models.Model):
         """
         return self.env['product.category'].load_category(connector=self)
 
+    @api.multi
+    def button_load_product_template_structure(self):
+        """ Load all product from website
+        """
+        return self.env['product.template'].load_product_template_structure(
+            connector=self)
+
     # -------------------------------------------------------------------------
     #                               COLUMNS:
     # -------------------------------------------------------------------------
