@@ -202,6 +202,8 @@
                 <page name="Wordpress" string="Wordpress">
                     <group colspan="4" col="4">
                         <field name="wp_published"/>
+                        <field name="wp_type" />
+                        
                         <field name="wp_tag_ids" colspan="4" widget="many2many_tags"/>
                     </group>
                     <group colspan="4" col="4" attrs="{'invisible': [('wp_published', '=', False)]}">
@@ -226,6 +228,8 @@
         <field name="inherit_id" ref="product.product_template_search_view"/>
         <field name="arch" type="xml">
             <field name="name" position="after">
+                 <field name="wp_type" />
+                 
                  <filter name="is_master" string="Is master" domain="[('wp_master', '=', True)]"/>
                  <filter name="is_slave" string="Is slave" domain="[('wp_master', '=', False)]"/>
 
@@ -234,6 +238,7 @@
 
                  <group expand="0" string="Group By...">
                      <filter name="group_master" string="Master" context="{'group_by': 'wp_master_id'}"/>
+                     <filter name="group_master" string="Type" context="{'group_by': 'wp_type'}"/>
                  </group>
             </field>
         </field>

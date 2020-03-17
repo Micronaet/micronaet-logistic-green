@@ -39,6 +39,7 @@ class WPConnector(models.Model):
                 wp_api=connector.api,
                 version=connector.version,
                 timeout=connector.timeout,
+                query_string_auth=True,
                 )
         except:
             _logger.error('Cannot connect to Wordpress!!')

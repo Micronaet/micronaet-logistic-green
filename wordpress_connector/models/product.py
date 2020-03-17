@@ -103,11 +103,12 @@ class ProductTemplate(models.Model):
         connector_id = connector.id
 
         wcapi = connector.get_connector()
-        params = {'per_page': 50, 'page': 1}
+        params = {'per_page': 100, 'page': 1}
         variation_param = {'per_page': 20, 'page': 1}
 
         # load from file:
         image_list = []
+        related_list = []
         while True:
             reply = wcapi.get('products', params=params)
             _logger.info('Page %s, Record: %s' % (
@@ -184,9 +185,14 @@ class ProductTemplate(models.Model):
                 product_id = products[0].id
                 products.update_product_supplier()
 
-                # Image update:
+                # -------------------------------------------------------------
+                # Complex fields:
+                # -------------------------------------------------------------
                 if image_update:
                     image_list.append((wp_id, images))
+
+                if related_ids:
+                    related_list.append((product_id, related_ids))
 
                 # -------------------------------------------------------------
                 #                        VARIATIONS
@@ -249,6 +255,7 @@ class ProductTemplate(models.Model):
                             odoo_variants.update_product_supplier()
                     break
             break
+
         # ---------------------------------------------------------------------
         # Image download:
         # ---------------------------------------------------------------------
@@ -268,7 +275,19 @@ class ProductTemplate(models.Model):
                     if not os.path.isfile(fullname):
                         urlretrieve(image_src, fullname)
                         _logger.info(
-                            '          >> Get image saved as %s' % filename)
+                            '  >> Get image saved as %s' % filename)
+
+        # ---------------------------------------------------------------------
+        # Related download:
+        # ---------------------------------------------------------------------
+        for product_id, related_ids in related_list:
+            products = self.search([
+                ('wp_id', 'in', related_ids),
+                ])
+            if products:
+                self.write({
+                    'related_ids': [(6, 0, products.mapped('id'))]
+                    })
 
     # -------------------------------------------------------------------------
     #                                FIELD FUNCTION:
@@ -331,6 +350,12 @@ class ProductTemplate(models.Model):
         string='Variation terms',
         help='Term used for this variation'
         )
+    wp_type = fields.Selection([
+        ('simple', 'Simple product'),
+        ('grouped', 'Grouped product'),
+        ('external', 'External product'),
+        ('variable', 'Variable product'),
+        ], 'Wordpress type', default='simple')
 
     # Link management:
     # wp_up_sell_ids = fields.Many2many(
