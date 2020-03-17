@@ -361,9 +361,20 @@ class ProductTemplate(models.Model):
     # wp_up_sell_ids = fields.Many2many(
     #    comodel_name='product.template',
     #    string='Up sell product')
-    # wp_cross_sell_ids = fields.Many2many(
-    #    comodel_name='product.template',
-    #    string='Cross sell product')
+    wp_up_sell_ids = fields.Many2many(
+        comodel_name='product.template',
+        relation='product_upsell_rel',
+        column1='template_id',
+        column2='upsell_id',
+        string='Up sell product',
+        )
+    wp_cross_sell_ids = fields.Many2many(
+        comodel_name='product.template',
+        relation='product_cross_rel',
+        column1='template_id',
+        column2='crossed_id',
+        string='Cross sell product',
+        )
 
     # Tags:
     wp_tag_ids = fields.Many2many(

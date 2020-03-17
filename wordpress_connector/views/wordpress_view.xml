@@ -206,7 +206,7 @@
                         
                         <field name="wp_tag_ids" colspan="4" widget="many2many_tags"/>
                     </group>
-                    <group colspan="4" col="4" attrs="{'invisible': [('wp_published', '=', False)]}">
+                    <group colspan="4" col="4" attrs="{'invisible': ['|', ('wp_published', '=', False), ('wp_type', '!=', 'variable')]}">
                         <!--Master part:-->
                         <field name="wp_master"/>
                         <field name="wp_default_id" attrs="{'invisible': [('wp_master', '=', False)]}"/>
