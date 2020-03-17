@@ -3,7 +3,9 @@
 
 import os
 import logging
-import urllib
+import base64
+from urllib.request import urlretrieve
+from urllib.parse import quote
 from odoo import models, fields, api
 
 _logger = logging.getLogger(__name__)
@@ -96,7 +98,7 @@ class ProductTemplate(models.Model):
         """ Load product template from Wordpress
         """
         # Parameters:
-        image_update = False
+        image_update = True
         image_path = connector.image_path
         connector_id = connector.id
 
@@ -114,7 +116,7 @@ class ProductTemplate(models.Model):
 
             # Loop stop check:
             if not reply.ok:
-                _logger.error('Error getting category list', reply)
+                _logger.error('Error getting product list %s' % (reply, ))
                 break
             records = reply.json()
             if not records:
@@ -245,8 +247,8 @@ class ProductTemplate(models.Model):
                                 _logger.info(
                                     '   >> Create %s variants' % variant_sku)
                             odoo_variants.update_product_supplier()
+                    break
             break
-
         # ---------------------------------------------------------------------
         # Image download:
         # ---------------------------------------------------------------------
@@ -255,7 +257,8 @@ class ProductTemplate(models.Model):
                 counter = -1
                 for image in images:
                     counter += 1
-                    image_src = urllib.quote(image['src'].encode('utf8'), ':/')
+                    image_src = quote(
+                        image['src'].encode('utf8'), ':/')
                     filename = '%s.%03d.jpg' % (
                         reference_id,
                         counter,
@@ -263,8 +266,9 @@ class ProductTemplate(models.Model):
 
                     fullname = os.path.join(image_path, filename)
                     if not os.path.isfile(fullname):
-                        urllib.urlretrieve(image_src, fullname)
-                        print('          >> Get image saved as %s' % filename)
+                        urlretrieve(image_src, fullname)
+                        _logger.info(
+                            '          >> Get image saved as %s' % filename)
 
     # -------------------------------------------------------------------------
     #                                FIELD FUNCTION:
@@ -291,6 +295,10 @@ class ProductTemplate(models.Model):
                     extension,
                     ),
                 )
+            if os.path.isfile(filename):
+                _logger.info('Image yet present: %s' % filename)
+                continue
+
             try:
                 f_data = open(filename, 'rb')
                 product.wp_image = base64.encodebytes(f_data.read())
