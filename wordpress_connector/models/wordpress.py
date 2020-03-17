@@ -58,6 +58,12 @@ class WPConnector(models.Model):
         """
         return self.env['wp.attribute'].load_attributes(connector=self)
 
+    @api.multi
+    def button_load_category(self):
+        """ Load all category from website
+        """
+        return self.env['product.category'].load_category(connector=self)
+
     # -------------------------------------------------------------------------
     #                               COLUMNS:
     # -------------------------------------------------------------------------
@@ -95,14 +101,23 @@ class ProductCategory(models.Model):
             ('connector_id', '=', connector.id),
             ])
         categories_db = {}
+        parent_wp2odoo = {}  # Convert ID
         for category in categories:
-            parent = category.parent_id.wp_id
-            categories_db[(parent, tag.name)] = category.id
+            parent_wp_id = category.parent_id.wp_id or False
+            categories_db[(
+                parent_wp_id, category.name)] = category.id
+            if parent_wp_id not in parent_wp2odoo:
+                parent_wp2odoo[parent_wp_id] = category.parent_id.id
 
         wcapi = connector.get_connector()
         start_page = 1
-        params = {'per_page': 50, 'page': start_page}
-        """
+        params = {
+            'per_page': 50,
+            'page': start_page,
+            'parent': False,
+            }
+
+        wp_category = {}
         while True:
             _logger.info('Reading category from %s [Record %s-%s]' % (
                 connector.name,
@@ -122,20 +137,29 @@ class ProductCategory(models.Model):
                 wp_id = record['id']
                 name = record['name']
                 description = record['description']
-                parent = record['parent']
+                parent_wp_id = record['parent'] or False
                 sequence = record['menu_order']  # TODO
                 image = record['image']  # TODO
-                if name in tags_db:  # Update?
+                key = (parent_wp_id, name)
+                print('Category: Parent [%s] Name [%s] Id: %s' % (
+                    parent_wp_id, name, wp_id,
+                    ))
+                if key in categories_db:  # Update?
                     pass
-                else:
-                    self.create({
-                        'connector_id': connector.id,
-                        'wp_id': wp_id,
-                        'name': name,
-                        'description': description
-                    })
-        """
+                    # else:
+                    # parent_odoo_id = parent_wp2odoo.get(parent_wp_id, False)
+                    # wp_category[key] = {
+                    #     'connector_id': connector.id,
+                    #     'wp_id': wp_id,
+                    #     'name': name,
+                    #     'description': description,
+                    #     }
 
+        # for key in sorted(wp_category):
+        #     parent_wp_id, name = key
+        #     data = wp_category[key]
+        #     data['parent_id'] = parent_wp2odoo.get(parent_wp_id)
+        #     self.create(data)
     # -------------------------------------------------------------------------
     #                                   COLUMNS:
     # -------------------------------------------------------------------------
