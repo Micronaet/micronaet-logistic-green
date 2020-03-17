@@ -65,9 +65,9 @@ odoo = erppeek.Client(
 product_pool = odoo.model('product.template')
 
 wcapi = woocommerce.API(
-    url='https://www.venditapianteonline.it',
-    consumer_key='ck_433f21a50a7e52ef28db2b739602aa659eec75fb',
-    consumer_secret='cs_b17b5c3b6faf8ea0e4f360c4f0fbc12253ea341e',
+    url='https://',
+    consumer_key='ck_',
+    consumer_secret='cs_',
     wp_api=True,
     version='wc/v3',
     query_string_auth=True,

@@ -110,11 +110,11 @@ class ProductCategory(models.Model):
                 parent_wp2odoo[parent_wp_id] = category.parent_id.id
 
         wcapi = connector.get_connector()
-        start_page = 1
         params = {
             'per_page': 50,
-            'page': start_page,
-            'parent': False,
+            'page': 1,
+            'order': 'asc',
+            'orderby': 'id',
             }
 
         wp_category = {}
@@ -141,8 +141,8 @@ class ProductCategory(models.Model):
                 sequence = record['menu_order']  # TODO
                 image = record['image']  # TODO
                 key = (parent_wp_id, name)
-                print('Category: Parent [%s] Name [%s] Id: %s' % (
-                    parent_wp_id, name, wp_id,
+                print('Category ID: %s > Parent [%s] Name [%s]' % (
+                    wp_id, parent_wp_id, name,
                     ))
                 if key in categories_db:  # Update?
                     pass
@@ -359,99 +359,6 @@ class WPAttributeRelations(models.Model):
         inverse_name='attribute_id',
         string='Terms',
         )
-
-
-class ProductTemplate(models.Model):
-    """ Model name: Product Template
-    """
-    _inherit = 'product.template'
-
-    # -------------------------------------------------------------------------
-    #                                FIELD FUNCTION:
-    # -------------------------------------------------------------------------
-    @api.multi
-    def _get_wp_image_file(self):
-        """ Return image loading from file:
-        """
-        connector = self[0].company_id.wp_connector_ids[0]
-        path = connector.image_path
-        extension = connector.image_extension or 'png'
-
-        for product in self:
-            if not path:
-                product.wp_image = False
-                _logger.info('Missed path, check connector parameter')
-                continue
-            default_code = (product.default_code or '').replace(' ', '&nbsp;')
-            filename = os.path.join(
-                path,
-                #  Default image is .000
-                '%s.000.%s' % (
-                    product.wp_id,  # default_code,
-                    extension,
-                    ),
-                )
-            try:
-                f_data = open(filename, 'rb')
-                product.wp_image = base64.encodebytes(f_data.read())
-                f_data.close()
-            except:
-                product.wp_image = False
-
-    # -------------------------------------------------------------------------
-    #                                   COLUMNS:
-    # -------------------------------------------------------------------------
-    wp_id = fields.Integer(string='Wp ID', readonly=True)
-    wp_sku = fields.Char('SKU', size=25, readonly=True)
-    connector_id = fields.Many2one('wp.connector', 'Connector')
-    wp_published = fields.Boolean(
-        string='WP published', help='Product present on Wordpress site')
-
-    # Master slave management:
-    wp_master = fields.Boolean(
-        string='Is master', help='Wordpress master product')
-    wp_master_id = fields.Many2one(
-        comodel_name='product.template',
-        string='Master')
-    wp_default_id = fields.Many2one(
-        comodel_name='product.template',
-        domain="[('wp_master_id', '=', active_id)]",
-        string='Default')
-    # TODO many2many field needed:
-    wp_variation_term_id = fields.Many2one(
-        comodel_name='wp.attribute.term',
-        string='Variation terms',
-        help='Term used for this variation'
-        )
-
-    # Link management:
-    # wp_up_sell_ids = fields.Many2many(
-    #    comodel_name='product.template',
-    #    string='Up sell product')
-    # wp_cross_sell_ids = fields.Many2many(
-    #    comodel_name='product.template',
-    #    string='Cross sell product')
-
-    # Tags:
-    wp_tag_ids = fields.Many2many('wp.tag', 'Tags')
-
-    wp_image = fields.Binary(
-         compute=_get_wp_image_file,
-         help='Load image from folder for connector', string='WP Image')
-
-
-class ProductTemplateRelation(models.Model):
-    """ Model name: Product Template
-    """
-    _inherit = 'product.template'
-
-    # -------------------------------------------------------------------------
-    #                                   COLUMNS:
-    # -------------------------------------------------------------------------
-    wp_slave_ids = fields.One2many(
-        comodel_name='product.template',
-        inverse_name='wp_master_id',
-        string='Slave')
 
 
 class ResCompany(models.Model):
