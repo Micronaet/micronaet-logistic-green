@@ -56,23 +56,23 @@ class ProductTemplate(models.Model):
     def update_product_supplier(self):
         """ Integration of supplier, taked from sku extra code
         """
-        self.ensureone()
+        self.ensure_one()
 
         # Pool used:
         partner_pool = self.env['res.partner']
         supplinfo_pool = self.env['product.supplierinfo']
 
-        if product.supplier_ids:
+        if self.seller_ids:
             return True  # TODO check if it's present!
 
         # ---------------------------------------------------------------------
-        # Update supplier:
+        # Update supplier for product:
         # ---------------------------------------------------------------------
-        sku = product.wp_sku
+        sku = self.wp_sku
         sku, code, supplier, child, ean13 = self.clean_code(sku)
         if not sku or not supplier:
             _logger.error('Jump empty code (sku or supplier) [%s]!' %
-                          product.name)
+                          self.name)
             return False
 
         suppliers = partner_pool.search([
@@ -81,12 +81,12 @@ class ProductTemplate(models.Model):
         if not suppliers:
             _logger.error('Supplier [%s] not found for product: %s!' % (
                 supplier,
-                product.name))
+                self.name))
             return False
 
         supplinfo_pool.create({
             'name': suppliers[0].id,
-            'product_tmpl_id': product.id,
+            'product_tmpl_id': self.id,
             'min_qty': 1,
             'price': 0.0,  # TODO add supplier price
         })
@@ -98,6 +98,7 @@ class ProductTemplate(models.Model):
         # Parameters:
         image_update = False
         image_path = connector.image_path
+        connector_id = connector.id
 
         wcapi = connector.get_connector()
         params = {'per_page': 50, 'page': 1}
@@ -105,7 +106,6 @@ class ProductTemplate(models.Model):
 
         # load from file:
         image_list = []
-        import pdb; pdb.set_trace()
         while True:
             reply = wcapi.get('products', params=params)
             _logger.info('Page %s, Record: %s' % (
@@ -139,8 +139,6 @@ class ProductTemplate(models.Model):
                 attributes = record['attributes']
                 slug = record['slug']
                 categories = record['categories']
-                wp_type = record['wp_type']
-                # default_attributes
 
                 # Clean sku for default_code
                 split_code = self.clean_code(sku)
@@ -148,6 +146,7 @@ class ProductTemplate(models.Model):
 
                 # Prepare data:
                 data = {
+                    'connector_id': connector_id,
                     'wp_published': True,
                     'name': name,
                     'wp_id': wp_id,
@@ -156,7 +155,7 @@ class ProductTemplate(models.Model):
                     'lst_price': regular_price,
                     'description_sale': description,
                     'weight': weight,
-                    'wp_type': wp_type,
+                    'wp_type': product_type,
                     # TODO variable, simple, grouped, external, variable
                 }
                 if barcode:
@@ -168,6 +167,7 @@ class ProductTemplate(models.Model):
 
                 # Update ODOO:
                 products = self.search([
+                    # ('connector_id', '=', connector_id),
                     ('wp_id', '=', wp_id),
                     ])
 
@@ -220,6 +220,7 @@ class ProductTemplate(models.Model):
                                     (variant_id, [variant_images]))
 
                             variant_data = {
+                                'connector_id': connector_id,
                                 'wp_published': True,
                                 'name': name,
                                 'wp_id': variant['id'],
@@ -244,6 +245,7 @@ class ProductTemplate(models.Model):
                                 _logger.info(
                                     '   >> Create %s variants' % variant_sku)
                             odoo_variants.update_product_supplier()
+            break
 
         # ---------------------------------------------------------------------
         # Image download:
@@ -263,11 +265,6 @@ class ProductTemplate(models.Model):
                     if not os.path.isfile(fullname):
                         urllib.urlretrieve(image_src, fullname)
                         print('          >> Get image saved as %s' % filename)
-
-
-
-
-
 
     # -------------------------------------------------------------------------
     #                                FIELD FUNCTION:
@@ -336,7 +333,9 @@ class ProductTemplate(models.Model):
     #    string='Cross sell product')
 
     # Tags:
-    wp_tag_ids = fields.Many2many('wp.tag', 'Tags')
+    wp_tag_ids = fields.Many2many(
+        comodel_name='wp.tag',
+        string='Tags')
 
     wp_image = fields.Binary(
          compute=_get_wp_image_file,
