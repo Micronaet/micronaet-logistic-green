@@ -144,7 +144,6 @@ class ProductCategory(models.Model):
         # ---------------------------------------------------------------------
         # Sort and create / update ODOO
         # ---------------------------------------------------------------------
-        import pdb; pdb.set_trace()
         for wp_id in sorted(wp_category,
                             key=lambda x: (
                                     wp_category[x]['parent'],
