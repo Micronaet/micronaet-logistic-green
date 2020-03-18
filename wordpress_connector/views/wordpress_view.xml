@@ -224,36 +224,46 @@
                              </tree>
                         </field>
                     </group>
-                    <group colspan="4" col="4">
-                        <separator string="Linked product (auto)" colspan="4"/>
-                        <field name="wp_up_sell_ids" colspan="4" nolabel="1">
-                             <tree string="Linked product" >
-                                 <field name="name" />
-                                 <field name="default_code" />
-                                 <field name="categ_id" />
-                             </tree>
-                        </field>
-                    </group>
-                    <group colspan="4" col="4">
-                        <separator string="Up sell" colspan="4"/>
-                        <field name="wp_up_sell_ids" colspan="4" nolabel="1">
-                             <tree string="Up sell product" >
-                                 <field name="name" />
-                                 <field name="default_code" />
-                                 <field name="categ_id" />
-                             </tree>
-                        </field>
-                    </group>
-                    <group colspan="4" col="4">
-                        <separator string="Cross sell" colspan="4"/>
-                        <field name="wp_cross_sell_ids" colspan="4" nolabel="1">
-                             <tree string="Cross sell product">
-                                 <field name="name" />
-                                 <field name="default_code" />
-                                 <field name="categ_id" />
-                             </tree>
-                        </field>
-                    </group>
+                    
+                    <separator string="Relations" colspan="4"/>
+                    <notebook colspan="4">
+                        <page string="Linked product">
+                            <group colspan="4" col="4">
+                                <separator string="Linked product (auto)" colspan="4"/>
+                                <field name="wp_linked_ids" colspan="4" nolabel="1">
+                                     <tree string="Linked product" >
+                                         <field name="name" />
+                                         <field name="default_code" />
+                                         <field name="categ_id" />
+                                     </tree>
+                                </field>
+                            </group>
+                        </page>
+                        <page string="Up sell product">
+                            <group colspan="4" col="4">
+                                <separator string="Up sell" colspan="4"/>
+                                <field name="wp_up_sell_ids" colspan="4" nolabel="1">
+                                     <tree string="Up sell product" >
+                                         <field name="name" />
+                                         <field name="default_code" />
+                                         <field name="categ_id" />
+                                     </tree>
+                                </field>
+                            </group>
+                        </page>
+                        <page string="Cross sell product">
+                            <group colspan="4" col="4">
+                                <separator string="Cross sell" colspan="4"/>
+                                <field name="wp_cross_sell_ids" colspan="4" nolabel="1">
+                                     <tree string="Cross sell product">
+                                         <field name="name" />
+                                         <field name="default_code" />
+                                         <field name="categ_id" />
+                                     </tree>
+                                </field>
+                            </group>
+                        </page>
+                    </notebook>
                     
                 </page>
             </xpath>
