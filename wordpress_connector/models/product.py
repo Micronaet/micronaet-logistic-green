@@ -76,7 +76,7 @@ class ProductTemplate(models.Model):
         sku = self.wp_sku
         sku, code, supplier, child, ean13 = self.clean_code(sku)
         if not sku or not supplier:
-            _logger.error('Jump empty code (sku or supplier) [%s]!' %
+            _logger.error('Supplier not update, missed sku or supplier [%s]!' %
                           self.name)
             return False
 
