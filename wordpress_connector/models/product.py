@@ -115,12 +115,21 @@ class ProductTemplate(models.Model):
         # ---------------------------------------------------------------------
         # Preload:
         # ---------------------------------------------------------------------
+        # Tag:
         tag_list = {}
         for tag in self.env['wp.tag'].search([]):
             tag_list[tag.name] = tag.id
 
-        # load from file:
+        # Category:
+        category_list = {}
+        for category in self.env['product.category'].search([
+                ('wp_id', '!=', False)]):
+            category_list[category.wp_id] = category.id
+
+        # Load and save in a file:
         image_list = []
+
+        # Linked relation:
         product_connection = {
             'wp_linked_ids': [],
             'wp_up_sell_ids': [],
@@ -155,13 +164,13 @@ class ProductTemplate(models.Model):
                 cross_sell_ids = record['cross_sell_ids']
                 tags = record['tags']
                 weight = record['weight']
-                stock_status = record['stock_status']
                 product_type = record['type']
-                status = record['status']
                 description = record['description']
-                attributes = record['attributes']
-                slug = record['slug']
                 categories = record['categories']
+                # stock_status = record['stock_status']
+                # status = record['status']
+                # attributes = record['attributes']
+                # slug = record['slug']
 
                 # Clean sku for default_code
                 split_code = self.clean_code(sku)
@@ -195,6 +204,12 @@ class ProductTemplate(models.Model):
                         if tag['name'] in tag_list:
                             data['wp_tag_ids'][0][2].append(
                                 tag_list[tag['name']])
+
+                if categories:
+                    data['wp_category_ids'] = [(6, 0, [])]
+                    for category in categories:
+                        data['wp_category_ids'][0][2].append(
+                            category_list[category['id']])
 
                 # Update ODOO:
                 products = self.search([
@@ -421,7 +436,11 @@ class ProductTemplate(models.Model):
         string='Cross sell product',
         )
 
-    # Tags:
+    # 2many fields:
+    wp_category_ids = fields.Many2many(
+        comodel_name='product.category',
+        string='Category')
+
     wp_tag_ids = fields.Many2many(
         comodel_name='wp.tag',
         string='Tags')

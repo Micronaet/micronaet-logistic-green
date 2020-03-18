@@ -56,13 +56,50 @@
     </record>
 
     <!--product.category-->
-    <record id="wp_product_category_action" model="ir.actions.act_window">
+    <record model="ir.ui.view" id="view_wordpress_category_tree">
+        <field name="name">product.category.tree</field>
+        <field name="model">product.category</field>
+        <field name="priority" eval="40"/>
+        <field name="arch" type="xml">
+            <tree string="Wordpress Category" decoration-info="parent_id == False">
+                <field name="wp_sequence" />
+                <field name="connector_id" readonly="1"/>
+                <field name="parent_id" />
+                <field name="name" />
+                <field name="wp_description" />
+            </tree>
+        </field>
+    </record>
+    <record model="ir.ui.view" id="view_wordpress_category_form">
+        <field name="name">product.category.form</field>
+        <field name="model">product.category</field>
+        <field name="priority" eval="40"/>
+        <field name="arch" type="xml">
+            <form string="Wordpress Category">
+                <sheet>
+                    <group colspan="4" col="4">
+                        <field name="connector_id" readonly="1"/>
+                        <field name="wp_sequence" />
+                        <field name="parent_id" />
+                        <field name="name" />
+                        <separator string="Description" colspan="4"/>
+                        <field name="wp_description" widget="html" colspan="4" nolabel="1"/>
+                        <separator string="Child" colspan="4"/>
+                        <field name="wp_child_ids" colspan="4" nolabel="1" context="{'tree_view_ref': 'wordpress_connector.view_wordpress_category_tree', 'form_view_ref': 'wordpress_connector.view_wordpress_category_form'}"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>    
+    <record id="wp_product_category_parent_action" model="ir.actions.act_window">
         <field name="name">Wordpress product category</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">product.category</field>
         <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_wordpress_category_tree"/>
+        <field name="context">{'form_view_ref': 'wordpress_connector.view_wordpress_category_form'}</field>
+        <field name="domain">[('connector_id', '!=', False), ('parent_id', '=', False)]</field>
     </record>
-    <!--TODO add WP data in product category-->
 
     <!--wp.tag-->
     <record model="ir.ui.view" id="view_wp_tag_search">
@@ -205,6 +242,7 @@
                         <field name="wp_type" />
                         
                         <field name="wp_tag_ids" colspan="4" widget="many2many_tags"/>
+                        <field name="wp_category_ids" colspan="4" widget="many2many_tags"/>
                     </group>
                     <group colspan="4" col="4" attrs="{'invisible': ['|', ('wp_published', '=', False), ('wp_type', '!=', 'variable')]}">
                         <!--Master part:-->
@@ -336,7 +374,7 @@
             <menuitem id="wordpress_configuration_connector" name="Connector" parent="wordpress_configuration_root" action="wp_connector_action" sequence="10"/>
             <menuitem id="wordpress_configuration_attribute" name="Attribute" parent="wordpress_configuration_root" action="wp_attribute_action" sequence="20"/>
             <menuitem id="wordpress_configuration_tags" name="Tags" parent="wordpress_configuration_root" action="wp_tag_action" sequence="30"/>
-            <menuitem id="wordpress_configuration_category" name="Category" parent="wordpress_configuration_root" action="wp_product_category_action" sequence="40"/>
+            <menuitem id="wordpress_configuration_category" name="Category" parent="wordpress_configuration_root" action="wp_product_category_parent_action" sequence="40"/>
 
 
 </odoo>

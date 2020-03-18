@@ -99,33 +99,30 @@ class ProductCategory(models.Model):
     """ Model name: Wordpress > Product Category
     """
     _inherit = 'product.category'
+    _order = 'wp_sequence'  # Force sort
 
     @api.model
     def load_category(self, connector):
         """ Load category from Wordpress
         """
         # Load current category:
-        categories = self.search([
-            ('connector_id', '=', connector.id),
-            ])
-        categories_db = {}
-        parent_wp2odoo = {}  # Convert ID
-        for category in categories:
-            parent_wp_id = category.parent_id.wp_id or False
-            categories_db[(
-                parent_wp_id, category.name)] = category.id
-            if parent_wp_id not in parent_wp2odoo:
-                parent_wp2odoo[parent_wp_id] = category.parent_id.id
+        cache_category = {}  # From WP to ODOO
+        for category in self.browse([]):
+            cache_category[category.wp_id] = category
+            # Used for parent_wp_id wp_id
+
+        # ---------------------------------------------------------------------
+        # Load category from WP
+        # ---------------------------------------------------------------------
+        wp_category = {}
 
         wcapi = connector.get_connector()
         params = {
             'per_page': 50,
             'page': 1,
-            'order': 'asc',
-            'orderby': 'id',
+            # 'order': 'asc',
+            # 'orderby': 'id',
             }
-
-        wp_category = {}
         while True:
             _logger.info('Reading category from %s [Record %s-%s]' % (
                 connector.name,
@@ -142,38 +139,56 @@ class ProductCategory(models.Model):
             if not records:
                 break
             for record in records:
-                wp_id = record['id']
-                name = record['name']
-                description = record['description']
-                parent_wp_id = record['parent'] or False
-                sequence = record['menu_order']  # TODO
-                image = record['image']  # TODO
-                key = (parent_wp_id, name)
-                print('Category ID: %s > Parent [%s] Name [%s]' % (
-                    wp_id, parent_wp_id, name,
-                    ))
-                if key in categories_db:  # Update?
-                    pass
-                    # else:
-                    # parent_odoo_id = parent_wp2odoo.get(parent_wp_id, False)
-                    # wp_category[key] = {
-                    #     'connector_id': connector.id,
-                    #     'wp_id': wp_id,
-                    #     'name': name,
-                    #     'description': description,
-                    #     }
+                wp_category[record['id']] = record
 
-        # for key in sorted(wp_category):
-        #     parent_wp_id, name = key
-        #     data = wp_category[key]
-        #     data['parent_id'] = parent_wp2odoo.get(parent_wp_id)
-        #     self.create(data)
+        # ---------------------------------------------------------------------
+        # Sort and create / update ODOO
+        # ---------------------------------------------------------------------
+        import pdb; pdb.set_trace()
+        for wp_id in sorted(wp_category,
+                            key=lambda x: (
+                                    wp_category[x]['parent'],
+                                    wp_category[x]['id'])):
+            record = wp_category[wp_id]
+            name = record['name']
+            description = record['description']
+            parent_wp_id = record['parent'] or False
+            sequence = record['menu_order']
+            image = record['image']  # TODO
+
+            if parent_wp_id and parent_wp_id not in cache_category:
+                _logger.error('Parent not yet created for category: %s' % name)
+                continue  # Not created
+            parent = cache_category.get(parent_wp_id, False)
+            if wp_id not in cache_category:  # Create (and cache element)
+                cache_category[wp_id] = self.create({
+                    'connector_id': connector.id,
+                    'wp_id': wp_id,
+                    'name': name,
+                    'wp_description': description,
+                    'parent_id': False if not parent else parent.id,
+                    'wp_sequence': sequence,
+                })
+
     # -------------------------------------------------------------------------
     #                                   COLUMNS:
     # -------------------------------------------------------------------------
     wp_id = fields.Integer(string='Wp ID', readonly=True)
     connector_id = fields.Many2one('wp.connector', 'Connector')
+    wp_description = fields.Char('WP Description')
+    wp_sequence = fields.Integer('Wp Sequence')
     # TODO Image
+
+
+class ProductCategory(models.Model):
+    """ Model name: Wordpress > Product Category
+    """
+    _inherit = 'product.category'
+
+    wp_child_ids = fields.One2many(
+        comodel_name='product.category',
+        inverse_name='parent_id',
+        string='WP Child')
 
 
 class WPTag(models.Model):
