@@ -225,6 +225,16 @@
                         </field>
                     </group>
                     <group colspan="4" col="4">
+                        <separator string="Linked product (auto)" colspan="4"/>
+                        <field name="wp_up_sell_ids" colspan="4" nolabel="1">
+                             <tree string="Linked product" >
+                                 <field name="name" />
+                                 <field name="default_code" />
+                                 <field name="categ_id" />
+                             </tree>
+                        </field>
+                    </group>
+                    <group colspan="4" col="4">
                         <separator string="Up sell" colspan="4"/>
                         <field name="wp_up_sell_ids" colspan="4" nolabel="1">
                              <tree string="Up sell product" >

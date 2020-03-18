@@ -121,7 +121,12 @@ class ProductTemplate(models.Model):
 
         # load from file:
         image_list = []
-        related_list = []
+        product_connection = {
+            'wp_linked_ids': [],
+            'wp_up_sell_ids': [],
+            'wp_cross_sell_ids': [],
+            }
+
         while True:
             reply = wcapi.get('products', params=params)
             _logger.info('Page %s, Record: %s' % (
@@ -146,6 +151,8 @@ class ProductTemplate(models.Model):
                 variations = record['variations']
                 regular_price = record['regular_price']
                 related_ids = record['related_ids']
+                up_sell_ids = record['upsell_ids']
+                cross_sell_ids = record['cross_sell_ids']
                 tags = record['tags']
                 weight = record['weight']
                 stock_status = record['stock_status']
@@ -213,7 +220,16 @@ class ProductTemplate(models.Model):
                     image_list.append((wp_id, images))
 
                 if related_ids:
-                    related_list.append((products[0], related_ids))
+                    product_connection['wp_linked_ids'].append(
+                        (products[0], related_ids))
+
+                if up_sell_ids:
+                    product_connection['wp_up_sell_ids'].append(
+                        (products[0], up_sell_ids))
+
+                if cross_sell_ids:
+                    product_connection['wp_cross_sell_ids'].append(
+                        (products[0], cross_sell_ids))
 
                 # -------------------------------------------------------------
                 #                        VARIATIONS
@@ -300,16 +316,19 @@ class ProductTemplate(models.Model):
         # ---------------------------------------------------------------------
         # Related download:
         # ---------------------------------------------------------------------
-        _logger.warning('Updating %s related' % len(related_list))
-
-        for product, related_ids in related_list:
-            related_products = self.search([
-                ('wp_id', 'in', related_ids),
-                ])
-            if related_products:
-                product.write({
-                    'wp_up_sell_ids': [(6, 0, related_products.mapped('id'))]
-                    })
+        for field in product_connection:
+            _logger.warning('Updating %s related # %s' % (
+                field,
+                len(product_connection[field]),
+                ))
+            for product, item_ids in product_connection[field]:
+                related_products = self.search([
+                    ('wp_id', 'in', item_ids),
+                    ])
+                if related_products:
+                    product.write({
+                        field: [(6, 0, related_products.mapped('id'))]
+                        })
 
     # -------------------------------------------------------------------------
     #                                FIELD FUNCTION:
@@ -380,6 +399,13 @@ class ProductTemplate(models.Model):
         ], 'Wordpress type', default='simple')
 
     # Link management:
+    wp_linked_ids = fields.Many2many(
+        comodel_name='product.template',
+        relation='product_linked_rel',
+        column1='template_id',
+        column2='linked_id',
+        string='Linhed product',
+        )
     wp_up_sell_ids = fields.Many2many(
         comodel_name='product.template',
         relation='product_upsell_rel',
