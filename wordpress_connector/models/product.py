@@ -48,10 +48,13 @@ class ProductTemplate(models.Model):
                 supplier = supplier[:3]
 
         if child:
-            code = '%s_%02d' % (
-                code,
-                ord(child) - 64,
-            )
+            try:
+                code = '%s_%02d' % (
+                    code,
+                    ord(child) - 64,
+                )
+            except:
+                code = 'ERR'
         return sku, code, supplier, child, ean13
 
     @api.multi
@@ -103,8 +106,18 @@ class ProductTemplate(models.Model):
         connector_id = connector.id
 
         wcapi = connector.get_connector()
-        params = {'per_page': 100, 'page': 1}
+        params = {
+            'per_page': 100,
+            'page': 1,
+            }
         variation_param = {'per_page': 20, 'page': 1}
+
+        # ---------------------------------------------------------------------
+        # Preload:
+        # ---------------------------------------------------------------------
+        tag_list = {}
+        for tag in self.env['wp.tag'].search([]):
+            tag_list[tag.name] = tag.id
 
         # load from file:
         image_list = []
@@ -168,6 +181,14 @@ class ProductTemplate(models.Model):
                 else:
                     data['wp_master'] = False
 
+                # Relation / Complex fields:
+                if tags:
+                    data['wp_tag_ids'] = [(6, 0, [])]
+                    for tag in tags:
+                        if tag['name'] in tag_list:
+                            data['wp_tag_ids'][0][2].append(
+                                tag_list[tag['name']])
+
                 # Update ODOO:
                 products = self.search([
                     # ('connector_id', '=', connector_id),
@@ -192,7 +213,7 @@ class ProductTemplate(models.Model):
                     image_list.append((wp_id, images))
 
                 if related_ids:
-                    related_list.append((product_id, related_ids))
+                    related_list.append((products[0], related_ids))
 
                 # -------------------------------------------------------------
                 #                        VARIATIONS
@@ -253,13 +274,12 @@ class ProductTemplate(models.Model):
                                 _logger.info(
                                     '   >> Create %s variants' % variant_sku)
                             odoo_variants.update_product_supplier()
-                    break
-            break
 
         # ---------------------------------------------------------------------
         # Image download:
         # ---------------------------------------------------------------------
         if image_update:
+            _logger.warning('Updating %s images' % len(image_list))
             for reference_id, images in image_list:
                 counter = -1
                 for image in images:
@@ -280,13 +300,15 @@ class ProductTemplate(models.Model):
         # ---------------------------------------------------------------------
         # Related download:
         # ---------------------------------------------------------------------
-        for product_id, related_ids in related_list:
-            products = self.search([
+        _logger.warning('Updating %s related' % len(related_list))
+
+        for product, related_ids in related_list:
+            related_products = self.search([
                 ('wp_id', 'in', related_ids),
                 ])
-            if products:
-                self.write({
-                    'related_ids': [(6, 0, products.mapped('id'))]
+            if related_products:
+                product.write({
+                    'wp_up_sell_ids': [(6, 0, related_products.mapped('id'))]
                     })
 
     # -------------------------------------------------------------------------
@@ -358,9 +380,6 @@ class ProductTemplate(models.Model):
         ], 'Wordpress type', default='simple')
 
     # Link management:
-    # wp_up_sell_ids = fields.Many2many(
-    #    comodel_name='product.template',
-    #    string='Up sell product')
     wp_up_sell_ids = fields.Many2many(
         comodel_name='product.template',
         relation='product_upsell_rel',

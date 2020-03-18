@@ -216,8 +216,35 @@
                         <field name="wp_variation_term_id" attrs="{'invisible': [('wp_master', '=', True)]}"/>
 
                         <separator string="Slave" colspan="4" attrs="{'invisible': [('wp_master', '=', False)]}"/>
-                        <field name="wp_slave_ids" attrs="{'invisible': [('wp_master', '=', False)]}" colspan="4" nolabel="1"/>
+                        <field name="wp_slave_ids" attrs="{'invisible': [('wp_master', '=', False)]}" colspan="4" nolabel="1">
+                             <tree string="Up sell product" >
+                                 <field name="name" />
+                                 <field name="default_code" />
+                                 <field name="categ_id" />
+                             </tree>
+                        </field>
                     </group>
+                    <group colspan="4" col="4">
+                        <separator string="Up sell" colspan="4"/>
+                        <field name="wp_up_sell_ids" colspan="4" nolabel="1">
+                             <tree string="Up sell product" >
+                                 <field name="name" />
+                                 <field name="default_code" />
+                                 <field name="categ_id" />
+                             </tree>
+                        </field>
+                    </group>
+                    <group colspan="4" col="4">
+                        <separator string="Cross sell" colspan="4"/>
+                        <field name="wp_cross_sell_ids" colspan="4" nolabel="1">
+                             <tree string="Cross sell product">
+                                 <field name="name" />
+                                 <field name="default_code" />
+                                 <field name="categ_id" />
+                             </tree>
+                        </field>
+                    </group>
+                    
                 </page>
             </xpath>
         </field>

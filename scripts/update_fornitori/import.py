@@ -131,9 +131,10 @@ data = {
     '108': 'Davi Austin',
     }
 
-import pdb; pdb.set_trace()
+print('Import partner')
 for ref in data:
     name = data[ref]
+    print('Import partner: %s' % name)
     
     partner_ids = partner_pool.search([
         ('ref', '=', ref),
