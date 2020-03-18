@@ -11,6 +11,25 @@ from odoo import models, fields, api
 _logger = logging.getLogger(__name__)
 
 
+class WpProductAttribute(models.Model):
+    """ Attribute linked to product (with terms)
+    """
+    _name = 'wp.product.attribute'
+    _description = 'Product attributes'
+    _rec_name = 'attribute_id'
+
+    # Columns:
+    product_id = fields.Many2one('product.template', 'Product')
+    attribute_id = fields.Many2one('wp.attribute', 'Attribute')
+    term_ids = fields.Many2many(
+        comodel_name='wp.attribute.term',
+        string='Terms available',
+        column1='attribute_id',
+        column2='term_id',
+        domain="[('attribute_id', '=', attribute_id)]",
+    )
+
+
 class ProductTemplate(models.Model):
     """ Model name: Product Template
     """
@@ -117,14 +136,27 @@ class ProductTemplate(models.Model):
         # ---------------------------------------------------------------------
         # Tag:
         tag_list = {}
-        for tag in self.env['wp.tag'].search([]):
+        for tag in self.env['wp.tag'].search([
+                ('connector_id', '=', connector_id),
+                ]):
             tag_list[tag.name] = tag.id
 
         # Category:
         category_list = {}
         for category in self.env['product.category'].search([
-                ('wp_id', '!=', False)]):
+                ('connector_id', '=', connector_id),
+                ('wp_id', '!=', False),
+                ]):
             category_list[category.wp_id] = category.id
+
+        attribute_list = {}
+        for attribute in self.env['wp.attribute'].search([
+                ('connector_id', '=', connector_id),
+                ]):
+            attribute_list[attribute.wp_id] = [
+                attribute.id,
+                {item.name: item.id for item in attribute.term_ids},
+                ]
 
         # Load and save in a file:
         image_list = []
@@ -167,8 +199,10 @@ class ProductTemplate(models.Model):
                 product_type = record['type']
                 description = record['description']
                 categories = record['categories']
+                status = record['status']
+                attributes = record['attributes']
+                default_attributes = record['default_attributes']
                 # stock_status = record['stock_status']
-                # status = record['status']
                 # attributes = record['attributes']
                 # slug = record['slug']
 
@@ -188,7 +222,7 @@ class ProductTemplate(models.Model):
                     'description_sale': description,
                     'weight': weight,
                     'wp_type': product_type,
-                    # TODO variable, simple, grouped, external, variable
+                    'wp_status': status,
                 }
                 if barcode:
                     data['barcode'] = barcode
@@ -231,6 +265,22 @@ class ProductTemplate(models.Model):
                 # -------------------------------------------------------------
                 # Complex fields:
                 # -------------------------------------------------------------
+                # Attributes:
+                if attributes:
+                    wp_attribute_ids = []
+                    products.write({'wp_attribute_ids': [(5, 0, 0)]})
+                    for attribute in attributes:
+                        attribute_odoo_id, attribute_odoo_terms = \
+                            attribute_list[attribute['id']]
+
+                        current_term_ids = [attribute_odoo_terms[option]
+                                            for option in attribute['options']]
+                        wp_attribute_ids.append((0, 0, {
+                            'attribute_id': attribute_odoo_id,
+                            'term_ids': [(6, 0, current_term_ids)],
+                            }))
+                    products.write({'wp_attribute_ids': wp_attribute_ids})
+
                 if image_update:
                     image_list.append((wp_id, images))
 
@@ -406,12 +456,20 @@ class ProductTemplate(models.Model):
         string='Variation terms',
         help='Term used for this variation'
         )
+
     wp_type = fields.Selection([
         ('simple', 'Simple product'),
         ('grouped', 'Grouped product'),
         ('external', 'External product'),
         ('variable', 'Variable product'),
         ], 'Wordpress type', default='simple')
+
+    wp_status = fields.Selection([
+        ('draft', 'draft'),
+        ('pending', 'pending'),
+        ('private', 'private'),
+        ('publish', 'publish'),
+        ], 'Wordpress Status', default='publish')
 
     # Link management:
     wp_linked_ids = fields.Many2many(
@@ -462,4 +520,9 @@ class ProductTemplateRelation(models.Model):
         comodel_name='product.template',
         inverse_name='wp_master_id',
         string='Slave')
+
+    wp_attribute_ids = fields.One2many(
+        comodel_name='wp.product.attribute',
+        inverse_name='product_id',
+        string='Attributes')
 
