@@ -44,6 +44,46 @@ class WPConnector(models.Model):
         except:
             _logger.error('Cannot connect to Wordpress!!')
 
+    @api.model
+    def get_publish_parameters(self, empty=False):
+        """ Return publish dict used for publish block setup and preload
+            If need empty record for setup in procedure pass empty = True
+        """
+        if empty:
+            force = False  # every field is False
+        else:
+            force = True  # every field depend on parameter
+        parameters = {
+            'publish': {
+                'text': force and self.publish_text,
+                'numeric': force and self.publish_numeric,
+                'variant': force and self.publish_variant,
+                'stock': force and self.publish_stock,
+                'price': force and self.publish_price,
+                'category': force and self.publish_category,
+                'tag': force and self.publish_tag,
+                'attribute': force and self.publish_attribute,
+                'default': force and self.publish_default,
+                'image': force and self.publish_image,
+                'linked': force and self.publish_linked,
+                },
+            'preload': {
+                'attribute': force and self.update_attribute,
+                'category': force and self.update_category,
+                'tag': force and self.update_tag,
+                },
+            }
+
+        # Log setup of parameters:
+        log_text = ''
+        for mode in parameters:
+            mode += 'Publish parameters, mode: %s list items:\n' % mode
+            for field in parameters[mode]:
+                if parameters[mode][field]:
+                    mode += 'Field: %s present!\n'
+        _logger.info(log_text)
+        return parameters
+
     # -------------------------------------------------------------------------
     # Button:
     # -------------------------------------------------------------------------
@@ -91,25 +131,26 @@ class WPConnector(models.Model):
     timeout = fields.Integer('Timeout', default=600)
 
     # Publish setup:
-    publish_text = fields.Boolean('Text')
-    publish_variant = fields.Boolean('Product variant')
-    publish_stock = fields.Boolean('Stock status')
-    publish_price = fields.Boolean('Price')
-    publish_category = fields.Boolean('Category')
-    publish_tag = fields.Boolean('Tags')
-    publish_attribute = fields.Boolean('Attributes')
-    publish_default = fields.Boolean('Default attribute')
-    publish_image = fields.Boolean('Image')
-    publish_linked = fields.Boolean('Linked document')
+    publish_text = fields.Boolean('Text data', default=True)
+    publish_numeric = fields.Boolean('Numeric data', default=True)
+    publish_variant = fields.Boolean('Product variant', default=True)
+    publish_stock = fields.Boolean('Stock status', default=True)
+    publish_price = fields.Boolean('Price', default=True)
+    publish_category = fields.Boolean('Category', default=True)
+    publish_tag = fields.Boolean('Tags', default=True)
+    publish_attribute = fields.Boolean('Attributes', default=True)
+    publish_default = fields.Boolean('Default attribute', default=True)
+    publish_image = fields.Boolean('Image', default=True)
+    publish_linked = fields.Boolean('Linked document', default=True)
 
     # Preload setup:
     update_attribute = fields.Boolean(
-        'Update attribute and terms',
+        'Update attribute and terms', default=True,
         help='Before import product update attribute and terms')
     update_category = fields.Boolean(
-        'Update category', help='Before import category')
+        'Update category', default=True, help='Before import category')
     update_tag = fields.Boolean(
-        'Update tag', help='Before import product update tags')
+        'Update tag', default=True, help='Before import product update tags')
 
     # album_ids = fields.Many2many(
     #    'product.image.album',

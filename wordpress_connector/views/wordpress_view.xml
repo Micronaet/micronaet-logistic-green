@@ -52,7 +52,7 @@
                                 <group colspan="4" col="4">
                                     <separator string="Record part:" colspan="4"/>
                                     <field name="publish_text" />
-                                    <field name="publish_variant" />
+                                    <field name="publish_numeric" />
 
                                     <field name="publish_stock" />
                                     <field name="publish_price" />
@@ -65,6 +65,8 @@
 
                                     <field name="publish_image"/>
                                     <field name="publish_linked" />
+
+                                    <field name="publish_variant" />
 
                                     <separator string="Preload setup:" colspan="4"/>
                                     <field name="update_attribute"/>

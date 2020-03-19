@@ -120,9 +120,9 @@ class ProductTemplate(models.Model):
         """ Load product template from Wordpress
         """
         # Parameters:
-        image_update = True
         image_path = connector.image_path
         connector_id = connector.id
+        parameters = connector.get_publish_parameters()
 
         wcapi = connector.get_connector()
         params = {
@@ -210,55 +210,74 @@ class ProductTemplate(models.Model):
                 split_code = self.clean_code(sku)
                 sku, default_code, supplier, child, barcode = split_code
 
+                # ODOO search:
+                products = self.search([
+                    # ('connector_id', '=', connector_id),
+                    ('wp_id', '=', wp_id),
+                    ])
+                # Used for check if need create:
+                create_mode = False if products else True
+
+                # -------------------------------------------------------------
                 # Prepare data:
+                # -------------------------------------------------------------
                 data = {
                     'connector_id': connector_id,
                     'wp_published': True,
-                    'name': name,
                     'wp_id': wp_id,
                     'default_code': sku,
                     'wp_sku': sku,
-                    'lst_price': regular_price,
-                    'description_sale': description,
-                    'weight': weight,
                     'wp_type': product_type,
                     'wp_status': status,
                 }
+
+                if create_mode or parameters['publish']['text']:
+                    data.update({
+                        'name': name,
+                        'description_sale': description,
+                    })
+
+                if create_mode or parameters['publish']['numeric']:
+                    data.update({
+                        'weight': weight,
+                    })
+
+                if create_mode or parameters['publish']['price']:
+                    data.update({
+                        'lst_price': regular_price,
+                    })
+
                 if barcode:
                     data['barcode'] = barcode
+
                 if variations:
                     data['wp_master'] = True
                 else:
                     data['wp_master'] = False
 
                 # Relation / Complex fields:
-                if tags:
+                if (create_mode or parameters['publish']['tag']) and tags:
                     data['wp_tag_ids'] = [(6, 0, [])]
                     for tag in tags:
                         if tag['name'] in tag_list:
                             data['wp_tag_ids'][0][2].append(
                                 tag_list[tag['name']])
 
-                if categories:
+                if (create_mode or parameters['publish']['category']) and \
+                        categories:
                     data['wp_category_ids'] = [(6, 0, [])]
                     for category in categories:
                         data['wp_category_ids'][0][2].append(
                             category_list[category['id']])
 
-                # Update ODOO:
-                products = self.search([
-                    # ('connector_id', '=', connector_id),
-                    ('wp_id', '=', wp_id),
-                    ])
-
-                if products:
-                    _logger.info(
-                        'Update product %s [%s]' % (default_code, sku))
-                    products.write(data)
-                else:
+                if create_mode:
                     _logger.info(
                         'Create product %s [%s]' % (default_code, sku))
                     products = self.create(data)
+                else:
+                    _logger.info(
+                        'Update product %s [%s]' % (default_code, sku))
+                    products.write(data)
                 product_id = products[0].id
                 products.update_product_supplier()
 
@@ -266,7 +285,8 @@ class ProductTemplate(models.Model):
                 # Complex fields:
                 # -------------------------------------------------------------
                 # Attributes:
-                if attributes:
+                if (create_mode or parameters['publish']['attribute']) and \
+                        attributes:
                     wp_attribute_ids = []
                     products.write({'wp_attribute_ids': [(5, 0, 0)]})
                     for attribute in attributes:
@@ -281,25 +301,26 @@ class ProductTemplate(models.Model):
                             }))
                     products.write({'wp_attribute_ids': wp_attribute_ids})
 
-                if image_update:
+                if parameters['publish']['image']:
                     image_list.append((wp_id, images))
 
-                if related_ids:
-                    product_connection['wp_linked_ids'].append(
-                        (products[0], related_ids))
+                if parameters['publish']['linked']:
+                    if related_ids:
+                        product_connection['wp_linked_ids'].append(
+                            (products[0], related_ids))
 
-                if up_sell_ids:
-                    product_connection['wp_up_sell_ids'].append(
-                        (products[0], up_sell_ids))
+                    if up_sell_ids:
+                        product_connection['wp_up_sell_ids'].append(
+                            (products[0], up_sell_ids))
 
-                if cross_sell_ids:
-                    product_connection['wp_cross_sell_ids'].append(
-                        (products[0], cross_sell_ids))
+                    if cross_sell_ids:
+                        product_connection['wp_cross_sell_ids'].append(
+                            (products[0], cross_sell_ids))
 
                 # -------------------------------------------------------------
                 #                        VARIATIONS
                 # -------------------------------------------------------------
-                if variations:
+                if parameters['publish']['linked'] and variations:
                     variation_param['page'] = 1
                     while True:
                         var_reply = wcapi.get(
@@ -324,7 +345,8 @@ class ProductTemplate(models.Model):
                             # product_type = variant['type']
                             # status = variant['status']
 
-                            if image_update and variant_images:
+                            if parameters['publish']['image'] and \
+                                    variant_images:
                                 # Usually one:
                                 image_list.append(
                                     (variant_id, [variant_images]))
@@ -342,6 +364,9 @@ class ProductTemplate(models.Model):
                                 'wp_master_id': product_id,
                                 # TODO attribute terms!
                                 }
+
+                            # TODO Publish block also here!
+
                             odoo_variants = self.search([
                                 ('wp_id', '=', variant_id),  # never overlap
                                 ])
@@ -359,7 +384,7 @@ class ProductTemplate(models.Model):
         # ---------------------------------------------------------------------
         # Image download:
         # ---------------------------------------------------------------------
-        if image_update:
+        if parameters['publish']['image']:
             _logger.warning('Updating %s images' % len(image_list))
             for reference_id, images in image_list:
                 counter = -1
@@ -381,19 +406,20 @@ class ProductTemplate(models.Model):
         # ---------------------------------------------------------------------
         # Related download:
         # ---------------------------------------------------------------------
-        for field in product_connection:
-            _logger.warning('Updating %s related # %s' % (
-                field,
-                len(product_connection[field]),
-                ))
-            for product, item_ids in product_connection[field]:
-                related_products = self.search([
-                    ('wp_id', 'in', item_ids),
-                    ])
-                if related_products:
-                    product.write({
-                        field: [(6, 0, related_products.mapped('id'))]
-                        })
+        if parameters['publish']['linked']:
+            for field in product_connection:
+                _logger.warning('Updating %s related # %s' % (
+                    field,
+                    len(product_connection[field]),
+                    ))
+                for product, item_ids in product_connection[field]:
+                    related_products = self.search([
+                        ('wp_id', 'in', item_ids),
+                        ])
+                    if related_products:
+                        product.write({
+                            field: [(6, 0, related_products.mapped('id'))]
+                            })
 
     # -------------------------------------------------------------------------
     #                                FIELD FUNCTION:
