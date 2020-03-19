@@ -54,6 +54,10 @@ class WPConnector(models.Model):
         else:
             force = True  # every field depend on parameter
         parameters = {
+            'block': {
+                'product': self.publish_product_block,
+                'variant': self.publish_variant_block,
+                },
             'publish': {
                 'text': force and self.publish_text,
                 'numeric': force and self.publish_numeric,
@@ -76,11 +80,15 @@ class WPConnector(models.Model):
 
         # Log setup of parameters:
         log_text = ''
-        for mode in parameters:
-            mode += 'Publish parameters, mode: %s list items:\n' % mode
+        for mode in sorted(parameters):
+            log_text += '\nList publish parameters for %s:\n' % mode
             for field in parameters[mode]:
                 if parameters[mode][field]:
-                    mode += 'Field: %s present!\n'
+                    log_text += '  %s = %s\n' % (
+                        field,
+                        parameters[mode][field],
+                    )
+
         _logger.info(log_text)
         return parameters
 
@@ -131,6 +139,9 @@ class WPConnector(models.Model):
     timeout = fields.Integer('Timeout', default=600)
 
     # Publish setup:
+    publish_product_block = fields.Integer('Publish product block', default=50)
+    publish_variant_block = fields.Integer('Publish variant block', default=30)
+
     publish_text = fields.Boolean('Text data', default=True)
     publish_numeric = fields.Boolean('Numeric data', default=True)
     publish_variant = fields.Boolean('Product variant', default=True)

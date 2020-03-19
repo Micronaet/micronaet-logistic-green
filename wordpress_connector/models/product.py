@@ -126,14 +126,18 @@ class ProductTemplate(models.Model):
 
         wcapi = connector.get_connector()
         params = {
-            'per_page': 100,
+            'per_page': parameters['block']['product'],
             'page': 1,
-            }
-        variation_param = {'per_page': 20, 'page': 1}
+        }
+        variation_param = {
+            'per_page': parameters['block']['variant'],
+            'page': 1,
+        }
 
         # ---------------------------------------------------------------------
         # Preload:
         # ---------------------------------------------------------------------
+        # NOTE: No preload parameters for get (only for publish):
         # Tag:
         tag_list = {}
         for tag in self.env['wp.tag'].search([
@@ -188,23 +192,21 @@ class ProductTemplate(models.Model):
                 wp_id = record['id']
                 sku = record['sku']
                 name = record['name']
+                # slug = record['slug']
+                # stock_status = record['stock_status']
+
                 images = record['images']
                 variations = record['variations']
-                regular_price = record['regular_price']
+
                 related_ids = record['related_ids']
                 up_sell_ids = record['upsell_ids']
                 cross_sell_ids = record['cross_sell_ids']
+
                 tags = record['tags']
-                weight = record['weight']
-                product_type = record['type']
-                description = record['description']
                 categories = record['categories']
-                status = record['status']
+
                 attributes = record['attributes']
                 default_attributes = record['default_attributes']
-                # stock_status = record['stock_status']
-                # attributes = record['attributes']
-                # slug = record['slug']
 
                 # Clean sku for default_code
                 split_code = self.clean_code(sku)
@@ -215,11 +217,10 @@ class ProductTemplate(models.Model):
                     # ('connector_id', '=', connector_id),
                     ('wp_id', '=', wp_id),
                     ])
-                # Used for check if need create:
                 create_mode = False if products else True
 
                 # -------------------------------------------------------------
-                # Prepare data:
+                # Prepare data (use publish setup):
                 # -------------------------------------------------------------
                 data = {
                     'connector_id': connector_id,
@@ -227,24 +228,24 @@ class ProductTemplate(models.Model):
                     'wp_id': wp_id,
                     'default_code': sku,
                     'wp_sku': sku,
-                    'wp_type': product_type,
-                    'wp_status': status,
+                    'wp_type': record['type'],
+                    'wp_status': record['status'],
                 }
 
                 if create_mode or parameters['publish']['text']:
                     data.update({
                         'name': name,
-                        'description_sale': description,
+                        'description_sale': record['description'],
                     })
 
                 if create_mode or parameters['publish']['numeric']:
                     data.update({
-                        'weight': weight,
+                        'weight': record['weight'],
                     })
 
                 if create_mode or parameters['publish']['price']:
                     data.update({
-                        'lst_price': regular_price,
+                        'lst_price': record['regular_price'],
                     })
 
                 if barcode:

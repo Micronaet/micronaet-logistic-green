@@ -50,6 +50,10 @@
                             </page>
                             <page string="Publish setup block:">
                                 <group colspan="4" col="4">
+                                    <separator string="Page block:" colspan="4"/>
+                                    <field name="publish_product_block" />
+                                    <field name="publish_variant_block" />
+
                                     <separator string="Record part:" colspan="4"/>
                                     <field name="publish_text" />
                                     <field name="publish_numeric" />
