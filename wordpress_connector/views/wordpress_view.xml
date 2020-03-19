@@ -29,20 +29,52 @@
                     <button name="button_load_product_template_structure" type="object" string="Load product" icon="fa-th-list fa-2x"/>
 
                 </header>
-                <sheet>
+                <sheet>                
                     <group colspan="4" col="4">
                         <field name="name"/>
                         <field name="company_id"/>
-                        <separator string="Connection:" colspan="4"/>
-                        <field name="url"/>
-                        <field name="key"/>
-                        <field name="secret"/>
-                        <field name="api"/>
-                        <field name="version"/>
-                        <field name="timeout"/>
-                        <separator string="Image:" colspan="4"/>
-                        <field name="image_path" />
-                        <field name="image_extension" />
+                        <notebook colspan="4">
+                            <page string="Parameters:">
+                                <group colspan="4" col="4">
+                                    <separator string="Connection:" colspan="4"/>
+                                    <field name="url"/>
+                                    <field name="key"/>
+                                    <field name="secret"/>
+                                    <field name="api"/>
+                                    <field name="version"/>
+                                    <field name="timeout"/>
+                                    <separator string="Image:" colspan="4"/>
+                                    <field name="image_path" />
+                                    <field name="image_extension" />
+                                </group>
+                            </page>
+                            <page string="Publish setup block:">
+                                <group colspan="4" col="4">
+                                    <separator string="Record part:" colspan="4"/>
+                                    <field name="publish_text" />
+                                    <field name="publish_variant" />
+
+                                    <field name="publish_stock" />
+                                    <field name="publish_price" />
+
+                                    <field name="publish_category" />
+                                    <field name="publish_tag" />
+
+                                    <field name="publish_attribute" />
+                                    <field name="publish_default" />
+
+                                    <field name="publish_image"/>
+                                    <field name="publish_linked" />
+
+                                    <separator string="Preload setup:" colspan="4"/>
+                                    <field name="update_attribute"/>
+                                    <field name="update_category"/>
+                                    
+                                    <field name="update_tag"/>
+                                    
+                                </group>
+                            </page>
+                        </notebook>
                     </group>
                 </sheet>
             </form>

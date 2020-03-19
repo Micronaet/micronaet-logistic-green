@@ -90,6 +90,27 @@ class WPConnector(models.Model):
     image_extension = fields.Char('Image extension', size=5)
     timeout = fields.Integer('Timeout', default=600)
 
+    # Publish setup:
+    publish_text = fields.Boolean('Text')
+    publish_variant = fields.Boolean('Product variant')
+    publish_stock = fields.Boolean('Stock status')
+    publish_price = fields.Boolean('Price')
+    publish_category = fields.Boolean('Category')
+    publish_tag = fields.Boolean('Tags')
+    publish_attribute = fields.Boolean('Attributes')
+    publish_default = fields.Boolean('Default attribute')
+    publish_image = fields.Boolean('Image')
+    publish_linked = fields.Boolean('Linked document')
+
+    # Preload setup:
+    update_attribute = fields.Boolean(
+        'Update attribute and terms',
+        help='Before import product update attribute and terms')
+    update_category = fields.Boolean(
+        'Update category', help='Before import category')
+    update_tag = fields.Boolean(
+        'Update tag', help='Before import product update tags')
+
     # album_ids = fields.Many2many(
     #    'product.image.album',
     #    'connector_album_rel', 'server_id', 'album_id', 'Album')
