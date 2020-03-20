@@ -277,6 +277,7 @@
                 <page name="Wordpress" string="Wordpress">
                     <group colspan="4" col="4">
                         <field name="wp_published"/>
+                        <field name="wp_id" />
                         <field name="wp_type" />
                         <field name="wp_status" />
                         

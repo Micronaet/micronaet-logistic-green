@@ -412,8 +412,8 @@ class ProductTemplate(models.Model):
                                 }))
                             odoo_variants.write(
                                 {'wp_attribute_ids': wp_attribute_ids})
+            # break  # TODO Test mode:
 
-            break  # TODO Test mode:
         # ---------------------------------------------------------------------
         # Image download:
         # ---------------------------------------------------------------------
