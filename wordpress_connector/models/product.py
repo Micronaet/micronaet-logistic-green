@@ -364,6 +364,7 @@ class ProductTemplate(models.Model):
 
                             variant_data = {
                                 'connector_id': connector_id,
+                                'wp_type': 'variable',
                                 'wp_published': True,
                                 'name': name,
                                 'wp_id': variant['id'],
@@ -373,7 +374,6 @@ class ProductTemplate(models.Model):
                                 'description_sale': variant['description'],
                                 'weight': variant['weight'],
                                 'wp_master_id': product_id,
-                                # TODO attribute terms!
                                 }
 
                             # TODO Publish block also here!
@@ -395,26 +395,25 @@ class ProductTemplate(models.Model):
                             # -------------------------------------------------
                             # Update Variant attributes:
                             # -------------------------------------------------
+                            print(products.default_code, '\n\n\n\n')
                             # Delete all previous:
-                            # odoo_variants.write(
-                            #     {'wp_attribute_ids': [(5, 0, 0)]})
+                            odoo_variants.write(
+                                {'wp_attribute_ids': [(5, 0, 0)]})
 
                             wp_attribute_ids = []
                             for item in variant_attributes:
-                                import pdb; pdb.set_trace()
                                 attribute_odoo_id, attribute_odoo_terms = \
                                     attribute_list[item['id']]
                                 wp_attribute_ids.append((0, 0, {
                                     'attribute_id': attribute_odoo_id,
                                     'term_ids': [
                                         (6, 0, [attribute_odoo_terms[
-                                            item['name']]])],
+                                            item['option']]])],
                                 }))
                             odoo_variants.write(
                                 {'wp_attribute_ids': wp_attribute_ids})
 
-
-            # break  # TODO Test mode:
+            break  # TODO Test mode:
         # ---------------------------------------------------------------------
         # Image download:
         # ---------------------------------------------------------------------
