@@ -21,6 +21,12 @@ class WpProductAttribute(models.Model):
     # Columns:
     product_id = fields.Many2one('product.template', 'Product')
     attribute_id = fields.Many2one('wp.attribute', 'Attribute')
+    show_product_page = fields.Boolean(
+        'Show', help='Show in product page')
+    used_in_variant = fields.Boolean(
+        'Variant', help='Used in product variant setup')
+    position = fields.Integer('Seq.')
+
     term_ids = fields.Many2many(
         comodel_name='wp.attribute.term',
         string='Terms available',
@@ -299,6 +305,9 @@ class ProductTemplate(models.Model):
                         wp_attribute_ids.append((0, 0, {
                             'attribute_id': attribute_odoo_id,
                             'term_ids': [(6, 0, current_term_ids)],
+                            'show_product_page': attribute['visible'],
+                            'used_in_variant': attribute['variation'],
+                            'position': attribute['position']
                             }))
                     products.write({'wp_attribute_ids': wp_attribute_ids})
 
@@ -342,6 +351,7 @@ class ProductTemplate(models.Model):
                             variant_id = variant['id']
                             variant_sku = variant['sku']
                             variant_images = variant['image']
+                            variant_attributes = variant['attributes']
                             # stock_status = variant['stock_status']
                             # product_type = variant['type']
                             # status = variant['status']
@@ -382,6 +392,29 @@ class ProductTemplate(models.Model):
                                     '   >> Create %s variants' % variant_sku)
                             odoo_variants.update_product_supplier()
 
+                            # -------------------------------------------------
+                            # Update Variant attributes:
+                            # -------------------------------------------------
+                            # Delete all previous:
+                            # odoo_variants.write(
+                            #     {'wp_attribute_ids': [(5, 0, 0)]})
+
+                            wp_attribute_ids = []
+                            for item in variant_attributes:
+                                import pdb; pdb.set_trace()
+                                attribute_odoo_id, attribute_odoo_terms = \
+                                    attribute_list[item['id']]
+                                wp_attribute_ids.append((0, 0, {
+                                    'attribute_id': attribute_odoo_id,
+                                    'term_ids': [
+                                        (6, 0, [attribute_odoo_terms[
+                                            item['name']]])],
+                                }))
+                            odoo_variants.write(
+                                {'wp_attribute_ids': wp_attribute_ids})
+
+
+            # break  # TODO Test mode:
         # ---------------------------------------------------------------------
         # Image download:
         # ---------------------------------------------------------------------

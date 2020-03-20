@@ -305,7 +305,10 @@
                         <page string="Attribute">
                             <group colspan="4" col="4">
                                 <field name="wp_attribute_ids" colspan="4" nolabel="1">
-                                     <tree string="Attributes available" editable="bottom">
+                                     <tree string="Attributes available" editable="bottom" decoration-primary="used_in_variant==True">
+                                          <field name="position" />
+                                          <field name="show_product_page" />
+                                          <field name="used_in_variant" />
                                           <field name="product_id" invisible="1"/>
                                           <field name="attribute_id" options="{'no_quick_create': True, 'no_create_edit': True}"/>
                                           <field name="term_ids" widget="many2many_tags" options="{'no_quick_create': True, 'no_create_edit': True}"/>
