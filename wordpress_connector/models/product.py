@@ -493,7 +493,8 @@ class ProductTemplate(models.Model):
     # -------------------------------------------------------------------------
     #                                   COLUMNS:
     # -------------------------------------------------------------------------
-    wp_id = fields.Integer(string='Wp ID', readonly=True)
+    wp_id = fields.Integer(string='Wp ID in', readonly=True)
+    wp_out_id = fields.Integer(string='Wp ID out', readonly=True)
     wp_sku = fields.Char('SKU', size=25, readonly=True)
     connector_id = fields.Many2one('wp.connector', 'Connector')
     wp_published = fields.Boolean(

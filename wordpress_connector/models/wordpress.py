@@ -99,32 +99,51 @@ class WPConnector(models.Model):
     def button_load_tags(self):
         """ Load all tags from website
         """
-        return self.env['wp.tag'].load_tags(connector=self)
+        if self.mode == 'in':
+            return self.env['wp.tag'].load_tags(connector=self)
+        else:
+            return self.env['wp.tag'].publish_tags(connector=self)
 
     @api.multi
     def button_load_attributes(self):
         """ Load all tags from website
         """
-        return self.env['wp.attribute'].load_attributes(connector=self)
+        if self.mode == 'in':
+            return self.env['wp.attribute'].load_attributes(connector=self)
+        else:
+            pass  # TODO
 
     @api.multi
     def button_load_category(self):
         """ Load all category from website
         """
-        return self.env['product.category'].load_category(connector=self)
+        if self.mode == 'in':
+            return self.env['product.category'].load_category(connector=self)
+        else:
+            pass  # TODO
 
     @api.multi
     def button_load_product_template_structure(self):
         """ Load all product from website
         """
-        return self.env['product.template'].load_product_template_structure(
-            connector=self)
+        if self.mode == 'in':
+            return self.env['product.template'].\
+                load_product_template_structure(connector=self)
+        else:
+            pass  # TODO
 
     # -------------------------------------------------------------------------
     #                               COLUMNS:
     # -------------------------------------------------------------------------
     name = fields.Char(string='Name', required=True, size=50)
     company_id = fields.Many2one('res.company', 'Company', required=True)
+    mode = fields.Selection([
+        ('out', 'ODOO > WP'),
+         ('in', 'WP > ODOO'),
+        ], 'Mode', required=True, default='in',
+        help='Tags, Attributes, Terms, Category, Products direction for sync'
+             '(Order always vs ODOO)'
+    )
 
     url = fields.Char('WP URL', size=180, required=True)
     key = fields.Char('WP consumer key', size=180, required=True)
@@ -245,7 +264,8 @@ class ProductCategory(models.Model):
     # -------------------------------------------------------------------------
     #                                   COLUMNS:
     # -------------------------------------------------------------------------
-    wp_id = fields.Integer(string='Wp ID', readonly=True)
+    wp_id = fields.Integer(string='Wp ID in', readonly=True)
+    wp_out_id = fields.Integer(string='Wp ID out', readonly=True)
     connector_id = fields.Many2one('wp.connector', 'Connector')
     wp_description = fields.Char('WP Description')
     wp_sequence = fields.Integer('Wp Sequence')
@@ -271,18 +291,17 @@ class WPTag(models.Model):
     _order = 'name'
 
     @api.model
-    def load_tags(self, connector):
-        """ Load tags from Wordpress
+    def get_odoo_wp_data(self, connector):
+        """ Prepare data for sync operation
+            tags = ODOO tag records
+            records_db = WP tag records
         """
         # Load current tags:
         tags = self.search([
             ('connector_id', '=', connector.id),
             ])
-        # tags.write({'removed': True})
-        tags_db = {}
-        for tag in tags:
-            tags_db[tag.name] = tag.id
 
+        wp_records = []
         wcapi = connector.get_connector()
         start_page = 1
         params = {'per_page': 50, 'page': start_page}
@@ -301,26 +320,47 @@ class WPTag(models.Model):
             records = reply.json()
             if not records:
                 break
-            for record in records:
-                wp_id = record['id']
-                name = record['name']
-                description = record['description']
-                if name in tags_db:  # Update?
-                    pass
-                else:
-                    self.create({
-                        'connector_id': connector.id,
-                        'wp_id': wp_id,
-                        'name': name,
-                        'description': description
-                    })
+            wp_records.extend(records)
+        return tags, wp_records
+
+    @api.model
+    def publish_tags(self, connector):
+        """ Publish tags from Wordpress (out)
+        """
+        tags, wp_records = self.get_odoo_wp_data(connector)
+
+    @api.model
+    def load_tags(self, connector):
+        """ Load tags from Wordpress (in)
+        """
+        tags, wp_records = self.get_odoo_wp_data(connector)
+        # tags.write({'removed': True})
+
+        tags_db = {}
+        for tag in tags:
+            tags_db[tag.name] = tag.id
+
+        for record in wp_records:
+            wp_id = record['id']
+            name = record['name']
+            description = record['description']
+            if name in tags_db:  # Update?
+                pass
+            else:
+                self.create({
+                    'connector_id': connector.id,
+                    'wp_id': wp_id,
+                    'name': name,
+                    'description': description
+                })
 
     # -------------------------------------------------------------------------
     #                                   COLUMNS:
     # -------------------------------------------------------------------------
     name = fields.Char('Tag name', size=64, required=True)
     description = fields.Char('Description', size=80)
-    wp_id = fields.Integer(string='Wp ID', readonly=True)
+    wp_id = fields.Integer(string='Wp ID in', readonly=True)
+    wp_out_id = fields.Integer(string='Wp ID out', readonly=True)
     connector_id = fields.Many2one('wp.connector', 'Connector')
     unused = fields.Boolean('Removed', help='No more present on WP')
 
@@ -414,7 +454,8 @@ class WPAttribute(models.Model):
     # -------------------------------------------------------------------------
     name = fields.Char('Name', size=64, required=True)
     connector_id = fields.Many2one('wp.connector', 'Connector')
-    wp_id = fields.Integer(string='Wp ID', readonly=True)
+    wp_id = fields.Integer(string='Wp ID in', readonly=True)
+    wp_out_id = fields.Integer(string='Wp ID out', readonly=True)
     # is_variation = fields.Boolean('Is variation')
     # is_visible = fields.Boolean('Is visible')
     unused = fields.Boolean('Removed', help='No more present on WP')
@@ -434,7 +475,8 @@ class WPAttributeTerm(models.Model):
     #                                   COLUMNS:
     # -------------------------------------------------------------------------
     name = fields.Char('Name', size=64, required=True)
-    wp_id = fields.Integer(string='Wp ID', readonly=True)
+    wp_id = fields.Integer(string='Wp ID in', readonly=True)
+    wp_out_id = fields.Integer(string='Wp ID out', readonly=True)
     attribute_id = fields.Many2one('wp.attribute', 'Attribute')
     connector_id = fields.Many2one(
         'wp.connector', 'Connector',

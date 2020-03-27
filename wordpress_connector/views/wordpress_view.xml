@@ -8,6 +8,7 @@
             <tree string="Wordpress connector">
                 <field name="name"/>
                 <field name="company_id"/>
+                <field name="mode" />
                 <field name="url"/>
                 <field name="key"/>
                 <field name="secret"/>
@@ -23,10 +24,10 @@
         <field name="arch" type="xml">
             <form string="Wordpress Attribute">
                 <header>
-                    <button name="button_load_tags" type="object" string="Load tags" icon="fa-tags fa-2x"/>
-                    <button name="button_load_attributes" type="object" string="Load attributes" icon="fa-th-list fa-2x"/>
-                    <button name="button_load_category" type="object" string="Load category" icon="fa-th-list fa-2x"/>
-                    <button name="button_load_product_template_structure" type="object" string="Load product" icon="fa-th-list fa-2x"/>
+                    <button name="button_load_tags" type="object" string="Syncro tags" icon="fa-tags fa-2x" help="In or out syncro depend on mode selected for this connection"/>
+                    <button name="button_load_attributes" type="object" string="Syncro attributes" icon="fa-th-list fa-2x" help="In or out syncro depend on mode selected for this connection"/>
+                    <button name="button_load_category" type="object" string="Syncro category" icon="fa-th-list fa-2x" help="In or out syncro depend on mode selected for this connection"/>
+                    <button name="button_load_product_template_structure" type="object" string="Syncro product" icon="fa-th-list fa-2x" help="In or out syncro depend on mode selected for this connection"/>
 
                 </header>
                 <sheet>                
@@ -36,6 +37,8 @@
                         <notebook colspan="4">
                             <page string="Parameters:">
                                 <group colspan="4" col="4">
+                                    <field name="mode" />
+
                                     <separator string="Connection:" colspan="4"/>
                                     <field name="url"/>
                                     <field name="key"/>
@@ -174,9 +177,9 @@
                 <sheet>
                     <group colspan="4" col="4">
                         <field name="unused"/>
-                        <newline/>
                         <field name="connector_id"/>
                         <field name="wp_id" />
+                        <field name="wp_out_id" />
 
                         <field name="name"/>
                         <field name="description"/>
@@ -199,6 +202,7 @@
         <field name="arch" type="xml">
             <tree string="Wordpress Attribute Term" editable="bottom">
                 <field name="wp_id" />
+                <field name="wp_out_id" />
                 <field name="name" />
             </tree>
         </field>
@@ -210,6 +214,7 @@
             <form string="Wordpress Attribute Term">
                 <group colspan="4" col="4">
                     <field name="wp_id" />
+                    <field name="wp_out_id" />
                     <field name="name" />
                 </group>
             </form>
@@ -224,6 +229,7 @@
             <tree string="Wordpress Attribute">
                 <field name="connector_id"/>
                 <field name="wp_id"/>
+                <field name="wp_out_id" />
                 <field name="name"/>
             </tree>
         </field>
@@ -235,9 +241,9 @@
             <form string="Wordpress Attribute">
                 <group colspan="4" col="4">
                     <field name="name"/>
-                    <newline/>
                     <field name="connector_id"/>
                     <field name="wp_id"/>
+                    <field name="wp_out_id" />
                     <separator string="Terms:" colspan="4"/>
                     <field name="term_ids" colspan="4" nolabel="1"/>
                 </group>
@@ -276,11 +282,11 @@
             <xpath expr="//notebook" postion="inside">
                 <page name="Wordpress" string="Wordpress">
                     <group colspan="4" col="4">
-                        <field name="wp_published"/>
                         <field name="wp_id" />
+                        <field name="wp_out_id" />
+                        <field name="wp_published"/>
                         <field name="wp_type" />
-                        <field name="wp_status" />
-                        
+                        <field name="wp_status" />                        
                     </group>
                     <notebook colspan="4">
                         <page string="Variants" attrs="{'invisible': ['|', ('wp_published', '=', False), ('wp_type', '!=', 'variable')]}">
