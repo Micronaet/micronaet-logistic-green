@@ -328,6 +328,48 @@ class WPTag(models.Model):
         """ Publish tags from Wordpress (out)
         """
         tags, wp_records = self.get_odoo_wp_data(connector)
+        wcapi = connector.get_connector()
+
+        command_data = {
+            'create': [],
+            'update': [],
+            }
+        import pdb; pdb.set_trace()
+        wp_ids = [record.id for record in wp_records]
+        created_tags = {}  # Used for link wp create ID to ODOO
+        for tag in tags:
+            key = tag.name
+            data = {
+                'name': key,
+                }
+            wp_old_id = tag.wp_old_id
+            if wp_old_id in wp_ids:  # Update tag name (if necessary)
+                wp_ids.remove(wp_old_id)
+                data['id'] = wp_old_id
+                command_data['update'].append(data)
+            else:
+                command_data['create'].append(data)
+                created_tags[key] = tag
+        command_data['delete'] = wp_ids
+
+        # Call Wordpress
+        import pdb; pdb.set_trace()
+        try:
+            reply = wcapi.post('products/tags/batch', command_data).json()
+            # Update created ID:
+            for record in reply.get('create', []):
+                key = record['name']
+                tag = created_tags.get(key)
+                if not tag:
+                    _logger.error('Tag %s in WP but no ref. in odoo' % key)
+                # Update ODOO with new ID
+                wp_out_id = record['wp_id']
+                tag.write({
+                    'wp_out_id': wp_out_id,
+                    })
+        except:
+            _logger.error('Error updating Tags in Wordpress')
+        import pdb; pdb.set_trace()
 
     @api.model
     def load_tags(self, connector):
