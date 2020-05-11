@@ -20,6 +20,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
     def export_pending_order(self):
         """ Export XLSX file for select product
         """
+        excluded
         report_pool = self.env['excel.report']
         line_pool = self.env['sale.order.line']
         lines = line_pool.search([
@@ -28,7 +29,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
 
         title = (
             '',
-            _('%s Sale order pending'),
+            _('Sale order pending'),
             )
 
         header = (
@@ -37,26 +38,25 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             _('Code'), _('Name'), _('Category'),
             _('Q.'), _('Price'),
             _('ID Supplier'), _('Supplier'),
-            _('Internal Stock'), _('From Internal'),
-            _('Supplier Stock'), _('From Supplier'),
+            _('Int. Stock'), _('Q. Int.'),
+            _('Supp. Stock'), _('Q. Supp.'),
         )
         column_width = (
             1,
-            25, 12, 20,
-            15, 40,
+            12, 15,
+            10, 30, 25,
+            7, 7,
             1, 30,
-            5, 7
-            5, 7,
+            10, 10,
+            10, 10,
         )
-
-        # TODO hide columns!
 
         ws_name = _('Pending sale order')
         report_pool.create_worksheet(ws_name, format_code='DEFAULT')
         report_pool.column_width(ws_name, column_width)
 
         # Title:
-        report_pool.column_hidden(ws_name, [0])  # Hide first columns
+        report_pool.column_hidden(ws_name, [0, 8])  # Hide ID columns
         row = 0
         report_pool.write_xls_line(ws_name, row, title, style_code='title')
 
@@ -69,19 +69,27 @@ class SaleOrderExcelManageWizard(models.TransientModel):
         for line in sorted(lines, key=lambda x: x.product_id.default_code):
             row += 1
             product = line.product_id
+            if product.type == 'service':
+                _logger.warning(
+                    'Excluded service from report:' % product.defalt_code)
+                continue
             order = line.order_id
             report_pool.write_xls_line(ws_name, row, (
                 line.id,
 
                 order.name,
-                order.order_date,
+                order.date_order,
 
                 product.default_code,
                 product.name,
-                product.categ_id,
+                ' ',  # product.categ_id,
 
                 (line.product_uom_qty, 'number'),
-                (line.list_price, 'number'),
+                (line.price_unit, 'number'),
+
+                0,  # ID Supplier
+                '',  # Supplier
+
 
                 (0, 'number'),  # Internal Stock
                 (0, 'number'),  # Assigned internal
@@ -92,7 +100,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
         return report_pool.return_attachment(_('current_sale_order_pending'))
 
     @api.multi
-    def export_pending_order(self):
+    def import_pending_order(self):
         """ Import sale order line selected where q. is present
         """
         purchase_pool = self.env['purchase.order']
