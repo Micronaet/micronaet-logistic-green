@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <record id="view_sale_order_status_extract_wizard" model="ir.ui.view">
+            <field name="name">Status extract wizard</field>
+            <field name="model">sale.order.status.extract.wizard</field>
+            <field name="arch" type="xml">
+              <form string="Extract excel status:">
+                  <header>
+                      <button string="Cancel" class="btn-default" special="cancel" />
+                      <button name="excel_extract" string="Excel report" type="object" class="btn-primary" />
+                  </header>
+                  <sheet>                  
+                      <group colspan="4" col="2">
+                          <field name="order_logistic_state" />
+                          <field name="logistic_state" />
+                          <field name="from_date" />
+                          <field name="to_date" />
+                      </group>    
+                  </sheet>
+              </form>
+            </field>
+        </record>
+        <record id="action_view_sale_order_status_extract_wizard" model="ir.actions.act_window">
+            <field name="name">Status extract wizard</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.order.status.extract.wizard</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_sale_order_status_extract_wizard"/>
+            <field name="target">new</field>
+        </record>
+        <menuitem 
+            parent="menu_logistic_left_configuration_root"
+            sequence="10"
+            id="menu_view_sale_order_status_extract_wizard" 
+            action="action_view_sale_order_status_extract_wizard"
+            />
+        
+
+    </data>
+</openerp>
+

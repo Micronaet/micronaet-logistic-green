@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+         <record model="ir.ui.view" id="view_stock_picking_ddt_fatturapa_field_form">
+             <field name="name">stock.picking.fatturapa.form</field>
+             <field name="model">stock.picking</field>
+             <field name="inherit_id" ref="logistic_ddt.view_stock_picking_ddt_page_form"/>
+             <field name="arch" type="xml">
+                 <field name="invoice_date" position="after">
+                      <field name="invoice_date" attrs="{'invisible': [('invoice_number','=',False)]}"/>
+                      <newline/>
+                 </field>     
+             </field>     
+         </record>             
+    </data>
+</openerp>
+

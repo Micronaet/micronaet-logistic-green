@@ -1,0 +1,190 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* manage_order_excel
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 11.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-05-11 09:33+0000\n"
+"PO-Revision-Date: 2020-05-11 09:33+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: manage_order_excel
+#: model:ir.ui.view,arch_db:manage_order_excel.view_sale_order_excel_manage_wizard_form
+msgid "Cancel"
+msgstr "Annulla"
+
+#. module: manage_order_excel
+#: code:addons/manage_order_excel/models/excel_order.py:125
+#, python-format
+msgid "Cannot read XLS file"
+msgstr "Non riesco a leggere il file XLSX"
+
+#. module: manage_order_excel
+#: code:addons/manage_order_excel/models/excel_order.py:38
+#, python-format
+msgid "Category"
+msgstr "Categoria"
+
+#. module: manage_order_excel
+#: code:addons/manage_order_excel/models/excel_order.py:38
+#, python-format
+msgid "Code"
+msgstr "Codice"
+
+#. module: manage_order_excel
+#: model:ir.model.fields,field_description:manage_order_excel.field_sale_order_excel_manage_wizard_create_uid
+msgid "Created by"
+msgstr "Creato da"
+
+#. module: manage_order_excel
+#: model:ir.model.fields,field_description:manage_order_excel.field_sale_order_excel_manage_wizard_create_date
+msgid "Created on"
+msgstr "Creato il"
+
+#. module: manage_order_excel
+#: code:addons/manage_order_excel/models/excel_order.py:37
+#, python-format
+msgid "Date"
+msgstr "Data"
+
+#. module: manage_order_excel
+#: model:ir.model.fields,field_description:manage_order_excel.field_sale_order_excel_manage_wizard_display_name
+msgid "Display Name"
+msgstr "Nome Completo"
+
+#. module: manage_order_excel
+#: model:ir.ui.view,arch_db:manage_order_excel.view_sale_order_excel_manage_wizard_form
+msgid "Export pending order"
+msgstr "Esporta ordini pendenti"
+
+#. module: manage_order_excel
+#: model:ir.actions.act_window,name:manage_order_excel.action_sale_order_excel_manage_wizard_form
+#: model:ir.ui.menu,name:manage_order_excel.menu_sale_order_excel_manage_wizard
+msgid "Export-Import order"
+msgstr "Import / Export ordini"
+
+#. module: manage_order_excel
+#: model:ir.model,name:manage_order_excel.model_sale_order_excel_manage_wizard
+msgid "Extract pricelist wizard"
+msgstr "Wiazard extrai ordini"
+
+#. module: manage_order_excel
+#: model:ir.model.fields,field_description:manage_order_excel.field_sale_order_excel_manage_wizard_id
+msgid "ID"
+msgstr "ID"
+
+#. module: manage_order_excel
+#: code:addons/manage_order_excel/models/excel_order.py:40
+#, python-format
+msgid "ID Supplier"
+msgstr "ID Fornitore"
+
+#. module: manage_order_excel
+#: model:ir.ui.view,arch_db:manage_order_excel.view_sale_order_excel_manage_wizard_form
+msgid "Import order for purchase"
+msgstr "Importa ordini per acquisti"
+
+#. module: manage_order_excel
+#: code:addons/manage_order_excel/models/excel_order.py:41
+#, python-format
+msgid "Int. Stock"
+msgstr "Mag. int."
+
+#. module: manage_order_excel
+#: model:ir.model.fields,field_description:manage_order_excel.field_sale_order_excel_manage_wizard___last_update
+msgid "Last Modified on"
+msgstr "Data di ultima modifica"
+
+#. module: manage_order_excel
+#: model:ir.model.fields,field_description:manage_order_excel.field_sale_order_excel_manage_wizard_write_uid
+msgid "Last Updated by"
+msgstr "Ultima modifica di"
+
+#. module: manage_order_excel
+#: model:ir.model.fields,field_description:manage_order_excel.field_sale_order_excel_manage_wizard_write_date
+msgid "Last Updated on"
+msgstr "Ultima modifica il"
+
+#. module: manage_order_excel
+#: code:addons/manage_order_excel/models/excel_order.py:38
+#, python-format
+msgid "Name"
+msgstr "Nome"
+
+#. module: manage_order_excel
+#: code:addons/manage_order_excel/models/excel_order.py:37
+#, python-format
+msgid "Order"
+msgstr "Ordine"
+
+#. module: manage_order_excel
+#: code:addons/manage_order_excel/models/excel_order.py:54
+#, python-format
+msgid "Pending sale order"
+msgstr "Ordini cliente pendenti"
+
+#. module: manage_order_excel
+#: code:addons/manage_order_excel/models/excel_order.py:39
+#, python-format
+msgid "Price"
+msgstr "Prezzo"
+
+#. module: manage_order_excel
+#: code:addons/manage_order_excel/models/excel_order.py:184
+#, python-format
+msgid "Purchase orders created"
+msgstr "Ordini di acquisto creati"
+
+#. module: manage_order_excel
+#: code:addons/manage_order_excel/models/excel_order.py:41
+#, python-format
+msgid "Q. Int."
+msgstr "Q. da Mag."
+
+#. module: manage_order_excel
+#: code:addons/manage_order_excel/models/excel_order.py:42
+#, python-format
+msgid "Q. Supp."
+msgstr "Q. da forn."
+
+#. module: manage_order_excel
+#: code:addons/manage_order_excel/models/excel_order.py:32
+#, python-format
+msgid "Sale order pending"
+msgstr "Ordini cliente pendenti"
+
+#. module: manage_order_excel
+#: code:addons/manage_order_excel/models/excel_order.py:42
+#, python-format
+msgid "Supp. Stock"
+msgstr "Mag. forn."
+
+#. module: manage_order_excel
+#: code:addons/manage_order_excel/models/excel_order.py:40
+#, python-format
+msgid "Supplier"
+msgstr "Fornitore"
+
+#. module: manage_order_excel
+#: model:ir.ui.view,arch_db:manage_order_excel.view_sale_order_excel_manage_wizard_form
+msgid "Wizard sale and purchase"
+msgstr "Wizard acquisti e vendite"
+
+#. module: manage_order_excel
+#: model:ir.model.fields,field_description:manage_order_excel.field_sale_order_excel_manage_wizard_file
+msgid "XLSX file"
+msgstr "File XLSX"
+
+#. module: manage_order_excel
+#: code:addons/manage_order_excel/models/excel_order.py:100
+#, python-format
+msgid "current_sale_order_pending"
+msgstr "ordini_cliente_pendenti"
+

@@ -1,0 +1,98 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <record id="view_logistic_manual_operation_wizard" model="ir.ui.view">
+            <field name="name">Logistic operation wizard</field>
+            <field name="model">logistic.manual.operation.wizard</field>
+            <field name="arch" type="xml">
+              <form string="Logistic operation management:">
+                  <header>
+                      <button string="Cancel" class="btn-default" special="cancel" />
+                  </header>
+                  <sheet>                  
+                      <group colspan="4" col="2">
+                          <separator string="A. Confirm payment on new order:"/>
+                          <button name="confirm_payment" string="Confirm _payment" type="object" class="btn-primary" />
+                      </group>    
+                      <group colspan="4" col="2">
+                          <separator string="B. Confirm payed order:"/>
+                          <button name="confirm_order" string="_Confirm order" type="object" class="btn-primary" />
+                      </group>    
+                      <group colspan="4" col="2">
+                          <separator string="C. Assign stock to order:"/>
+                          <button name="assign_stock" string="_Assign stock" type="object" class="btn-primary" />
+                      </group>    
+                      <group colspan="4" col="2">
+                          <separator string="D. Generate supplier purchase:"/>
+                          <button name="generate_purchase" string="_Generate purchase" type="object" class="btn-primary" colspan="1"/>
+                          <button name="confirm_generated_purchase" string="Confirm Draft _Purchase" type="object" class="btn-primary" colspan="1"/>
+                      </group>    
+                      <group colspan="4" col="2">
+                          <separator string="E. Update picking in loading:"/>
+                          <button name="update_ready" string="_Update ready" type="object" class="btn-primary" />
+                          <!--Not necessary (work after update_ready)
+                          <button name="update_ready_purchase_check" string="Update ready purchase check" type="object" class="btn-primary" /> -->
+                      </group>    
+                      
+                      <group colspan="4" col="4">
+                          <separator string="F. Generate picking out document (and confirm):" colspan="4"/>
+                          <field name="limit" />
+                          <field name="loop" />
+                          <button name="generate_delivery" string="Generate _Delivery" type="object" class="btn-primary" />
+                      </group>                          
+                      <!--<group colspan="4" col="2">
+                          <separator string="G. Close customer order delivered:"/>
+                          <button name="closed_delivered" string="_Closed Delivered" type="object" class="btn-primary" />
+                      </group>-->
+
+                      <separator string="Report:" colspan="4"/>
+                      <group colspan="4" col="2">
+                          <separator string="Report: Load position"/>
+                          <button name="load_position_print" string="Load position report" type="object" class="btn-primary" />
+                      </group>                          
+
+                      <group colspan="4" col="5">
+                          <separator string="Report: Accounting Fees" colspan="2"/><field name="evaluation_date" />
+                          <button name="print_report_account_fees_month" string="Print account fees" type="object" class="btn-primary" colspan="1"/>
+                          
+                      </group>                          
+
+                      <group colspan="4" col="2">
+                          <separator string="Bug check:"/>
+                          <button name="print_bug_check_pending_draft_line" string="Check pending order with draft lines" type="object" class="btn-primary" />
+                      </group>                          
+
+
+
+                  </sheet>
+              </form>
+            </field>
+        </record>
+
+        <record id="action_logistic_manual_operation_wizard" model="ir.actions.act_window">
+            <field name="name">Change Standard Price</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">logistic.manual.operation.wizard</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_logistic_manual_operation_wizard"/>
+            <field name="target">new</field>
+        </record>
+        
+        <menuitem 
+            parent="menu_logistic_management_root"
+            sequence="5"
+            id="menu_logistic_manual_operation_wizard" 
+            action="action_logistic_manual_operation_wizard"
+             />
+        <menuitem 
+            parent="menu_logistic_left_configuration_root"
+            sequence="5"
+            id="menu_logistic_manual_operation_wizard_master" 
+            action="action_logistic_manual_operation_wizard"
+             />
+        
+
+    </data>
+</openerp>
+
