@@ -1,0 +1,133 @@
+<?xml version="1.0"?>
+<openerp>
+    <data noupdate="1">
+        <!-- Invoice: -->
+        <record model="ir.sequence" id="data_sequence_stock_picking_invoice_A">
+            <field name="name">Invoice CEE (not italian) Sed. 41</field>
+            <field name="code">stock.picking.invoice.sequence</field>
+            <field name="implementation">no_gap</field>
+            <field name="active">1</field>
+            <field name="prefix">FT/41/%(year)s/</field>
+            <field name="suffix"></field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+            <field name="padding">6</field>
+            <field name="use_data_range">1</field>
+        </record>
+        <record model="ir.sequence" id="data_sequence_stock_picking_invoice_B">
+            <field name="name">Invoice Extra CEE (private)</field>
+            <field name="code">stock.picking.invoice.sequence</field>
+            <field name="implementation">no_gap</field>
+            <field name="active">1</field>
+            <field name="prefix">FT/N8/%(year)s/</field>
+            <field name="suffix"></field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+            <field name="padding">6</field>
+            <field name="use_data_range">1</field>
+        </record>
+        <record model="ir.sequence" id="data_sequence_stock_picking_invoice_C">
+            <field name="name">Invoice Italy (private, company)</field>
+            <field name="code">stock.picking.invoice.sequence</field>
+            <field name="implementation">no_gap</field>
+            <field name="active">1</field>
+            <field name="prefix">FT/FE/%(year)s/</field>
+            <field name="suffix"></field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+            <field name="padding">6</field>
+            <field name="use_data_range">1</field>
+        </record>
+        <record model="ir.sequence" id="data_sequence_stock_picking_invoice_D">
+            <field name="name">Invoice UK (private)</field>
+            <field name="code">stock.picking.invoice.sequence</field>
+            <field name="implementation">no_gap</field>
+            <field name="active">1</field>
+            <field name="prefix">FT/UK/%(year)s/</field>
+            <field name="suffix"></field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+            <field name="padding">6</field>
+            <field name="use_data_range">1</field>
+        </record>
+
+        <!-- Refund: -->
+        <record model="ir.sequence" id="data_sequence_stock_picking_refund_A">
+            <field name="name">Refund CEE (not italian) Sed. 41</field>
+            <field name="code">stock.picking.invoice.sequence</field>
+            <field name="implementation">no_gap</field>
+            <field name="active">1</field>
+            <field name="prefix">NC/41/%(year)s/</field>
+            <field name="suffix"></field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+            <field name="padding">6</field>
+            <field name="use_data_range">1</field>
+        </record>
+        <record model="ir.sequence" id="data_sequence_stock_picking_refund_B">
+            <field name="name">Refund Extra CEE (private)</field>
+            <field name="code">stock.picking.invoice.sequence</field>
+            <field name="implementation">no_gap</field>
+            <field name="active">1</field>
+            <field name="prefix">NC/N8/%(year)s/</field>
+            <field name="suffix"></field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+            <field name="padding">6</field>
+            <field name="use_data_range">1</field>
+        </record>
+        <record model="ir.sequence" id="data_sequence_stock_picking_refund_C">
+            <field name="name">Refund Italy (private, company)</field>
+            <field name="code">stock.picking.invoice.sequence</field>
+            <field name="implementation">no_gap</field>
+            <field name="active">1</field>
+            <field name="prefix">NC/FE/%(year)s/</field>
+            <field name="suffix"></field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+            <field name="padding">6</field>
+            <field name="use_data_range">1</field>
+        </record>
+        <record model="ir.sequence" id="data_sequence_stock_picking_refund_D">
+            <field name="name">Refund UK (private)</field>
+            <field name="code">stock.picking.invoice.sequence</field>
+            <field name="implementation">no_gap</field>
+            <field name="active">1</field>
+            <field name="prefix">NC/UK/%(year)s/</field>
+            <field name="suffix"></field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+            <field name="padding">6</field>
+            <field name="use_data_range">1</field>
+        </record>
+
+        <!-- DDT: -->
+        <record model="ir.sequence" id="data_sequence_stock_picking_ddt">
+            <field name="name">Picking DDT 1</field>
+            <field name="code">stock.picking.ddt.sequence</field>
+            <field name="implementation">no_gap</field>
+            <field name="active">1</field>
+            <field name="prefix">DDT/1/%(year)s/</field>
+            <field name="suffix"></field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+            <field name="padding">6</field>
+            <field name="use_data_range">1</field>
+        </record>
+
+        <!-- Refund: -->
+        <record model="ir.sequence" id="data_sequence_stock_picking_refund">
+            <field name="name">Picking Refund 1</field>
+            <field name="code">stock.picking.refund.sequence</field>
+            <field name="implementation">no_gap</field>
+            <field name="active">1</field>
+            <field name="prefix">RC/1/%(year)s/</field>
+            <field name="suffix"></field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+            <field name="padding">6</field>
+            <field name="use_data_range">1</field>
+        </record>
+    </data>
+</openerp>
+

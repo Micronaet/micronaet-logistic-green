@@ -876,7 +876,7 @@ class SaleOrder(models.Model):
         ('delivering', 'Delivering'),  # In delivering phase
         ('done', 'Done'),  # Delivered or closed XXX manage partial delivery
         ('dropshipped', 'Dropshipped'),  # Order dropshipped
-        ('unificated', 'Unificated'),  # Unificated with another
+        # ('unificated', 'Unificated'),  # Unificated with another
 
         ('error', 'Error order'),  # Order without line
         ('cancel', 'Cancel'),  # Removed order
