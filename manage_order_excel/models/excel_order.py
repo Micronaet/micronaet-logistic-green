@@ -38,8 +38,8 @@ class SaleOrderExcelManageWizard(models.TransientModel):
         line_pool = self.env['sale.order.line']
         lines = line_pool.search([
             # TODO only open
-            ('connector_id', '!=', False),
-            ('wp_status', 'in', ('pending', ))
+            ('order_id.connector_id', '!=', False),
+            ('order_id.wp_status', 'in', ('pending', ))
             ])
 
         title = (
