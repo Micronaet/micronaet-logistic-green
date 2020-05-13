@@ -140,7 +140,6 @@
                      <field name="logistic_unload_id" />
 
                      <field name="logistic_quant_id" />
-                     <field name="slot_id" />
                      <field name="state" invisible="1" />
                  </tree>
              </field>
@@ -332,7 +331,7 @@
              <field name="view_type">form</field>
              <field name="view_mode">tree,form</field>
              <!--<field name="view_id" ref="view_model_name_form"/>-->
-             <field name="context">{'form_view_ref': 'logistic_management.view_res_company_logistic_parameter_form'}</field>
+             <field name="context">{'form_view_ref': 'green_logistic_management.view_res_company_logistic_parameter_form'}</field>
              <field name="domain">[]</field>
          </record>
 
@@ -431,16 +430,12 @@
              <field name="model">sale.order.line</field>
              <field name="priority" eval="40" />
              <field name="arch" type="xml">
-                 <tree string="Sale line logistic" decoration-muted="is_kit==True" decoration-warning="kit_product_id != False">
+                 <tree string="Sale line logistic">
                      <button name="open_view_sale_order" string="Open sale order" type="object" icon="fa-arrow-circle-o-right"/>
                      <field name="order_id" />
                      <button name="open_view_sale_order_product" string="Open sale order product" type="object" icon="fa-arrow-circle-o-right"/>
                      <field name="product_id" />
-                     <button name="open_view_sale_order_original_product" string="Open sale order original product" type="object" icon="fa-arrow-circle-o-right" attrs="{'invisible': [('origin_product_id','=',False)]}"/>
-                     <!--<field name="origin_product_id" />
-                     <field name="linked_mode" />
-                     <button name="chain_broken_purchase_line" attrs="{'invisible': [('logistic_state','!=','ordered')]}" string="" help="Delete purchase line and return to order phase" type="object" icon="fa-chain-broken" confirm="Reassign product if needed, program delete purchase line and return do order step, confirm?"/>
-                     -->
+                     <button name="open_view_sale_order_original_product" string="Open sale order original product" type="object" icon="fa-arrow-circle-o-right" />
                      <field name="name" />
                      <field name="product_uom_qty" />
                      <field name="logistic_covered_qty" />
@@ -463,8 +458,6 @@
                  <tree string="MRP lavoration" decoration-muted="mrp_state=='draft'" decoration-warning="mrp_state=='progress'">
                      <field name="order_id" />
                      <field name="product_id" />
-                     <!--<field name="origin_product_id" />
-                     <field name="linked_mode" />-->
                      <field name="name" />
                      <field name="product_uom_qty" />
                      <!--<field name="logistic_covered_qty" />
@@ -476,17 +469,6 @@
                  </tree>
              </field>
          </record>
-         <record model="ir.ui.view" id="view_sale_order_line_real_product_unchain_form">
-            <field name="name">sale.order.line.unchain.product.form</field>
-            <field name="model">sale.order</field>
-            <field name="inherit_id" ref="order_line_change_product.view_sale_order_line_real_product_form"/>
-            <field name="arch" type="xml">
-                <field name="linked_mode" position="after">
-                    <!--<button name="chain_broken_purchase_line" attrs="{'invisible': [('logistic_state','!=','ordered')]}" string="" help="Delete purchase line and return to order phase" type="object" icon="fa-chain-broken" confirm="Reassign product if needed, program delete purchase line and return do order step, confirm?"/>-->
-                    <field name="logistic_state" invisible="1"/>
-                </field>
-            </field>
-        </record>
 
          <record model="ir.ui.view" id="view_sale_order_line_search">
              <field name="name">sale.order.line.search</field>
@@ -606,7 +588,6 @@
                                               <field name="origin" />
                                               <field name="product_uom_qty" />
                                               <field name="location_dest_id" />
-                                              <field name="slot_id" />
                                               <field name="state" />
                                          </tree>
                                      </field>
@@ -632,7 +613,7 @@
              <field name="view_mode">tree,form</field>
              <field name="view_id" ref="view_sale_order_line_logistic_mrp_tree"/>
              <field name="search_view_id" ref="view_sale_order_line_mrp_search"/>
-             <field name="context">{'form_view_ref': 'logistic_management.view_sale_order_line_logistic_form'}</field>
+             <field name="context">{'form_view_ref': 'green_logistic_management.view_sale_order_line_logistic_form'}</field>
              <field name="domain">[('mrp_state', '!=', False)]</field>
          </record>
          <record model="ir.actions.act_window" id="action_sale_order_line_logistic_mrp_draft">
@@ -642,7 +623,7 @@
              <field name="view_mode">tree,form</field>
              <field name="view_id" ref="view_sale_order_line_logistic_mrp_tree"/>
              <field name="search_view_id" ref="view_sale_order_line_mrp_search"/>
-             <field name="context">{'form_view_ref': 'logistic_management.view_sale_order_line_logistic_form'}</field>
+             <field name="context">{'form_view_ref': 'green_logistic_management.view_sale_order_line_logistic_form'}</field>
              <field name="domain">[('mrp_state', '=', 'draft')]</field>
          </record>
          <record model="ir.actions.act_window" id="action_sale_order_line_logistic_mrp_progress">
@@ -652,7 +633,7 @@
              <field name="view_mode">tree,form</field>
              <field name="view_id" ref="view_sale_order_line_logistic_mrp_tree"/>
              <field name="search_view_id" ref="view_sale_order_line_mrp_search"/>
-             <field name="context">{'form_view_ref': 'logistic_management.view_sale_order_line_logistic_form'}</field>
+             <field name="context">{'form_view_ref': 'green_logistic_management.view_sale_order_line_logistic_form'}</field>
              <field name="domain">[('mrp_state', '=', 'progress')]</field>
          </record>
          <record model="ir.actions.act_window" id="action_sale_order_line_logistic_mrp_done">
@@ -662,7 +643,7 @@
              <field name="view_mode">tree,form</field>
              <field name="view_id" ref="view_sale_order_line_logistic_mrp_tree"/>
              <field name="search_view_id" ref="view_sale_order_line_mrp_search"/>
-             <field name="context">{'form_view_ref': 'logistic_management.view_sale_order_line_logistic_form'}</field>
+             <field name="context">{'form_view_ref': 'green_logistic_management.view_sale_order_line_logistic_form'}</field>
              <field name="domain">[('mrp_state', '=', 'done')]</field>
          </record>
 
@@ -674,7 +655,7 @@
              <field name="view_mode">tree,form</field>
              <field name="view_id" ref="view_sale_order_line_logistic_tree"/>
              <field name="search_view_id" ref="view_sale_order_line_search"/>
-             <field name="context">{'form_view_ref': 'logistic_management.view_sale_order_line_logistic_form'}</field>
+             <field name="context">{'form_view_ref': 'green_logistic_management.view_sale_order_line_logistic_form'}</field>
              <field name="domain">[]</field>
          </record>
 
@@ -1092,12 +1073,12 @@
                      action="action_product_template_form"
                      sequence="10"
                      />
-                 <menuitem
+                 <!--<menuitem
                      id="menu_logistic_left_configuration_anagrafic_template_no_supplier"
                      parent="menu_logistic_left_configuration_anagrafic_root"
                      action="action_product_template_no_supplier_form"
                      sequence="20"
-                     />
+                     />-->
 
                  <menuitem
                      id="menu_logistic_left_configuration_partner_customer"

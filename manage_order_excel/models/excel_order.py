@@ -82,7 +82,8 @@ class SaleOrderExcelManageWizard(models.TransientModel):
 
         # Collect:
         # TODO manage order from wizard
-        for line in sorted(lines, key=lambda x: x.product_id.default_code):
+        for line in sorted(lines, 
+                key=lambda x: (x.product_id.default_code or '')):
             row += 1
             product = line.product_id
             if product.type == 'service':
