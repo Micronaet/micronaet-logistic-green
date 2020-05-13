@@ -49,7 +49,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
 
         header = (
             'ID',
-            _('Connettore'), _('Order'), _('Date'), _('Status')
+            _('Connettore'), _('Order'), _('Date'), _('Status'),
             _('Code'), _('Name'), _('Category'),
             _('Q.'), _('Price'),
             _('ID Supplier'), _('Supplier'),
