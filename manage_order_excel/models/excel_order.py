@@ -49,7 +49,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
 
         header = (
             'ID',
-            _('Connettore'), _('Order'), _('Date'),
+            _('Connettore'), _('Order'), _('Date'), _('Status')
             _('Code'), _('Name'), _('Category'),
             _('Q.'), _('Price'),
             _('ID Supplier'), _('Supplier'),
@@ -59,10 +59,10 @@ class SaleOrderExcelManageWizard(models.TransientModel):
         )
         column_width = (
             1,
-            15, 12, 15,
-            10, 45, 25,
+            18, 9, 15, 10,
+            12, 48, 25,
             7, 7,
-            1, 30,
+            1, 25,
             10, 10,
             10, 10,
             4,
@@ -74,7 +74,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
         report_pool.column_width(ws_name, column_width)
 
         # Title:
-        report_pool.column_hidden(ws_name, [0, 9])  # Hide ID columns
+        report_pool.column_hidden(ws_name, [0, 10])  # Hide ID columns
         row = 0
         report_pool.write_xls_line(ws_name, row, title, style_code='title')
 
@@ -88,26 +88,35 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                 key=lambda x: (x.product_id.default_code or '')):
             row += 1
             product = line.product_id
+
+            # Jump service product (not used):
             if product.type == 'service':
                 _logger.warning(
                     'Excluded service from report: %s' % product.default_code)
                 continue
+
+            # Readability:
             order = line.order_id
             supplier_id, supplier_name = self.get_suppinfo_supplier(product)
 
             # Category:
             category = ', '.join(
                 [item.name for item in product.wp_category_ids])
+
+            # Color setup:
+            supplier_color = 'number_total' if supplier_id else 'number'
+
             report_pool.write_xls_line(ws_name, row, (
                 line.id,
 
                 order.connector_id.name or '',
-                order.name,
-                order.date_order,
+                order.name or '',
+                order.date_order or '',
+                order.wp_status or '',
 
-                product.default_code,
-                product.name,
-                category,
+                product.default_code or '',
+                product.name or '',
+                category or '',
 
                 (line.product_uom_qty, 'number'),
                 (line.price_unit, 'number'),
@@ -120,7 +129,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                 (0, 'number_total'),
                 # Supplier:
                 (0 if supplier_id else '/', 'number'),
-                (0, 'number_total'),
+                (0, supplier_color),
                 '',  # TODO add formula after:
             ), style_code='text')
             # report_pool.write_formula(
