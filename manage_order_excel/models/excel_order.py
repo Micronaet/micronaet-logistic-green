@@ -38,6 +38,8 @@ class SaleOrderExcelManageWizard(models.TransientModel):
         line_pool = self.env['sale.order.line']
         lines = line_pool.search([
             # TODO only open
+            ('connector_id', '!=', False),
+            ('wp_status', 'in', ('pending', ))
             ])
 
         title = (
@@ -82,7 +84,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
 
         # Collect:
         # TODO manage order from wizard
-        for line in sorted(lines, 
+        for line in sorted(lines,
                 key=lambda x: (x.product_id.default_code or '')):
             row += 1
             product = line.product_id
