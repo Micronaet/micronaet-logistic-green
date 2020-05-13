@@ -16,6 +16,7 @@
         'base',
         'sale',
         'xlsxwriter_report',
+        'wordpress_order',
         ],
     'data': [
         'security/ir.model.access.csv',

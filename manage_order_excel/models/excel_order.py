@@ -94,6 +94,10 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                 continue
             order = line.order_id
             supplier_id, supplier_name = self.get_suppinfo_supplier(product)
+
+            # Category:
+            category = ', '.join(
+                [item.name for item in product.wp_category_ids])
             report_pool.write_xls_line(ws_name, row, (
                 line.id,
 
@@ -103,7 +107,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
 
                 product.default_code,
                 product.name,
-                product.categ_id.name or ' ',
+                category,
 
                 (line.product_uom_qty, 'number'),
                 (line.price_unit, 'number'),
