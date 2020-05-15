@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+   <data>
+        <!--Add custom CSS:-->
+        <!--<template id="minimal_layout_css_inherit" inherit_id="web.report_assets_common">
+            <xpath expr="link" position="before">
+                <link rel='stylesheet' href="/plant_passport/static/src/css/sale_report.css"/>
+            </xpath>
+        </template>-->
+        <!--                         Report template:                                -->
+        <template id="report_sale_passport_label">
+            <div t-call="web.html_container">
+                <div t-foreach="docs" t-as="o">
+                    <div t-call="web.external_layout">
+                        <div class="page">
+                            <div class="oe_structure"/>
+                            <!-- DESTINATION BOX: -->
+                            <!--<div class="row">
+                                <div class="col-xs-5"/>
+                                <div class="col-xs-7">
+                                    <span class="company_address" t-field="o.partner_id"
+                                       t-field-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": true}'/>
+                                    <span t-if="o.client_order_ref">C/O: <span t-esc="o.client_order_ref" /></span>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-xs-7">
+                                        <strong t-esc="'PREVENTIVO:' if o.state in ['draft','sent'] else 'ORDINE:'"/> <span t-esc="o.name"/>
+                                </div>
+                                <div class="col-xs-5">
+                                    <span t-esc="('%s, ' % res_company.city) if res_company.city else 'Data: '"/> <span t-esc="o.date_order or ''" t-options="{'widget': 'date'}"/>
+                                </div>
+                            </div>-->
+
+                            <!--                          DETAIL:                         -->
+                            <!-- BLOCK LOOP: -->
+                            <!--<div t-foreach="o.block_ids" t-as="block">
+                                <t t-set="show_discount" t-value="block.has_discount()[0]"/>
+                                <div t-if="show_the_block(block, data)">
+                                    <t t-if="block.show_header">
+                                        <h3 t-esc="(block.title or '/').upper()" />
+                                    </t>
+                                    <div t-raw="block.pre_text or ''"/>
+
+                                    <t t-if="block.show_detail">
+                                        <table class="table table-condensed">
+                                            <thead>
+                                                <tr class="row">
+                                                    <th colspan="4">DETTAGLIO</th>
+                                                    <th colspan="1" class="text-right">Q.</th>
+                                                    <th t-if="block.show_price" colspan="1" class="text-right">PREZZO</th>
+                                                    <th t-if="block.show_price and show_discount" colspan="1" class="text-right">SCONTO</th>
+                                                    <th t-if="block.show_price" colspan="1" class="text-right">TOTALE</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                <tr t-foreach="block.line_ids" t-as="l" class="row">
+                                                    <td colspan="4">
+                                                        <t t-if="not o.hide_link and l.product_id.product_link">
+                                                            <a t-att-href="l.product_id.product_link" t-att-target="_blank">
+                                                                <span t-if="l.map_code" t-esc="'[%s]' % l.map_code" /> <span t-esc="clean_name(l)"/>
+                                                            </a>
+                                                        </t>
+                                                        <t t-if="not l.product_id.product_link">
+                                                            <span t-if="l.map_code" t-esc="'[%s]' % l.map_code" /> <span t-esc="clean_name(l)"/>
+                                                        </t>
+                                                    </td>
+                                                    <td class="text-right"><span t-esc="l.product_uom_qty"/> <span t-esc="(l.product_uom and l.product_uom.name) or ''"/></td>
+                                                    <td t-if="block.show_price" class="text-right"><span t-esc="l.price_unit" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                                    <td t-if="block.show_price and show_discount" class="text-right"><span t-esc="l.discount_multi_rate" /></td>
+                                                    <td t-if="block.show_price" class="text-right"><span t-esc="l.price_subtotal" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </t>
+                                    <div class="row">
+                                        <div class="col-xs-8" >
+                                            <span t-raw="block.post_text or ''"/>
+                                        </div>
+                                        <div class="col-xs-4" t-if="block.show_total">
+                                            <table>
+                                                <tr><th><span t-esc="'TOTALE A CORPO' if block.total else 'TOTALE A SEZIONE'"/></th></tr>
+                                                <tr><td class="text-right"><span t-esc="block.total or block.real_total" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td></tr>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>-->
+
+                            <!--Master total:-->
+                            <!--<div class="row">
+                                <div class="col-xs-4" t-if="o.show_master_total">
+                                    <table>
+                                        <tr><th>TOTALE OFFERTA</th></tr>
+                                        <tr><td class="text-right"><span t-esc="o.real_total" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}" /></td></tr>
+                                    </table>
+                                </div>
+                            </div>-->
+
+                            <!-- END OF PAGE: -->
+                            <!--<div class="row">
+                                <div class="col-xs-12" >
+                                    <u><strong>N.B.: I prezzi si intendono esclusi di IVA (ove applicata).</strong><br/></u>
+                                    <strong t-if="o.payment_term_id">TERMINI DI PAGAMENTO:</strong> <span t-if="o.payment_term_id" t-esc="o.payment_term_id.name"/>
+                                </div>
+                            </div>-->
+
+                            <!--EXTRA STATICS BLOCKS:-->
+                            <!--<div t-foreach="o.report_text_ids" t-as="static">
+                                <p t-if="static.pagebreak_before" style="page-break-before:always;" />
+                                <p t-raw="static.text_id.text" />
+                            </div>-->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+        <!--<template id="report_sale_passport_label_temp">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-call="sale_order_block.report_sale_block" t-lang="doc.partner_id.lang"/>
+                </t>
+            </t>
+        </template>-->
+
+        <record id="paperformat_passport_label" model="report.paperformat">
+            <field name="name">Passport label report</field>
+            <field name="default" eval="True"/>
+            <field name="format">custom</field>
+            <field name="page_height">297</field>
+            <field name="page_width">210</field>
+            <field name="orientation">Portrait</field>
+            <field name="margin_top">33</field>
+            <field name="margin_bottom">20</field>
+            <field name="margin_left">5</field>
+            <field name="margin_right">5</field>
+            <field name="header_line" eval="False"/>
+            <field name="header_spacing">24</field>
+            <field name="dpi">90</field>
+        </record>
+
+        <!--Report action:-->
+        <report
+            id="action_report_sale_passport_label"
+            model="sale.order"
+            string="Passport oder label report"
+            report_type="qweb-pdf"
+            name="plant_passport.report_sale_passport_label"
+            file="plant_passport.report_sale_passport_label"
+            attachment_use="False"
+            attachment="object.name + '.pdf'"
+            print_report_name="'%s' % object.name"
+            paperformat="paperformat_passport_label"
+        />
+        <!--
+        print_report_name="'%s.%s' % ((object.name or 'draft').replace('/', '_'), object.printed)"
+        "(object._get_printed_report_name())"
+        "'%s.%s' % ((object.name or 'draft').replace('/', '_'), object.printed)"
+        -->
+   </data>
+</openerp>

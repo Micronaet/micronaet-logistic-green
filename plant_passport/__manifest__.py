@@ -20,6 +20,7 @@
     'data': [
         'security/ir.model.access.csv',
         'views/passport_view.xml',
+        'report/sales_label_report.xml',
         ],
     'external_dependencies': {},
     'application': False,
