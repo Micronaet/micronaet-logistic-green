@@ -1,0 +1,127 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* plant_passport
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 11.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-05-15 14:28+0000\n"
+"PO-Revision-Date: 2020-05-15 14:28+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: plant_passport
+#: model:ir.model.fields,field_description:plant_passport.field_passport_plant_category_name
+msgid "Botanic genre"
+msgstr "Genere botanico"
+
+#. module: plant_passport
+#: model:ir.model,name:plant_passport.model_res_company
+msgid "Companies"
+msgstr "Aziende"
+
+#. module: plant_passport
+#: model:ir.model.fields,field_description:plant_passport.field_product_product_passport_company_code
+#: model:ir.model.fields,field_description:plant_passport.field_product_template_passport_company_code
+msgid "Company code"
+msgstr "Codice passaporto"
+
+#. module: plant_passport
+#: model:ir.model.fields,field_description:plant_passport.field_passport_plant_category_create_uid
+msgid "Created by"
+msgstr "Creato da"
+
+#. module: plant_passport
+#: model:ir.model.fields,field_description:plant_passport.field_passport_plant_category_create_date
+msgid "Created on"
+msgstr "Creato il"
+
+#. module: plant_passport
+#: model:ir.model.fields,field_description:plant_passport.field_passport_plant_category_display_name
+msgid "Display Name"
+msgstr "Nome Completo"
+
+#. module: plant_passport
+#: model:ir.model.fields,field_description:plant_passport.field_passport_plant_category_id
+msgid "ID"
+msgstr "ID"
+
+#. module: plant_passport
+#: model:ir.model.fields,field_description:plant_passport.field_passport_plant_category___last_update
+msgid "Last Modified on"
+msgstr "Data di ultima modifica"
+
+#. module: plant_passport
+#: model:ir.model.fields,field_description:plant_passport.field_passport_plant_category_write_uid
+msgid "Last Updated by"
+msgstr "Ultima modifica di"
+
+#. module: plant_passport
+#: model:ir.model.fields,field_description:plant_passport.field_passport_plant_category_write_date
+msgid "Last Updated on"
+msgstr "Ultima modifica il"
+
+#. module: plant_passport
+#: model:ir.model.fields,field_description:plant_passport.field_passport_plant_category_note
+msgid "Note"
+msgstr "Nota"
+
+#. module: plant_passport
+#: model:ir.ui.view,arch_db:plant_passport.view_product_template_passport_form
+#: model:ir.ui.view,arch_db:plant_passport.view_product_template_passport_tree
+msgid "Passport"
+msgstr "Passaporto"
+
+#. module: plant_passport
+#: model:ir.actions.act_window,name:plant_passport.action_passport_plant_category
+#: model:ir.model.fields,field_description:plant_passport.field_product_product_passport_category_id
+#: model:ir.model.fields,field_description:plant_passport.field_product_template_passport_category_id
+#: model:ir.ui.menu,name:plant_passport.menu_passport_plant_category
+#: model:ir.ui.view,arch_db:plant_passport.view_passport_plant_category_form
+#: model:ir.ui.view,arch_db:plant_passport.view_passport_plant_category_tree
+msgid "Passport category"
+msgstr "Categoria botanica"
+
+#. module: plant_passport
+#: model:ir.model.fields,field_description:plant_passport.field_res_company_passport_code
+msgid "Passport code"
+msgstr "Codice passaporto"
+
+#. module: plant_passport
+#: model:ir.model.fields,field_description:plant_passport.field_product_product_passport_country_id
+#: model:ir.model.fields,field_description:plant_passport.field_product_template_passport_country_id
+msgid "Passport country"
+msgstr "Nazione provenienza"
+
+#. module: plant_passport
+#: model:ir.model.fields,field_description:plant_passport.field_product_product_passport_manage
+#: model:ir.model.fields,field_description:plant_passport.field_product_template_passport_manage
+msgid "Passport manage"
+msgstr "Gestione passaporto"
+
+#. module: plant_passport
+#: model:ir.model,name:plant_passport.model_passport_plant_category
+msgid "Passport plant category"
+msgstr "Categorie botaniche passaporto"
+
+#. module: plant_passport
+#: model:ir.model,name:plant_passport.model_product_template
+msgid "Product Template"
+msgstr "Modello prodotto"
+
+#. module: plant_passport
+#: model:ir.ui.view,arch_db:plant_passport.view_product_template_passport_form
+msgid "Treament"
+msgstr "Trattamento"
+
+#. module: plant_passport
+#: model:ir.model.fields,field_description:plant_passport.field_product_product_passport_treatment
+#: model:ir.model.fields,field_description:plant_passport.field_product_template_passport_treatment
+msgid "Treatment"
+msgstr "Trattamento"
+

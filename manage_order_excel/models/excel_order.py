@@ -59,7 +59,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
         )
         column_width = (
             1,
-            18, 9, 15, 10,
+            20, 8, 15, 10,
             12, 48, 25,
             7, 7,
             1, 25,
