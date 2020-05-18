@@ -32,17 +32,50 @@ class ReportSaleOrderPassportLabel(models.AbstractModel):
             'data': data,
 
             # Parser functions:
-            # 'show_the_block': self.show_the_block,
+            'get_labels_for_report': self.get_labels_for_report,
         }
 
     # -------------------------------------------------------------------------
     # Parser function:
     # -------------------------------------------------------------------------
-    # @api.model
-    # def show_the_block(self, block, data=None):
-    #     """ Check if the block need to be showed
-    #     """
-    #     if data is None:
-    #         data = {}
-    #     return not block.hide_block
+    @api.model
+    def get_labels_for_report(self, order):
+        """ Format label for report
+        """
+        cols = 2
+        labels = {}
+        for line in order.order_line:
+            product = line.product_id
+            if not product.passport_manage:
+                continue
+            category = product.passport_category_id.name or ''
+            country = product.passport_country_id.code or ''
+            if not category:
+                _logger.error('Category not present in %s' % product.name)
+                continue
+            if not country:
+                _logger.error('Country not present in %s' % product.name)
+
+            if country not in labels:
+                labels[country] = []
+
+            if category not in labels[country]:
+                labels[country].append(category)
+        label_block = []
+        keys = [key for key in labels]
+
+        for position in range(0, len(labels), cols):
+            block = [
+                (keys[position], ', '.join(labels[keys[position]])),
+                False,
+            ]
+            try:
+                block[1] = (
+                    keys[position + 1],
+                    ', '.join(labels[keys[position + 1]]),
+                )
+            except:
+                pass
+            label_block.append(block)
+        return label_block
 
