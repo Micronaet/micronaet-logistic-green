@@ -12,7 +12,6 @@
         </field>
     </record>
 
-    product.product_normal_form_view
     <!--product.template-->
     <record model="ir.ui.view" id="view_product_template_passport_tree">
         <field name="name">product.template.tree</field>
