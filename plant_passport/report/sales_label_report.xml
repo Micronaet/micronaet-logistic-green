@@ -37,6 +37,7 @@
                                         <t t-if="not label">
                                             <p></p>
                                         </t>
+                                        <br/>
                                     </td>
                                 </tr>
                             </tbody>
