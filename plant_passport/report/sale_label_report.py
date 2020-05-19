@@ -48,7 +48,7 @@ class ReportSaleOrderPassportLabel(models.AbstractModel):
             product = line.product_id
             if not product.passport_manage:
                 continue
-            category = product.passport_category_id.name or ''
+            category = (product.passport_category_id.name or '').title()
             country = product.passport_country_id.code or ''
             if not category:
                 _logger.error('Category not present in %s' % product.name)

@@ -26,6 +26,7 @@ class ResCompany(models.Model):
     _inherit = 'res.company'
 
     passport_code = fields.Char('Passport code')
+    passport_prefix = fields.Char('Passport prefix', help='For order block')
     passport_logo = fields.Binary('Passport logo')
 
 
