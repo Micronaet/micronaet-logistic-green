@@ -264,7 +264,7 @@ class WPConnector(models.Model):
                 created = False
                 if sales:
                     _logger.warning(
-                        'Yet present order: %s (not updated)' % number)
+                        'Yet present order: %s (update minimal)' % number)
                     # TODO Update (or state update only)
                     sales.write(order_data)
                     order = sales[0]
@@ -285,8 +285,9 @@ class WPConnector(models.Model):
                         _logger.error('Problem create: %s order [%s]\n%s' % (
                             number, order_data, sys.exc_info()))
                         continue
-                    order_id = order.id
 
+                    order_id = order.id
+                    # TODO <<<< back block of 4 char
                     # Create line:
                     """
                     'line_items': [
@@ -313,6 +314,8 @@ class WPConnector(models.Model):
                     # Check order if present:
                     shipping_line = False
                     origin_line_found = {}
+                    """
+                    TODO for now not update yet present order line:
                     if not created:  # Save current list of line
                         #  Check previous line present:
                         for origin_line in order.order_line:
@@ -322,7 +325,7 @@ class WPConnector(models.Model):
                             else:  # Product line:
                                 origin_line_found[origin_line.wp_line_id] = \
                                         origin_line
-
+                    """
                     for line in record['line_items']:
                         wp_line_id = line['id']
                         sku = line['sku']
@@ -353,18 +356,21 @@ class WPConnector(models.Model):
                             'price_unit': price,
                             }
 
-                        # Check if line is present:
+                        # Check if line is present: TODO not used for now
                         if wp_line_id in origin_line_found:
                             line.write(line_data)
                             del(origin_line_found[wp_line_id])
                         else:
                             line_pool.create(line_data)
 
+                    # TODO not used for now
+                    """
                     if origin_line_found:
                         # Sale order line to remove:
                         # TODO remove
                         _logger.warning('Remove line no more present')
                         origin_line_found.unlink()
+                    """
 
                     # ---------------------------------------------------------
                     # Shipping product line:
