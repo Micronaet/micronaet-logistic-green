@@ -113,7 +113,7 @@ msgstr "Passaporto"
 #: model:ir.ui.view,arch_db:plant_passport.view_passport_plant_category_form
 #: model:ir.ui.view,arch_db:plant_passport.view_passport_plant_category_tree
 msgid "Passport category"
-msgstr "Categoria botanica"
+msgstr "Genere botanico"
 
 #. module: plant_passport
 #: model:ir.model.fields,field_description:plant_passport.field_res_company_passport_code
@@ -145,7 +145,7 @@ msgstr "Report Passaporto per ordine"
 #. module: plant_passport
 #: model:ir.model,name:plant_passport.model_passport_plant_category
 msgid "Passport plant category"
-msgstr "Categorie botaniche passaporto"
+msgstr "Generi botanici passaporto"
 
 #. module: plant_passport
 #: model:ir.model,name:plant_passport.model_product_template
