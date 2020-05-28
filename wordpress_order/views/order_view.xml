@@ -21,13 +21,12 @@
                         <separator string="Order block:" colspan="3"/>
                         <button name="button_load_order" type="object" string="Load order" icon="fa-stack-overflow fa-2x"/>
 
-                        <field name="order_start"/>
+                        <field name="order_start_page"/>
+                        <field name="order_stop_page"/>
                         <field name="order_limit"/>
                     </group>
                 </page>
             </xpath>
-
-
         </field>
     </record>
     <!-- Inherit Form View to Modify it -->

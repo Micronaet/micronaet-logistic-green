@@ -15,9 +15,13 @@ class WPConnector(models.Model):
     _inherit = 'wp.connector'
 
     # Columns:
-    order_page = fields.Integer(
-        'Order Start page', default=1,
+    order_start_page = fields.Integer(
+        'Order start page', default=1,
         help='Start reading orders from page',
+    )
+    order_stop_page = fields.Integer(
+        'Order stop page', default=100,
+        help='Stop reading orders from page (0 means unlimited)',
     )
     order_limit = fields.Integer(
         'Order limit', default=50,
@@ -161,12 +165,19 @@ class WPConnector(models.Model):
 
         wcapi = self.get_connector()
 
+        # Parameters:
         connector_id = self.id
-        start_page = 1
-        end_page = 100
-        params = {'per_page': 50, 'page': start_page}
+        start_page = self.order_start_page
+        end_page = self.order_stop_page
+
+        # WP parameters:
+        params = {
+            'per_page': self.order_limit,
+            'page': start_page,
+        }
 
         while True:
+            # Log:
             _logger.info('Reading orders from %s [Record %s-%s]' % (
                 self.name,
                 params['per_page'] * (params['page'] - 1),
@@ -217,14 +228,14 @@ class WPConnector(models.Model):
                  'status': 'pending', 
                  'created_via': 'checkout',
                  'version': '3.6.5', '_links': {'self': [{
-                        'href': 'https://www.venditapianteonline.it/wp-json/wc/v3/orders/121605'}],
+                        'href': 'https://www.it/wp-json/wc/v3/orders/121605'}],
                         'collection': [{
-                        'href': 'https://www.venditapianteonline.it/wp-json/wc/v3/orders'}]},
+                        'href': 'https://www.it/wp-json/wc/v3/orders'}]},
                  'currency': 'EUR', 
                  'order_key': 'wc_order_J7VSecMlSkF3Z',
                  'shipping_total': '11.50', 'date_completed': None,
                  'cart_tax': '0.00',
-                 'customer_user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36 Edge/18.18362',
+                 'customer_user_agent': 'Mozilla/5.0 (Windows NT 10.0; ...
                  'discount_tax': '0.00', 'date_paid': None,
                  'shipping_tax': '0.00',
                  'prices_include_tax': True, 'date_paid_gmt': None,
@@ -244,14 +255,7 @@ class WPConnector(models.Model):
                  'payment_method': 'amazon_payments_advanced', 
                  }
                 """
-                order_data = {
-                    'connector_id': connector_id,
-                    'wp_id': wp_id,
-                    'name': number,
-                    'date_order': date_created,
-                    'partner_id': partner_id,
-                    'partner_shipping_id': partner_shipping_id,
-                    'partner_invoice_id': partner_invoice_id,
+                order_data = {  # Update mode:
                     'wp_status': status,
                     'wp_date_created': date_created,
                     'wp_date_modified': date_modified,
@@ -262,9 +266,18 @@ class WPConnector(models.Model):
                     _logger.warning(
                         'Yet present order: %s (not updated)' % number)
                     # TODO Update (or state update only)
-                    # sales.write(order_data)
+                    sales.write(order_data)
                     order = sales[0]
-                else:  # Create
+                else:  # Create mode
+                    order_data.update({
+                        'connector_id': connector_id,
+                        'wp_id': wp_id,
+                        'name': number,
+                        'date_order': date_created,
+                        'partner_id': partner_id,
+                        'partner_shipping_id': partner_shipping_id,
+                        'partner_invoice_id': partner_invoice_id,
+                    })
                     created = True
                     try:
                         order = sale_pool.create(order_data)
@@ -286,16 +299,21 @@ class WPConnector(models.Model):
                     'sku': '01366-29'}], 
                     'meta_data': [
                         {'id': 3759624, 'key': 'is_vat_exempt', 'value': 'no'},
-                        {'id': 3759628, 'key': '_shipping_phone', 'value': '3292132098'},
-                        {'id': 3759642, 'key': 'amazon_reference_id', 'value': 'P02-5649172-2284784'},
-                        {'id': 3759644, 'key': 'amazon_order_language', 'value': 'it-IT'},
-                        {'id': 3759645, 'key': 'is_vat_exempt', 'value': 'no'}
+                        {'id': 3759628, 
+                            'key': '_shipping_phone', 'value': '3292132098'},
+                        {'id': 3759642, 
+                            'key': 'amazon_reference_id', 
+                            'value': 'P02-5649172-2284784'},
+                        {'id': 3759644, 
+                            'key': 'amazon_order_language', 'value': 'it-IT'},
+                        {'id': 3759645, 
+                            'key': 'is_vat_exempt', 'value': 'no'}
                         ],
                     """
                     # Check order if present:
                     shipping_line = False
                     origin_line_found = {}
-                    if not created:
+                    if not created:  # Save current list of line
                         #  Check previous line present:
                         for origin_line in order.order_line:
                             product = origin_line.product_id
@@ -314,10 +332,11 @@ class WPConnector(models.Model):
                         products = product_pool.search([
                             ('default_code', '=', sku),
                             ])
+
+                        # Check product:
                         if products:
                             product_id = products[0].id
-                        else:
-                            # Create product not present!:
+                        else:  # Create product not present!:
                             _logger.warning(
                                 'Create product not present: %s' % sku)
                             product_id = product_pool.create({
@@ -356,10 +375,7 @@ class WPConnector(models.Model):
                             shipping_line.write({
                                 'price_unit': shipping_total,
                                 })
-                        else:
-                            # -------------------------------------------------
-                            # Search shipping product:
-                            # -------------------------------------------------
+                        else:  # Search / Create shipping product:
                             products = product_pool.search([
                                 ('default_code', '=', 'shipping'),
                                 ])
@@ -381,10 +397,10 @@ class WPConnector(models.Model):
                                 'product_uom_qty': 1,
                                 'price_unit': shipping_total,
                                 })
-
                     _logger.info('Create  order: %s' % number)
-            if end_page and params['page'] >= end_page:
-                 break  # TODO remove (for testing)
+            # Block end limit check:
+            if end_page and params['page'] >= end_page + 1:
+                break
         return True
 
 
