@@ -14,6 +14,16 @@ class WPConnector(models.Model):
     """
     _inherit = 'wp.connector'
 
+    # Columns:
+    order_page = fields.Integer(
+        'Order Start page', default=1,
+        help='Start reading orders from page',
+    )
+    order_limit = fields.Integer(
+        'Order limit', default=50,
+        help='Limit of record page for order',
+    )
+
     @api.model
     def extract_partner(self, record):
         """ Extract Partner data from order
