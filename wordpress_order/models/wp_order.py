@@ -431,7 +431,6 @@ class SaleOrder(models.Model):
     def wp_wf_refresh_status(self):
         """ Refresh order status
         """
-        import pdb; pdb.set_trace()
         connector = False  # Updated in loop
         error = []
         for order in self:
