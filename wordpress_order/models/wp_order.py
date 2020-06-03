@@ -443,7 +443,11 @@ class SaleOrder(models.Model):
                 if reply.ok:
                     json_reply = reply.json()
                     wp_status = json_reply['status']
-                    order.write({'wp_status': wp_status})
+                    if wp_status != order.wp_status:  # Update if different
+                        order.write({'wp_status': wp_status})
+                    else:
+                        _logger.warning(
+                            'No need to update order: %s' % order.name)
                 else:
                     _logger.error('Order: %s error in update call' % reply)
             except:
