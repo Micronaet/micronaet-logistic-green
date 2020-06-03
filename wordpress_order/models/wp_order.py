@@ -428,6 +428,27 @@ class SaleOrder(models.Model):
 
     # WP Workflow button:
     @api.multi
+    def wp_wf_refresh_status(self):
+        """ Refresh order status
+        """
+        import pdb; pdb.set_trace()
+        connector_pool = self.env['wp.connector']
+        wcapi = connector_pool.get_connector()
+        error = []
+        for order in self:
+            try:
+                reply = wcapi.get('orders/%s' % order.wp_id)
+                if reply.ok:
+                    json_reply = reply.json()
+                    wp_status = json_reply['status']
+                    order.write({'wp_status': wp_status})
+                else:
+                    _logger.error('Order: %s error in update call' % reply)
+            except:
+                error.append(order)
+                _logger.error('Order: %s not updated' % order.name)
+
+    @api.multi
     def wp_wf_processing(self):
         """ Update status to processing
         """
@@ -448,7 +469,6 @@ class SaleOrder(models.Model):
             except:
                 error.append(order)
                 _logger.error('Order: %s not updated' % order.name)
-        return True
 
     # -------------------------------------------------------------------------
     #                                   COLUMNS:
