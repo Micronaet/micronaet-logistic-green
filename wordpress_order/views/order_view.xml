@@ -41,6 +41,9 @@
             <xpath expr="//page[1]" position="after" attrs="{'invisible': [('connector_id', '=', False)]}">
                 <page string="Wordpress">
                     <group colspan="4" col="5">
+                        <button name="wp_wf_refresh_status" type="object" string="Refresh" icon="fa-refresh"/>
+                        <newline/>
+
                         <field name="wp_id"/>
                         <field name="wp_status"/>
                         <button name="wp_wf_processing" type="object" string="Confirmed payment" colspan="1" attrs="{'invisible': [('wp_status', '!=', 'on-hold')]}"/>
