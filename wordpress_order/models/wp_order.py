@@ -426,6 +426,28 @@ class SaleOrder(models.Model):
     """
     _inherit = 'sale.order'
 
+    # WP Workflow button:
+    @api.multi
+    def wp_wf_processing(self):
+        """ Update status to processing
+        """
+        connector_pool = self.env['wp.connector']
+        wcapi = connector_pool.get_connector()
+
+        data = {
+            'status': 'processing',
+        }
+        error = []
+        for order in self:
+            try:
+                res = wcapi.put('orders/%s' % order.wp_id, data)
+                if res.status_ok:
+                    order.write({'wp_status': 'processing'})
+            except:
+                error.append(order)
+                _logger.error('Order: %s not updated' % order.name)
+        return True
+
     # -------------------------------------------------------------------------
     #                                   COLUMNS:
     # -------------------------------------------------------------------------
