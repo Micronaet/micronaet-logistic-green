@@ -440,9 +440,11 @@ class SaleOrder(models.Model):
         error = []
         for order in self:
             try:
-                res = wcapi.put('orders/%s' % order.wp_id, data)
-                if res.status_ok:
+                reply = wcapi.put('orders/%s' % order.wp_id, data)
+                if reply.ok:
                     order.write({'wp_status': 'processing'})
+                else:
+                    _logger.error('Order: %s error in update call' % reply)
             except:
                 error.append(order)
                 _logger.error('Order: %s not updated' % order.name)
