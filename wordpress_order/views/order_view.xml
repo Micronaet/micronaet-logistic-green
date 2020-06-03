@@ -40,12 +40,17 @@
             </field>
             <xpath expr="//page[1]" position="after" attrs="{'invisible': [('connector_id', '=', False)]}">
                 <page string="Wordpress">
-                    <group colspan="4" col="3"><button name="wp_wf_processing" type="object" string="Confirmed payment" colspan="1" attrs="{'invisible': [('wp_status', '!=', 'on-hold')]}"/>
+                    <group colspan="4" col="5">
                         <field name="wp_id"/>
                         <field name="wp_status"/>
+                        <button name="wp_wf_processing" type="object" string="Confirmed payment" colspan="1" attrs="{'invisible': [('wp_status', '!=', 'on-hold')]}"/>
+
                         <field name="wp_date_created"/>
                         <field name="wp_date_modified"/>
+                        <newline/>
+
                         <field name="wp_date_completed"/>
+                        <newline/>
                     </group>
                 </page>
             </xpath>
