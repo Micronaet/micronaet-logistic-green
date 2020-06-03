@@ -432,11 +432,13 @@ class SaleOrder(models.Model):
         """ Refresh order status
         """
         import pdb; pdb.set_trace()
-        connector_pool = self.env['wp.connector']
-        wcapi = connector_pool.get_connector()
+        connector = False  # Updated in loop
         error = []
         for order in self:
             try:
+                if self.connector_id != connector:
+                    connector = self.connector_id
+                    wcapi = connector.get_connector()
                 reply = wcapi.get('orders/%s' % order.wp_id)
                 if reply.ok:
                     json_reply = reply.json()
