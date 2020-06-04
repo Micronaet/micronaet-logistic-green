@@ -31,15 +31,18 @@ order_ids = order_pool.search([
     ('wp_status', 'in', (
         'delivered', 'on-hold', 'pending', 'processing', 'sent-to-gsped')),
 ])
-print('Update order status [Tot. %s]' % len(order_ids))
+total = len(order_ids)
+print('Update order status [Tot. %s]' % total)
 import pdb; pdb.set_trace()
+i = 0
 for order in order_pool.browse(order_ids):
+    i += 1
     name = order.name
     try:
         order.wp_wf_refresh_status()
-        print('[INFO] Refresh order: %s [%s]' % (
-            name, order.wp_status))
+        print('[INFO] Refresh order: %s [%s] (%s/%s)' % (
+            name, order.wp_status, i, total))
     except:
-        print('[ERR] Cannot Refresh order: %s [%s]' % (
-            name, order.wp_status))
+        print('[ERR] Cannot Refresh order: %s [%s] (%s/%s)' % (
+            name, order.wp_status, i, total))
 
