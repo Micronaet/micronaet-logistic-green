@@ -33,7 +33,6 @@ order_ids = order_pool.search([
 ])
 total = len(order_ids)
 print('Update order status [Tot. %s]' % total)
-import pdb; pdb.set_trace()
 i = 0
 for order in order_pool.browse(order_ids):
     i += 1
