@@ -27,13 +27,17 @@ odoo = erppeek.Client(
 # Pool used:
 order_pool = odoo.model('sale.order')
 
-print('Update order status')
 order_ids = order_pool.search([
     ('wp_status', 'in', (
         'delivered', 'on-hold', 'pending', 'processing', 'sent-to-gsped')),
 ])
+print('Update order status [Tot. %s]' % len(order_ids))
 import pdb; pdb.set_trace()
 for order in order_pool.browse(order_ids):
-    name = order['name']
-    print('Update order: %s [%s]' % (name, order.wp_status))
-    order.wp_wf_refresh_status()
+    name = order.name
+    try:
+        order.wp_wf_refresh_status()
+        print('[INFO] Refresh order: %s [%s]' % (name, order.wp_status))
+    except:
+        print('[ERR] Cannot Refresh order: %s [%s]' % (name, order.wp_status))
+
