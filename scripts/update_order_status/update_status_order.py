@@ -37,7 +37,9 @@ for order in order_pool.browse(order_ids):
     name = order.name
     try:
         order.wp_wf_refresh_status()
-        print('[INFO] Refresh order: %s [%s]' % (name, order.wp_status))
+        print('[INFO] Refresh order: %s [%s]' % (
+            name, order.wp_status))
     except:
-        print('[ERR] Cannot Refresh order: %s [%s]' % (name, order.wp_status))
+        print('[ERR] Cannot Refresh order: %s [%s]' % (
+            name, order.wp_status))
 
