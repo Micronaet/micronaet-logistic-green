@@ -426,7 +426,10 @@ class SaleOrder(models.Model):
     """
     _inherit = 'sale.order'
 
+    # -------------------------------------------------------------------------
     # WP Workflow button:
+    # -------------------------------------------------------------------------
+    # Utility:
     @api.multi
     def wp_wf_refresh_status(self):
         """ Refresh order status
@@ -455,26 +458,67 @@ class SaleOrder(models.Model):
         return True
 
     @api.multi
-    def wp_wf_processing(self):
-        """ Update status to processing
+    def wp_wf_set_to_state(self, state):
+        """ Update status to state passed (utility called from WF button
         """
         connector_pool = self.env['wp.connector']
         wcapi = connector_pool.get_connector()
 
         data = {
-            'status': 'processing',
+            'status': state,
         }
         error = []
         for order in self:
             try:
                 reply = wcapi.put('orders/%s' % order.wp_id, data)
                 if reply.ok:
-                    order.write({'wp_status': 'processing'})
+                    order.write({'wp_status': state})
                 else:
                     _logger.error('Order: %s error in update call' % reply)
             except:
                 error.append(order)
                 _logger.error('Order: %s not updated' % order.name)
+
+    # Status button:
+    # pending
+    # on-hold
+    # delivered
+
+    @api.multi
+    def wp_wf_processing(self):
+        """ Update status to processing
+        """
+        return self.wp_wf_set_to_state('processing')
+
+    @api.multi
+    def wp_wf_completed(self):
+        """ Update status to competed
+        """
+        return self.wp_wf_set_to_state('completed')
+
+    @api.multi
+    def wp_wf_cancelled(self):
+        """ Update status to cancelled
+        """
+        return self.wp_wf_set_to_state('cancelled')
+
+    @api.multi
+    def wp_wf_refunded(self):
+        """ Update status to refunded
+        """
+        return self.wp_wf_set_to_state('refunded')
+
+    @api.multi
+    def wp_wf_trash(self):
+        """ Update status to trash
+        """
+        return self.wp_wf_set_to_state('trash')
+
+    @api.multi
+    def wp_wf_failed(self):
+        """ Update status to failed
+        """
+        return self.wp_wf_set_to_state('failed')
 
     # -------------------------------------------------------------------------
     #                                   COLUMNS:
