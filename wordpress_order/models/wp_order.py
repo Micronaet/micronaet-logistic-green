@@ -452,6 +452,7 @@ class SaleOrder(models.Model):
             except:
                 error.append(order)
                 _logger.error('Order: %s not updated' % order.name)
+        return True
 
     @api.multi
     def wp_wf_processing(self):
