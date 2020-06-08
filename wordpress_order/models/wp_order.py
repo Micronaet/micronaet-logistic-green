@@ -466,6 +466,7 @@ class SaleOrder(models.Model):
         }
         error = []
         previous_connector = False
+        import pdb; pdb.set_trace()
         for order in self:
             connector = order.connector_id
             if connector != previous_connector:
