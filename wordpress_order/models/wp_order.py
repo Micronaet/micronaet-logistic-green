@@ -476,17 +476,10 @@ class SaleOrder(models.Model):
                 if reply.ok:
                     order.write({'wp_status': state})
                 else:
-                    import pdb;
-                    pdb.set_trace()
                     _logger.error('Order: %s error in update call' % reply)
             except:
                 error.append(order)
                 _logger.error('Order: %s not updated' % order.name)
-
-    # Status button:
-    # pending
-    # on-hold
-    # delivered
 
     @api.multi
     def wp_wf_processing(self):
@@ -513,12 +506,6 @@ class SaleOrder(models.Model):
         return self.wp_wf_set_to_state('refunded')
 
     @api.multi
-    def wp_wf_trash(self):
-        """ Update status to trash
-        """
-        return self.wp_wf_set_to_state('trash')
-
-    @api.multi
     def wp_wf_failed(self):
         """ Update status to failed
         """
@@ -543,6 +530,6 @@ class SaleOrder(models.Model):
             ('cancelled', 'Cancelled'),
             ('refunded', 'Refunded'),
             ('failed', 'Failed'),
-            ('trash', 'Trash'),
+            # ('trash', 'Trash'),
             ('sent-to-gsped', 'Sent to GSped')
             ])
