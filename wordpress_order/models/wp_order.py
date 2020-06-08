@@ -466,7 +466,6 @@ class SaleOrder(models.Model):
         }
         error = []
         previous_connector = False
-        import pdb; pdb.set_trace()
         for order in self:
             connector = order.connector_id
             if connector != previous_connector:
@@ -477,6 +476,8 @@ class SaleOrder(models.Model):
                 if reply.ok:
                     order.write({'wp_status': state})
                 else:
+                    import pdb;
+                    pdb.set_trace()
                     _logger.error('Order: %s error in update call' % reply)
             except:
                 error.append(order)
