@@ -461,14 +461,16 @@ class SaleOrder(models.Model):
     def wp_wf_set_to_state(self, state):
         """ Update status to state passed (utility called from WF button
         """
-        connector_pool = self.env['wp.connector']
-        wcapi = connector_pool.get_connector()
-
         data = {
             'status': state,
         }
         error = []
+        previous_connector = False
         for order in self:
+            connector = order.connector_id
+            if connector != previous_connector:
+                previous_connector = connector
+                wcapi = connector.get_connector()
             try:
                 reply = wcapi.put('orders/%s' % order.wp_id, data)
                 if reply.ok:
