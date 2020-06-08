@@ -46,9 +46,9 @@
                         <button name="wp_wf_refresh_status" type="object" string="Refresh" icon="fa-refresh" colspan="1"/>
                         <newline/>
 
-                        <button name="wp_wf_trash" type="object" string="Trash" icon="fa-bitbucket" colspan="1"  attrs="{'invisible': [('wp_status', '=', 'trash')]}" confirm="Order will trashed, confirm?"/>
                         <button name="wp_wf_cancelled" type="object" string="Cancelled" icon="fa-mail-reply" colspan="1"  attrs="{'invisible': [('wp_status', '=', 'cancelled')]}"  confirm="Order wil be marked as cancelled, confirm?"/>
                         <button name="wp_wf_failed" type="object" string="Failed" icon="fa-ban" colspan="1"  attrs="{'invisible': [('wp_status', '=', 'failed')]}"  confirm="Order wil be marked as failed, confirm?"/>
+                        <!--<button name="wp_wf_trash" type="object" string="Trash" icon="fa-bitbucket" colspan="1"  attrs="{'invisible': [('wp_status', '=', 'trash')]}" confirm="Order will trashed, confirm?"/>-->
                         <newline/>
 
 
