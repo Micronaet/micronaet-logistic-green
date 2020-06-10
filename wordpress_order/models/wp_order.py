@@ -492,7 +492,7 @@ class SaleOrder(models.Model):
         """ Update status to competed
         """
         self.wp_wf_set_to_state('delivered')
-        #self.wp_wf_set_to_state('completed')
+        # self.wp_wf_set_to_state('completed')
         return True
 
     @api.multi

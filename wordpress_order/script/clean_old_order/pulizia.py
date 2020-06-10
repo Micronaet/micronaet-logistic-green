@@ -39,8 +39,8 @@ order_pool = odoo.model('sale.order')
 order_ids = order_pool.search([
     ('date_order', '<=', date_order),
     ('wp_status', 'in', (
-        # 'delivered',
-        'sent-to-gsped',
+        'delivered',
+        # 'sent-to-gsped',
 
         # 'on-hold',
         # 'pending',
@@ -49,17 +49,22 @@ order_ids = order_pool.search([
     )),
     ])
 
-print('Order to be cleaned: %s' % len(order_ids))
+total = len(order_ids)
+print('Order to be cleaned: %s' % total)
 now = ('%s' % datetime.now()).replace('\\', '_').replace(':', '').replace(
     ' ', '').replace('-', '_').replace('/', '_')
 log_file = open('./log/export_%s.csv' % now, 'w')
 import pdb; pdb.set_trace()
+i = 0
 for order in order_pool.browse(order_ids):
+    i += 1
     # Update confirmed
-    text = '%s del %s (da %s a completed)\n' % (
+    text = '%s del %s (da %s a completed) [%s di %s]\n' % (
         order.name,
         order.date_order,
         order.wp_status,
+        i,
+        total,
     )
     print(text)
     status = '[OK] '
