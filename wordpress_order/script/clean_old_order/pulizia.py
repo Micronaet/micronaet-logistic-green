@@ -62,4 +62,5 @@ for order in order_pool.browse(order_ids):
             order.date_order,
             order.wp_status,
         ))
+        # wp_wf_cancelled
         order.wp_wf_completed()
