@@ -15,7 +15,6 @@ date_order = '2020-03-10'
 dry_run = False
 
 print('Clean before: %s' % date_order)
-import pdb; pdb.set_trace()
 cfg_file = os.path.expanduser('./openerp.cfg')
 
 config = ConfigParser.ConfigParser()
@@ -52,6 +51,7 @@ print('Order to be cleaned: %s' % len(order_ids))
 now = ('%s' % datetime.now()).replace('\\', '_').replace(':', '').replace(
     ' ', '').replace('-', '_').replace('/', '_')
 log_file = open('./log/export_%s.csv' % now, 'w')
+import pdb; pdb.set_trace()
 for order in order_pool.browse(order_ids):
     # Update confirmed
     if dry_run:
