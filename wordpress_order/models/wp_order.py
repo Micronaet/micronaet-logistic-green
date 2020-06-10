@@ -436,7 +436,6 @@ class SaleOrder(models.Model):
         """
         connector = False  # Updated in loop
         error = []
-        import pdb; pdb.set_trace()
         for order in self:
             try:
                 if self.connector_id != connector:
