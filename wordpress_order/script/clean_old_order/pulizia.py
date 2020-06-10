@@ -39,7 +39,7 @@ order_pool = odoo.model('sale.order')
 order_ids = order_pool.search([
     ('date_order', '<=', date_order),
     ('wp_status', 'in', (
-        'delivered',
+        'completed',
         # 'sent-to-gsped',
 
         # 'on-hold',
