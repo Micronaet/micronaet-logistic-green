@@ -72,3 +72,4 @@ for order in order_pool.browse(order_ids):
             print('%s' % (sys.exc_info(), )
 
     log_file.write(status + text)
+    log_file.flush()
