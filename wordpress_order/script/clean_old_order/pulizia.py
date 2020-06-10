@@ -57,8 +57,9 @@ for order in order_pool.browse(order_ids):
     if dry_run:
         print('Marked completed: %s' % order.name)
     else:
-        log_file.write('%s (da %s a completed)\n' % (
+        log_file.write('%s del %s (da %s a completed)\n' % (
             order.name,
+            order.date_order,
             order.wp_status,
         ))
         order.wp_wf_completed()
