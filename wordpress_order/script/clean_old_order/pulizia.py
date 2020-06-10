@@ -41,9 +41,11 @@ order_ids = order_pool.search([
     ('wp_status', 'in', (
         'delivered',
         'sent-to-gsped',
-        # 'processing',
+
         # 'on-hold',
         # 'pending',
+
+        # 'processing',
     )),
     ])
 

@@ -491,7 +491,6 @@ class SaleOrder(models.Model):
     def wp_wf_completed(self):
         """ Update status to competed
         """
-        import pdb; pdb.set_trace()
         return self.wp_wf_set_to_state('completed')
 
     @api.multi
