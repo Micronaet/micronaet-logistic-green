@@ -3,6 +3,7 @@ import woocommerce
 import pickle
 import urllib
 import sys
+from datetime import datetime
 import erppeek
 import ConfigParser
 
