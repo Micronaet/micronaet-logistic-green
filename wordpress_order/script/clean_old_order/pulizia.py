@@ -11,7 +11,7 @@ import ConfigParser
 # -----------------------------------------------------------------------------
 # From config file:
 date_order = '2020-03-10'
-dry_run = True
+dry_run = False
 
 print('Clean before: %s' % date_order)
 import pdb; pdb.set_trace()
@@ -48,9 +48,16 @@ order_ids = order_pool.search([
     ])
 
 print('Order to be cleaned: %s' % len(order_ids))
+now = ('%s' % datetime.now()).replace('\\', '_').replace(':', '').replace(
+    ' ', '').replace('-', '_').replace('/', '_')
+log_file = open('./log/export_%s.csv' % now, 'w')
 for order in order_pool.browse(order_ids):
     # Update confirmed
     if dry_run:
         print('Marked completed: %s' % order.name)
     else:
+        log_file.write('%s (da %s a completed)\n' % (
+            order.name,
+            order.wp_status,
+        ))
         order.wp_wf_completed()
