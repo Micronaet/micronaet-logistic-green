@@ -62,8 +62,13 @@ for order in order_pool.browse(order_ids):
         order.wp_status,
     )
     print(text)
+    status = '[OK] '
     if not dry_run:
         # wp_wf_cancelled
-        order.wp_wf_completed()
+        try:
+            order.wp_wf_completed()
+        except:
+            status = '[ERROR] '
+            print('%s' % (sys.exc_info(), )
 
-    log_file.write(text)
+    log_file.write(status + text)
