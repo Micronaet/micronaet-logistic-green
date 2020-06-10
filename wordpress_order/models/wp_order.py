@@ -491,13 +491,15 @@ class SaleOrder(models.Model):
     def wp_wf_completed(self):
         """ Update status to competed
         """
-        return self.wp_wf_set_to_state('completed')
+        self.wp_wf_set_to_state('completed')
+        return True
 
     @api.multi
     def wp_wf_cancelled(self):
         """ Update status to cancelled
         """
-        return self.wp_wf_set_to_state('cancelled')
+        self.wp_wf_set_to_state('cancelled')
+        return True
 
     @api.multi
     def wp_wf_refunded(self):
