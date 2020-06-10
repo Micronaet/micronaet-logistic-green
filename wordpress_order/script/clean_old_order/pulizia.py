@@ -12,9 +12,9 @@ import ConfigParser
 # -----------------------------------------------------------------------------
 # From config file:
 date_order = '2020-03-10'
-dry_run = True
+dry_run = False
 
-print('Clean before: %s' % date_order)
+print('Clean before: %s Dry run: %s' % (date_order, dry_run))
 cfg_file = os.path.expanduser('./openerp.cfg')
 
 config = ConfigParser.ConfigParser()
@@ -39,7 +39,7 @@ order_pool = odoo.model('sale.order')
 order_ids = order_pool.search([
     ('date_order', '<=', date_order),
     ('wp_status', 'in', (
-        'delivered',
+        # 'delivered',
         'sent-to-gsped',
 
         # 'on-hold',
@@ -56,12 +56,14 @@ log_file = open('./log/export_%s.csv' % now, 'w')
 import pdb; pdb.set_trace()
 for order in order_pool.browse(order_ids):
     # Update confirmed
+    text = '%s del %s (da %s a completed)\n' % (
+        order.name,
+        order.date_order,
+        order.wp_status,
+    )
+    print(text)
     if not dry_run:
         # wp_wf_cancelled
         order.wp_wf_completed()
 
-    log_file.write('%s del %s (da %s a completed)\n' % (
-        order.name,
-        order.date_order,
-        order.wp_status,
-    ))
+    log_file.write(text)
