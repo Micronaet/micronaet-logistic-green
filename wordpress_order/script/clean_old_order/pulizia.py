@@ -59,7 +59,7 @@ i = 0
 for order in order_pool.browse(order_ids):
     i += 1
     # Update confirmed
-    text = '%s del %s (da %s a completed) [%s di %s]\n' % (
+    text = '%s del %s (da %s a delivered) [%s di %s]\n' % (
         order.name,
         order.date_order,
         order.wp_status,
