@@ -12,7 +12,7 @@ import ConfigParser
 # -----------------------------------------------------------------------------
 # From config file:
 date_order = '2020-03-10'
-dry_run = False
+dry_run = True
 
 print('Clean before: %s' % date_order)
 cfg_file = os.path.expanduser('./openerp.cfg')
@@ -56,13 +56,12 @@ log_file = open('./log/export_%s.csv' % now, 'w')
 import pdb; pdb.set_trace()
 for order in order_pool.browse(order_ids):
     # Update confirmed
-    if dry_run:
-        print('Marked completed: %s' % order.name)
-    else:
-        log_file.write('%s del %s (da %s a completed)\n' % (
-            order.name,
-            order.date_order,
-            order.wp_status,
-        ))
+    if not dry_run:
         # wp_wf_cancelled
         order.wp_wf_completed()
+
+    log_file.write('%s del %s (da %s a completed)\n' % (
+        order.name,
+        order.date_order,
+        order.wp_status,
+    ))
