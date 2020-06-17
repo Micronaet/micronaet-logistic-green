@@ -165,10 +165,9 @@ class SaleOrder(models.Model):
             product = line.product_id
             if product.type == 'service' or product.is_expence:
                 continue
-            carrier_description += '%s (X %s) ' % (
-                product.description_sale or product.titolocompleto or
-                product.name or _('Not found'),
+            carrier_description += '(%s X) %s ' % (
                 int(line.product_uom_qty),
+                product.description_sale or product.name or _('Not found'),
                 )
 
         self.carrier_description = self.sanitize_text(
