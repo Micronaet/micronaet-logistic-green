@@ -159,8 +159,6 @@ class SaleOrder(models.Model):
             'length': template.length,
             'width': template.width,
             'height': template.height,
-
-            # 'weight': template.weight,
             })
         return True
 

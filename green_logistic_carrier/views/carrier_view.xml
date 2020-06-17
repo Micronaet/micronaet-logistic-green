@@ -37,21 +37,10 @@
                             <button name="set_carrier_ok_yes" string="Delivery confirmed" type="object" attrs="{'invisible': [('carrier_ok', '=', True)]}" icon="fa-dropbox" /><!--('logistic_state', 'not in', ('order', 'pending')), -->
                             <button name="set_carrier_ok_no" string="Delivery undo" type="object" attrs="{'invisible': [('carrier_ok', '=', False)]}" icon="fa-mail-reply"/>
                             <newline/>
-                            <!--<field name="carrier_shippy" />-->
                             <field name="carrier_ok" invisible="1" />
-                            <newline/>
                         </group>
 
-                        <!--MANUAL:-->
-                        <!--<group colspan="4" col="5" >
-                             <field name="carrier_manual_weight" attrs="{'required': [('carrier_shippy','=',False)]}"/>
-                             <field name="carrier_manual_parcel" attrs="{'required': [('carrier_shippy','=',False)]}"/>
-
-                            <field name="carrier_supplier_id" />
-                        </group>-->
-
-                        <!--SHIPPY:-->
-                        <group colspan="4" col="5" ><!--attrs="{'invisible': [('carrier_shippy','=',False)]}"-->
+                        <group colspan="4" col="5" >
                             <field name="carrier_supplier_id" />
                             <field name="carrier_mode_id" domain="[('supplier_id', '=', carrier_supplier_id)]"/>
                             <newline/>
@@ -81,7 +70,7 @@
                             <newline/>
                         </group>
 
-                        <group colspan="4" col="5" > <!--attrs="{'invisible': [('carrier_shippy','=',False)]}"-->
+                        <group colspan="4" col="5" >
                             <separator string="Request:" colspan="3"/>
                             <button name="set_default_carrier_description" string="Force description" type="object" icon="fa-hand-o-down"/>
                             <field name="carrier_description" colspan="4" />
@@ -106,10 +95,6 @@
                             <field name="carrier_cost" />
                             <field name="carrier_track_id" />
                             <newline/>
-
-                             <!--Double fields: mandatory insert the name of carrier for stock people-->
-                             <field name="carrier_stock_note" colspan="4" /> <!--attrs="{'required': [('carrier_shippy','=',False)], 'invisible': [('carrier_shippy','=',True)]}"-->
-                             <newline/>
                         </group>
                     </page>
                 </xpath>
