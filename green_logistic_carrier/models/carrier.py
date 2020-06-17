@@ -330,7 +330,7 @@ class ReportSaleOrderPassportLabel(models.AbstractModel):
         labels_country = []
         labels_category = []
         total = sum(
-            [1 for parcel in order.parcel_ids if not parcel.no_label])
+            [1 for parcel in order.parcel_ids if not parcel.no_label]) or 1
         for line in order.order_line:
             product = line.product_id
             if not product.passport_manage:
