@@ -44,6 +44,7 @@ class ReportSaleOrderPassportLabel(models.AbstractModel):
         """
         cols = 2
         labels = {}
+
         for line in order.order_line:
             product = line.product_id
             if not product.passport_manage:

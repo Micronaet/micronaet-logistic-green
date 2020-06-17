@@ -16,6 +16,7 @@
         'stock',
         'sale',
         'product',
+        'plant_passport',  # Change report total
         ],
     'data': [
         'security/ir.model.access.csv',

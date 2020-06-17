@@ -311,3 +311,55 @@ class SaleOrder(models.Model):
     carrier_track_id = fields.Char('Track ID', size=64)
     # manual_track_id = fields.Char('Track ID (not shippy)', size=64)
     # TODO extra data needed!
+
+
+# Override label depend on parcels:
+class ReportSaleOrderPassportLabel(models.AbstractModel):
+    """ Passport report for label
+    """
+    _inherit = 'report.plant_passport.report_sale_passport_label'
+
+    # -------------------------------------------------------------------------
+    # Parser function:
+    # -------------------------------------------------------------------------
+    @api.model
+    def get_labels_for_report(self, order):
+        """ Format label for report
+        """
+        cols = 2
+        labels_country = []
+        labels_category = []
+        total = sum(
+            [1 for parcel in order.parcel_ids if not parcel.no_label])
+        for line in order.order_line:
+            product = line.product_id
+            if not product.passport_manage:
+                continue
+
+            category = (product.passport_category_id.name or '').title()
+            if category:
+                if category not in labels_category:
+                    labels_category.append(category)
+            else:
+                _logger.error('Category not present in %s' % product.name)
+                continue
+
+            country = product.passport_country_id.code or ''
+            if country:
+                if country not in labels_country:
+                    labels_country.append(country)
+            else:
+                _logger.error('Country not present in %s' % product.name)
+
+        label_block = []
+
+        for position in range(0, total, cols):
+            block = [
+                (', '.join(labels_country)), ', '.join(labels_category),
+                False,
+            ]
+            if position + 1 < total:
+                block[1] = (
+                    (', '.join(labels_country)), ', '.join(labels_category))
+            label_block.append(block)
+        return label_block
