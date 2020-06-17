@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+   <data>
+        <template id="report_sale_passport_label">
+            <div t-call="web.basic_layout">
+                <div t-foreach="docs" t-as="o">
+                    <div class="page">
+                        <table class="table table-bordered">
+                            <tbody>
+                                <tr t-foreach="get_labels_for_report(o)" t-as="label" class="row">
+                                    <!-- LABEL: -->
+                                    <p>
+                                        <img t-if="res_company.passport_logo"
+                                             t-att-src="'data:image/*;base64,%s' % to_text(res_company.passport_logo)"
+                                             style="max-width: 100px; max-height: 40px;"/>
+
+                                        PASSAPORTO DELLE PIANTE / PLANT PASSPORT
+                                    </p>
+                                    <p>
+                                        <b>A. </b> <span t-esc="label[1]"/>
+                                    </p>
+
+                                    <p>
+                                        <b>B. </b> <span t-esc="res_company.passport_code"/>
+                                    </p>
+
+                                    <p>
+                                        <b>C. </b> <span t-esc="'%s%s' % (res_company.passport_prefix, o.name)"/>
+                                    </p>
+
+                                    <p>
+                                        <b>D. </b> <span t-esc="label[0]"/>
+                                    </p>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </template>
+        <record id="paperformat_passport_label" model="report.paperformat">
+            <field name="name">Passport label report</field>
+            <field name="default" eval="True"/>
+            <field name="format">custom</field>
+            <field name="page_height">297</field>
+            <field name="page_width">210</field>
+            <field name="orientation">Portrait</field>
+            <field name="margin_top">7</field>
+            <field name="margin_bottom">7</field>
+            <field name="margin_left">7</field>
+            <field name="margin_right">7</field>
+            <field name="header_line" eval="False"/>
+            <field name="header_spacing">24</field>
+            <field name="dpi">90</field>
+        </record>
+
+        <!--Report action:-->
+        <report
+            id="action_report_sale_passport_label"
+            model="sale.order"
+            string="Passport oder label report"
+            report_type="qweb-pdf"
+            name="plant_passport.report_sale_passport_label"
+            file="plant_passport.report_sale_passport_label"
+            attachment_use="False"
+            attachment="object.name + '.pdf'"
+            print_report_name="'%s' % object.name"
+            paperformat="paperformat_passport_label"
+        />
+        <!--
+        print_report_name="'%s.%s' % ((object.name or 'draft').replace('/', '_'), object.printed)"
+        "(object._get_printed_report_name())"
+        "'%s.%s' % ((object.name or 'draft').replace('/', '_'), object.printed)"
+        -->
+   </data>
+</openerp>

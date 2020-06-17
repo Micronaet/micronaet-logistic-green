@@ -326,8 +326,6 @@ class ReportSaleOrderPassportLabel(models.AbstractModel):
     def get_labels_for_report(self, order):
         """ Format label for report
         """
-        import pdb; pdb.set_trace()
-        cols = 2
         labels_country = []
         labels_category = []
         total = sum(
@@ -353,14 +351,7 @@ class ReportSaleOrderPassportLabel(models.AbstractModel):
                 _logger.error('Country not present in %s' % product.name)
 
         label_block = []
-
-        for position in range(0, total, cols):
-            block = [
-                (', '.join(labels_country)), ', '.join(labels_category),
-                False,
-            ]
-            if position + 1 < total:
-                block[1] = (
-                    ', '.join(labels_country), ', '.join(labels_category))
-            label_block.append(block)
+        for i in range(total):
+            label_block.append(
+                (', '.join(labels_country)), ', '.join(labels_category))
         return label_block
