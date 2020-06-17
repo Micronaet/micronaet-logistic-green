@@ -27,9 +27,9 @@ msgstr "%s [Utente: %s]"
 msgid "%s<b>ORD.:</b> %s\n"
 "<b>INV.:</b> %s\n"
 "<b>DELIV.:</b> %s"
-msgstr "%s<b>ORD.:</b> %s\n"
-"<b>INV.:</b> %s\n"
-"<b>CONS.:</b> %s"
+msgstr "%s<b>ORDINE:</b> %s\n"
+"<b>FATTURAZ.:</b> %s\n"
+"<b>CONSEGNA:</b> %s"
 
 #. module: green_logistic_carrier
 #: model:ir.model.fields,field_description:green_logistic_carrier.field_carrier_supplier_account_ref
