@@ -71,7 +71,7 @@ class CarrierParcelTemplate(models.Model):
 
     weight = fields.Float(
         'Weight volumetric', digits=(16, 2), compute='_get_volumetric_weight',
-        help='Volumetric weight (H x L x P / 5000)')
+        help='Volumetric weight (H x L x P / 5000)', readonly=True)
     weight_uom_id = fields.Many2one('product.uom', 'Product UOM')
 
 
