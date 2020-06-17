@@ -8,29 +8,31 @@
                         <table class="table table-bordered">
                             <tbody>
                                 <tr t-foreach="get_labels_for_report(o)" t-as="label" class="row">
-                                    <!-- LABEL: -->
-                                    <p>
-                                        <img t-if="res_company.passport_logo"
-                                             t-att-src="'data:image/*;base64,%s' % to_text(res_company.passport_logo)"
-                                             style="max-width: 100px; max-height: 40px;"/>
+                                    <td>
+                                        <!-- LABEL: -->
+                                        <p>
+                                            <img t-if="res_company.passport_logo"
+                                                 t-att-src="'data:image/*;base64,%s' % to_text(res_company.passport_logo)"
+                                                 style="max-width: 100px; max-height: 40px;"/>
 
-                                        PASSAPORTO DELLE PIANTE / PLANT PASSPORT
-                                    </p>
-                                    <p>
-                                        <b>A. </b> <span t-esc="label[1]"/>
-                                    </p>
+                                            PASSAPORTO DELLE PIANTE / PLANT PASSPORT
+                                        </p>
+                                        <p>
+                                            <b>A. </b> <span t-esc="label[1]"/>
+                                        </p>
 
-                                    <p>
-                                        <b>B. </b> <span t-esc="res_company.passport_code"/>
-                                    </p>
+                                        <p>
+                                            <b>B. </b> <span t-esc="res_company.passport_code"/>
+                                        </p>
 
-                                    <p>
-                                        <b>C. </b> <span t-esc="'%s%s' % (res_company.passport_prefix, o.name)"/>
-                                    </p>
+                                        <p>
+                                            <b>C. </b> <span t-esc="'%s%s' % (res_company.passport_prefix, o.name)"/>
+                                        </p>
 
-                                    <p>
-                                        <b>D. </b> <span t-esc="label[0]"/>
-                                    </p>
+                                        <p>
+                                            <b>D. </b> <span t-esc="label[0]"/>
+                                        </p>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>

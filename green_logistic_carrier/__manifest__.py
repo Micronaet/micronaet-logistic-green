@@ -21,6 +21,7 @@
     'data': [
         'security/ir.model.access.csv',
         'views/carrier_view.xml',
+        'report/sale_label_report.xml',
         ],
     'test': [],
     'installable': True,
