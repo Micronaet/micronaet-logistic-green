@@ -326,6 +326,7 @@ class ReportSaleOrderPassportLabel(models.AbstractModel):
     def get_labels_for_report(self, order):
         """ Format label for report
         """
+        import pdb; pdb.set_trace()
         cols = 2
         labels_country = []
         labels_category = []
