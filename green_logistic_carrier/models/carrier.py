@@ -353,5 +353,5 @@ class ReportSaleOrderPassportLabel(models.AbstractModel):
         label_block = []
         for i in range(total):
             label_block.append(
-                (', '.join(labels_country)), ', '.join(labels_category))
+                (', '.join(labels_country), ', '.join(labels_category)))
         return label_block
