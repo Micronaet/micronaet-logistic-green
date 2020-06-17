@@ -52,11 +52,12 @@ class CarrierParcelTemplate(models.Model):
     _rec_name = 'name'
 
     @api.multi
-    def _get_volumetric_weigth(self):
+    def _get_volumetric_weight(self):
         """ Compute volumetric weight, return value
         """
         for template in self:
-            self.weight = self.length * self.width * self.height / 5000.0
+            template.weight = (
+                template.length * template.width * template.height / 5000.0)
 
     # -------------------------------------------------------------------------
     #                                   COLUMNS:
