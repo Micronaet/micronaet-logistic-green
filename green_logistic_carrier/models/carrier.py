@@ -51,6 +51,13 @@ class CarrierParcelTemplate(models.Model):
     _description = 'Parcel template'
     _rec_name = 'name'
 
+    @api.multi
+    def _get_volumetric_weigth(self):
+        """ Compute volumetric weight, return value
+        """
+        for template in self:
+            self.weight = self.length * self.width * self.height / 5000.0
+
     # -------------------------------------------------------------------------
     #                                   COLUMNS:
     # -------------------------------------------------------------------------
@@ -61,7 +68,9 @@ class CarrierParcelTemplate(models.Model):
     height = fields.Float('Height', digits=(16, 2), required=True)
     dimension_uom_id = fields.Many2one('product.uom', 'Product UOM')
 
-    weight = fields.Float('Weight', digits=(16, 2), required=True)
+    weight = fields.Float(
+        'Weight volumetric', digits=(16, 2), compute='_get_volumetric_weight',
+        help='Volumetric weight (H x L x P / 5000)')
     weight_uom_id = fields.Many2one('product.uom', 'Product UOM')
 
 
