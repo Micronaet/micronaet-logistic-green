@@ -34,7 +34,7 @@ msgstr "%s<b>ORDINE:</b> %s\n"
 #. module: green_logistic_carrier
 #: model:ir.model.fields,field_description:green_logistic_carrier.field_carrier_supplier_account_ref
 msgid "Account ref."
-msgstr "Rig. contabile"
+msgstr "Rif. contabile"
 
 #. module: green_logistic_carrier
 #: model:ir.ui.view,arch_db:green_logistic_carrier.view_sale_order_form
