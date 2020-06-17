@@ -9,7 +9,7 @@
                         <table class="table table-bordered">
                             <tbody>
                                 <tr t-foreach="get_labels_for_report(o)" t-as="label" class="row">
-                                    <td>
+                                    <td height="250">
                                         <!-- LABEL: -->
                                         <p>
                                             <img t-if="res_company.passport_logo"
@@ -35,6 +35,7 @@
                                         </p>
                                     </td>
                                 </tr>
+                                <div style="page-break-after:auto;"></div>
                             </tbody>
                         </table>
                     </div>
