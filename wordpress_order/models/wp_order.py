@@ -458,6 +458,34 @@ class SaleOrder(models.Model):
         return True
 
     @api.multi
+    def wp_wf_set_to_state_batch(self, state):
+        """ Batch update all orders
+        """
+        data = {
+            'update': [],
+        }
+        error = []
+        connector = False
+        for order in self:
+            if not connector:
+                connector = order.connector_id
+                wcapi = connector.get_connector()
+            try:
+                reply = wcapi.put('orders/batch', data)
+                if reply.ok:
+                    # reply_json = reply.json()
+                    # for item in reply_json:
+
+                    order.write({'wp_status': state})
+                else:
+                    _logger.error('Order: %s error in update call' % reply)
+            except:
+                error.append(order)
+                _logger.error('Order: %s not updated' % order.name)
+
+
+
+    @api.multi
     def wp_wf_set_to_state(self, state):
         """ Update status to state passed (utility called from WF button
         """
@@ -489,10 +517,10 @@ class SaleOrder(models.Model):
 
     @api.multi
     def wp_wf_completed(self):
-        """ Update status to competed
+        """ Update status to completed
         """
+        # TODO change event name (complete is wrong state)
         self.wp_wf_set_to_state('delivered')
-        # self.wp_wf_set_to_state('completed')
         return True
 
     @api.multi
