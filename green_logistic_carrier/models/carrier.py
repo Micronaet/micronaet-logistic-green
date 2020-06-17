@@ -130,6 +130,21 @@ class SaleOrder(models.Model):
 
     _inherit = 'sale.order'
 
+    # Utility (TODO move in main module)
+    @api.model
+    def write_log_chatter_message(self, message):
+        """ Write message for log operation in order chatter
+        """
+        user = self.env['res.users'].browse(self.env.uid)
+        body = _('%s [User: %s]') % (
+            message,
+            user.name,
+            )
+        self.message_post(
+            body=body,
+            #subtype='mt_comment',
+            #partner_ids=followers
+            )
     @api.multi
     def set_default_carrier_description(self):
         """ Update description from sale order line
