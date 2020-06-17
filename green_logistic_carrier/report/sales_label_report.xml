@@ -9,7 +9,7 @@
                         <table class="table table-bordered">
                             <tbody>
                                 <tr t-foreach="get_labels_for_report(o)" t-as="label" class="row">
-                                    <td height="250">
+                                    <td height="200">
                                         <!-- LABEL: -->
                                         <p>
                                             <img t-if="res_company.passport_logo"
@@ -46,7 +46,7 @@
             <field name="name">Passport label report</field>
             <field name="default" eval="True"/>
             <field name="format">custom</field>
-            <field name="page_height">70</field>
+            <field name="page_height">55</field>
             <field name="page_width">110</field>
             <field name="orientation">Portrait</field>
             <field name="margin_top">7</field>
