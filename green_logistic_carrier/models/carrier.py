@@ -152,7 +152,7 @@ class SaleOrder(models.Model):
         :param text: HTML text to clean
         :return: clean text
         """
-        self.ensureone()
+        self.ensure_one()
         tag_re = re.compile(r'<[^>]+>')
         return tag_re.sub('', text)
 
