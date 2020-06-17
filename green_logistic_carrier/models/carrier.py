@@ -110,13 +110,13 @@ class SaleOrderParcel(models.Model):
     dimension_uom_id = fields.Many2one('product.uom', 'Product UOM')
 
     # Weight:
+    real_weight = fields.Float(
+        'Real weight', digits=(16, 2),
+        )
     weight = fields.Float(
         'Volumetric weight', digits=(16, 2), compute='_get_volumetric_weight',
         readonly=True,
     )
-    real_weight = fields.Float(
-        'Weight', digits=(16, 2), readonly=True,
-        )
     used_weight = fields.Float(
         'Used weight', digits=(16, 2), compute='_get_volumetric_weight',
         readonly=True,
