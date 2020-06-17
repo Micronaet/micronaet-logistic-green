@@ -167,7 +167,8 @@ class SaleOrder(models.Model):
                 continue
             carrier_description += '(%s X) %s ' % (
                 int(line.product_uom_qty),
-                product.description_sale or product.name or _('Not found'),
+                (line.name or product.description_sale or product.name or
+                 _('Not found')),
                 )
 
         self.carrier_description = self.sanitize_text(
