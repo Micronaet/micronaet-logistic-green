@@ -83,6 +83,21 @@ class SaleOrderParcel(models.Model):
     _description = 'Sale order parcel'
     _rec_name = 'weight'
 
+    @api.multi
+    def _get_volumetric_weight(self):
+        """ Compute volumetric weight, return value
+        """
+        for template in self:
+            weight = (  # Volumetric:
+                template.length * template.width * template.height / 5000.0)
+            real_weight = template.real_weight
+            if weight > real_weight:
+                used_weight = weight
+            else:
+                used_weight = real_weight
+            template.real_weight = real_weight
+            template.used_weight = used_weight
+
     # -------------------------------------------------------------------------
     #                                   COLUMNS:
     # -------------------------------------------------------------------------
@@ -92,11 +107,20 @@ class SaleOrderParcel(models.Model):
     length = fields.Float('Length', digits=(16, 2), required=True)
     width = fields.Float('Width', digits=(16, 2), required=True)
     height = fields.Float('Height', digits=(16, 2), required=True)
-    order_id = fields.Many2one('sale.order', 'Order')
     dimension_uom_id = fields.Many2one('product.uom', 'Product UOM')
 
     # Weight:
-    weight = fields.Float('Weight', digits=(16, 2), required=True)
+    weight = fields.Float(
+        'Volumetric weight', digits=(16, 2), compute='_get_volumetric_weight',
+        readonly=True,
+    )
+    real_weight = fields.Float(
+        'Weight', digits=(16, 2), readonly=True,
+        )
+    used_weight = fields.Float(
+        'Used weight', digits=(16, 2), compute='_get_volumetric_weight',
+        readonly=True,
+    )
     weight_uom_id = fields.Many2one('product.uom', 'Product UOM')
 
 

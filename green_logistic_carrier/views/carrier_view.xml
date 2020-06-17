@@ -67,7 +67,9 @@
                                     <field name="width" />
                                     <field name="height" />
 
-                                    <field name="weight" required="1"/>
+                                    <field name="real_weight" />
+                                    <field name="weight" />
+                                    <field name="used_weight" sum="total_weight"/>
                                 </tree>
                             </field>
                             <newline/>
