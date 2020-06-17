@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
    <data>
-        <template id="plant_passport.report_sale_passport_label">
+        <template id="report_sale_passport_label">
             <div t-call="web.basic_layout">
                 <div t-foreach="docs" t-as="o">
                     <div class="page">
