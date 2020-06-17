@@ -95,7 +95,7 @@ class SaleOrderParcel(models.Model):
                 used_weight = weight
             else:
                 used_weight = real_weight
-            template.real_weight = real_weight
+            template.weight = weight
             template.used_weight = used_weight
 
     # -------------------------------------------------------------------------
