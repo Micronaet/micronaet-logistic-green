@@ -156,6 +156,7 @@
                     <field name="width" />
                     <field name="height" />
                     <field name="weight" />
+                    <field name="no_label" />
                 </tree>
             </field>
         </record>
@@ -173,6 +174,8 @@
                             <field name="length" />
                             <field name="width" />
                             <field name="height" />
+
+                            <field name="no_label" />
                         </group>
                     </sheet>
                 </form>
