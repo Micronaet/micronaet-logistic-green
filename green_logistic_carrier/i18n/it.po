@@ -1,0 +1,418 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* green_logistic_carrier
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 11.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-06-17 14:04+0000\n"
+"PO-Revision-Date: 2020-06-17 14:04+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: green_logistic_carrier
+#: code:addons/green_logistic_carrier/models/carrier.py:139
+#, python-format
+msgid "%s [User: %s]"
+msgstr "%s [Utente: %s]"
+
+#. module: green_logistic_carrier
+#: code:addons/green_logistic_carrier/models/carrier.py:237
+#, python-format
+msgid "%s<b>ORD.:</b> %s\n"
+"<b>INV.:</b> %s\n"
+"<b>DELIV.:</b> %s"
+msgstr "%s<b>ORD.:</b> %s\n"
+"<b>INV.:</b> %s\n"
+"<b>CONS.:</b> %s"
+
+#. module: green_logistic_carrier
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_carrier_supplier_account_ref
+msgid "Account ref."
+msgstr "Rig. contabile"
+
+#. module: green_logistic_carrier
+#: model:ir.ui.view,arch_db:green_logistic_carrier.view_sale_order_form
+msgid "Add"
+msgstr "Aggiungi"
+
+#. module: green_logistic_carrier
+#: code:addons/green_logistic_carrier/models/carrier.py:216
+#, python-format
+msgid "Address"
+msgstr "Indirizzo"
+
+#. module: green_logistic_carrier
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_carrier_parcel_template_carrier_supplier_id
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_carrier_supplier_mode_supplier_id
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_sale_order_carrier_supplier_id
+#: model:ir.ui.menu,name:green_logistic_carrier.menu_carrier_root
+#: model:ir.ui.view,arch_db:green_logistic_carrier.view_sale_order_form
+msgid "Carrier"
+msgstr "Corriere"
+
+#. module: green_logistic_carrier
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_sale_order_carrier_ok
+msgid "Carrier OK"
+msgstr "Corriere OK"
+
+#. module: green_logistic_carrier
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_sale_order_carrier_check
+msgid "Carrier check"
+msgstr "Verifica dati corriere"
+
+#. module: green_logistic_carrier
+#: code:addons/green_logistic_carrier/models/carrier.py:184
+#, python-format
+msgid "Carrier data is OK"
+msgstr "Dati corriere OK"
+
+#. module: green_logistic_carrier
+#: code:addons/green_logistic_carrier/models/carrier.py:196
+#, python-format
+msgid "Carrier data is not OK (undo operation)"
+msgstr "I dati corriere non sono OK (annullare operazione)"
+
+#. module: green_logistic_carrier
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_sale_order_carrier_description
+msgid "Carrier description"
+msgstr "Descrizione corriere"
+
+#. module: green_logistic_carrier
+#: model:ir.actions.act_window,name:green_logistic_carrier.action_carrier_supplier_mode
+#: model:ir.model,name:green_logistic_carrier.model_carrier_supplier_mode
+#: model:ir.ui.menu,name:green_logistic_carrier.menu_carrier_supplier_mode
+#: model:ir.ui.view,arch_db:green_logistic_carrier.view_sale_order_logistic_search
+msgid "Carrier mode"
+msgstr "Modalità corriere"
+
+#. module: green_logistic_carrier
+#: model:ir.model.fields,help:green_logistic_carrier.field_sale_order_carrier_ok
+msgid "Carrier must be confirmed when done!"
+msgstr "Il corriere deve essere confermato quando a posto!"
+
+#. module: green_logistic_carrier
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_sale_order_carrier_note
+msgid "Carrier note"
+msgstr "Note per corriere"
+
+#. module: green_logistic_carrier
+#: model:ir.ui.view,arch_db:green_logistic_carrier.view_sale_order_form
+msgid "Carrier reply:"
+msgstr "Risposta corriere:"
+
+#. module: green_logistic_carrier
+#: model:ir.actions.act_window,name:green_logistic_carrier.action_carrier_supplier_form
+#: model:ir.ui.menu,name:green_logistic_carrier.menu_carrier_supplier
+#: model:ir.ui.view,arch_db:green_logistic_carrier.view_carrier_supplier_tree
+#: model:ir.ui.view,arch_db:green_logistic_carrier.view_sale_order_logistic_search
+msgid "Carrier supplier"
+msgstr "Corriere effettivo"
+
+#. module: green_logistic_carrier
+#: model:ir.ui.view,arch_db:green_logistic_carrier.view_carrier_supplier_mode_tree
+msgid "Carrier supplier mode"
+msgstr "Modalità corriere effettivo"
+
+#. module: green_logistic_carrier
+#: selection:sale.order,carrier_pay_mode:0
+msgid "Cash"
+msgstr "Contanti"
+
+#. module: green_logistic_carrier
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_sale_order_carrier_cash_delivery
+msgid "Cash on delivery"
+msgstr "Contanti alla consegna"
+
+#. module: green_logistic_carrier
+#: model:ir.model.fields,help:green_logistic_carrier.field_sale_order_carrier_check
+msgid "Check carrier address"
+msgstr "Verifica indirizzo di consegna"
+
+#. module: green_logistic_carrier
+#: code:addons/green_logistic_carrier/models/carrier.py:219
+#, python-format
+msgid "City"
+msgstr "Città"
+
+#. module: green_logistic_carrier
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_sale_order_real_parcel_total
+msgid "Colli"
+msgstr "Colli"
+
+#. module: green_logistic_carrier
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_sale_order_carrier_cost
+msgid "Cost"
+msgstr "Costo"
+
+#. module: green_logistic_carrier
+#: code:addons/green_logistic_carrier/models/carrier.py:221
+#, python-format
+msgid "Country"
+msgstr "Nazione"
+
+#. module: green_logistic_carrier
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_carrier_parcel_template_create_uid
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_carrier_supplier_create_uid
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_carrier_supplier_mode_create_uid
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_sale_order_parcel_create_uid
+msgid "Created by"
+msgstr "Creato da"
+
+#. module: green_logistic_carrier
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_carrier_parcel_template_create_date
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_carrier_supplier_create_date
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_carrier_supplier_mode_create_date
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_sale_order_parcel_create_date
+msgid "Created on"
+msgstr "Creato il"
+
+#. module: green_logistic_carrier
+#: model:ir.ui.view,arch_db:green_logistic_carrier.view_sale_order_form
+msgid "Delivery confirmed"
+msgstr "Dati corriere confermati"
+
+#. module: green_logistic_carrier
+#: model:ir.ui.view,arch_db:green_logistic_carrier.view_sale_order_form
+msgid "Delivery undo"
+msgstr "Sblocca dati corriere"
+
+#. module: green_logistic_carrier
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_sale_order_destination_country_id
+msgid "Destination"
+msgstr "Destinazione"
+
+#. module: green_logistic_carrier
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_carrier_parcel_template_display_name
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_carrier_supplier_display_name
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_carrier_supplier_mode_display_name
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_sale_order_parcel_display_name
+msgid "Display Name"
+msgstr "Nome Completo"
+
+#. module: green_logistic_carrier
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_sale_order_carrier_ensurance
+msgid "Ensurance"
+msgstr "Assicurazione"
+
+#. module: green_logistic_carrier
+#: code:addons/green_logistic_carrier/models/carrier.py:230
+#, python-format
+msgid "Fiscal pos.: Order: %s, Partner %s<br/>"
+msgstr "Pos. fiscale: Ordine: %s, Cliente %s<br/>"
+
+#. module: green_logistic_carrier
+#: model:ir.ui.view,arch_db:green_logistic_carrier.view_sale_order_form
+msgid "Force description"
+msgstr "Forza descrizione"
+
+#. module: green_logistic_carrier
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_sale_order_carrier_total
+msgid "Goods value"
+msgstr "Valore beni"
+
+#. module: green_logistic_carrier
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_carrier_parcel_template_height
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_sale_order_parcel_height
+msgid "Height"
+msgstr "Altezza"
+
+#. module: green_logistic_carrier
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_carrier_parcel_template_id
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_carrier_supplier_id
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_carrier_supplier_mode_id
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_sale_order_parcel_id
+msgid "ID"
+msgstr "ID"
+
+#. module: green_logistic_carrier
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_carrier_parcel_template___last_update
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_carrier_supplier___last_update
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_carrier_supplier_mode___last_update
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_sale_order_parcel___last_update
+msgid "Last Modified on"
+msgstr "Data di ultima modifica"
+
+#. module: green_logistic_carrier
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_carrier_parcel_template_write_uid
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_carrier_supplier_mode_write_uid
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_carrier_supplier_write_uid
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_sale_order_parcel_write_uid
+msgid "Last Updated by"
+msgstr "Ultima modifica di"
+
+#. module: green_logistic_carrier
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_carrier_parcel_template_write_date
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_carrier_supplier_mode_write_date
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_carrier_supplier_write_date
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_sale_order_parcel_write_date
+msgid "Last Updated on"
+msgstr "Ultima modifica il"
+
+#. module: green_logistic_carrier
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_carrier_parcel_template_length
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_sale_order_parcel_length
+msgid "Length"
+msgstr "Lunghezza"
+
+#. module: green_logistic_carrier
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_sale_order_carrier_mode_id
+msgid "Mode"
+msgstr "Modalità"
+
+#. module: green_logistic_carrier
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_carrier_parcel_template_name
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_carrier_supplier_mode_name
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_carrier_supplier_name
+msgid "Name"
+msgstr "Nome"
+
+#. module: green_logistic_carrier
+#: code:addons/green_logistic_carrier/models/carrier.py:159
+#, python-format
+msgid "Not found"
+msgstr "Non trovato"
+
+#. module: green_logistic_carrier
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_sale_order_parcel_order_id
+msgid "Order"
+msgstr "Ordine"
+
+#. module: green_logistic_carrier
+#: model:ir.ui.view,arch_db:green_logistic_carrier.view_sale_order_form
+msgid "Parcel"
+msgstr "Colli"
+
+#. module: green_logistic_carrier
+#: model:ir.model,name:green_logistic_carrier.model_carrier_supplier
+msgid "Parcel supplier"
+msgstr "Corriere selezionato"
+
+#. module: green_logistic_carrier
+#: model:ir.actions.act_window,name:green_logistic_carrier.action_carrier_parcel_template_tree
+#: model:ir.model,name:green_logistic_carrier.model_carrier_parcel_template
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_sale_order_carrier_parcel_template_id
+#: model:ir.ui.menu,name:green_logistic_carrier.menu_parcel_template
+#: model:ir.ui.view,arch_db:green_logistic_carrier.view_carrier_parcel_template_form
+#: model:ir.ui.view,arch_db:green_logistic_carrier.view_carrier_parcel_template_tree
+msgid "Parcel template"
+msgstr "Modello collo"
+
+#. module: green_logistic_carrier
+#: model:ir.ui.view,arch_db:green_logistic_carrier.view_sale_order_form
+msgid "Parcel:"
+msgstr "Colli:"
+
+#. module: green_logistic_carrier
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_sale_order_parcel_ids
+msgid "Parcels"
+msgstr "Colli"
+
+#. module: green_logistic_carrier
+#: model:ir.ui.view,arch_db:green_logistic_carrier.view_sale_order_form
+msgid "Partner check:"
+msgstr "Controllo dati cliente:"
+
+#. module: green_logistic_carrier
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_sale_order_carrier_pay_mode
+msgid "Pay mode"
+msgstr "Modalità pagamento"
+
+#. module: green_logistic_carrier
+#: code:addons/green_logistic_carrier/models/carrier.py:222
+#, python-format
+msgid "Phone"
+msgstr "Telefono"
+
+#. module: green_logistic_carrier
+#: code:addons/green_logistic_carrier/models/carrier.py:224
+#, python-format
+msgid "Pos. fisc."
+msgstr "Pos. fisc."
+
+#. module: green_logistic_carrier
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_carrier_parcel_template_dimension_uom_id
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_carrier_parcel_template_weight_uom_id
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_sale_order_parcel_dimension_uom_id
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_sale_order_parcel_weight_uom_id
+msgid "Product UOM"
+msgstr "UM prodotto"
+
+#. module: green_logistic_carrier
+#: model:ir.model,name:green_logistic_carrier.model_sale_order
+msgid "Quotation"
+msgstr "Preventivo"
+
+#. module: green_logistic_carrier
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_sale_order_parcel_real_weight
+msgid "Real weight"
+msgstr "Peso reale"
+
+#. module: green_logistic_carrier
+#: model:ir.ui.view,arch_db:green_logistic_carrier.view_sale_order_form
+msgid "Request:"
+msgstr "Richiesta:"
+
+#. module: green_logistic_carrier
+#: model:ir.model,name:green_logistic_carrier.model_sale_order_parcel
+msgid "Sale order parcel"
+msgstr "Colli ordine"
+
+#. module: green_logistic_carrier
+#: code:addons/green_logistic_carrier/models/carrier.py:220
+#, python-format
+msgid "State"
+msgstr "Località"
+
+#. module: green_logistic_carrier
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_sale_order_carrier_stock_note
+msgid "Stock operator note"
+msgstr "Note interne"
+
+#. module: green_logistic_carrier
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_sale_order_carrier_track_id
+msgid "Track ID"
+msgstr "ID Tracking"
+
+#. module: green_logistic_carrier
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_sale_order_parcel_used_weight
+msgid "Used weight"
+msgstr "Peso utilizzato"
+
+#. module: green_logistic_carrier
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_sale_order_parcel_weight
+msgid "Volumetric weight"
+msgstr "Peso volumetrico"
+
+#. module: green_logistic_carrier
+#: model:ir.model.fields,help:green_logistic_carrier.field_carrier_parcel_template_weight
+msgid "Volumetric weight (H x L x P / 5000)"
+msgstr "Peso volumetrico (calcolo: H x L x P / 5000)"
+
+#. module: green_logistic_carrier
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_carrier_parcel_template_weight
+msgid "Weight volumetric"
+msgstr "Peso volumetrico"
+
+#. module: green_logistic_carrier
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_carrier_parcel_template_width
+#: model:ir.model.fields,field_description:green_logistic_carrier.field_sale_order_parcel_width
+msgid "Width"
+msgstr "Larghezza"
+
+#. module: green_logistic_carrier
+#: code:addons/green_logistic_carrier/models/carrier.py:218
+#, python-format
+msgid "ZIP"
+msgstr "CAP"
+
+#. module: green_logistic_carrier
+#: model:ir.ui.view,arch_db:green_logistic_carrier.view_sale_order_form
+msgid "total_weight"
+msgstr "Peso totale"
+
