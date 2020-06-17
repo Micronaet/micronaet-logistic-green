@@ -152,8 +152,10 @@ class SaleOrder(models.Model):
         :param text: HTML text to clean
         :return: clean text
         """
+        self.ensureone()
         tag_re = re.compile(r'<[^>]+>')
         return tag_re.sub('', text)
+
     @api.multi
     def set_default_carrier_description(self):
         """ Update description from sale order line
@@ -169,7 +171,8 @@ class SaleOrder(models.Model):
                 int(line.product_uom_qty),
                 )
 
-        self.carrier_description = carrier_description.strip()
+        self.carrier_description = self.sanitize_text(
+            carrier_description.strip())
 
     @api.multi
     def load_template_parcel(self, ):
