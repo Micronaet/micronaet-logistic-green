@@ -63,6 +63,7 @@ class CarrierParcelTemplate(models.Model):
     #                                   COLUMNS:
     # -------------------------------------------------------------------------
     name = fields.Char('Name')
+    no_label = fields.Boolean('No label')
     carrier_supplier_id = fields.Many2one('carrier.supplier', 'Carrier')
     length = fields.Float('Length', digits=(16, 2), required=True)
     width = fields.Float('Width', digits=(16, 2), required=True)
@@ -122,6 +123,7 @@ class SaleOrderParcel(models.Model):
         readonly=True,
     )
     weight_uom_id = fields.Many2one('product.uom', 'Product UOM')
+    no_label = fields.Boolean('No label')
 
 
 class SaleOrder(models.Model):
@@ -186,6 +188,7 @@ class SaleOrder(models.Model):
             'length': template.length,
             'width': template.width,
             'height': template.height,
+            'no_label': template.no_label,
             })
         return True
 

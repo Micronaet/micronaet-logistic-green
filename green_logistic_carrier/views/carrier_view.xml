@@ -59,6 +59,7 @@
                                     <field name="real_weight" />
                                     <field name="weight" />
                                     <field name="used_weight" sum="total_weight"/>
+                                    <field name="no_label" />
                                 </tree>
                             </field>
                             <newline/>
