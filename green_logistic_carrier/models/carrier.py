@@ -360,6 +360,6 @@ class ReportSaleOrderPassportLabel(models.AbstractModel):
             ]
             if position + 1 < total:
                 block[1] = (
-                    (', '.join(labels_country)), ', '.join(labels_category))
+                    ', '.join(labels_country), ', '.join(labels_category))
             label_block.append(block)
         return label_block
