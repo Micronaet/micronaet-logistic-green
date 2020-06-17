@@ -5,10 +5,10 @@
 
 import os
 import sys
+import re
 import logging
 from odoo import fields, models, api
 from odoo import _
-
 
 _logger = logging.getLogger(__name__)
 
@@ -142,9 +142,18 @@ class SaleOrder(models.Model):
             )
         self.message_post(
             body=body,
-            #subtype='mt_comment',
-            #partner_ids=followers
+            # subtype='mt_comment',
+            # partner_ids=followers
             )
+
+    @api.multi
+    def sanitize_text(self, text):
+        """ Clean HTML tag from text
+        :param text: HTML text to clean
+        :return: clean text
+        """
+        tag_re = re.compile(r'<[^>]+>')
+        return tag_re.sub('', text)
     @api.multi
     def set_default_carrier_description(self):
         """ Update description from sale order line
