@@ -225,12 +225,7 @@ class WPConnector(models.Model):
                       'taxes': [], 'total': '11.50',
                       'method_title': 'Corriere espresso', 'meta_data': [],
                       'total_tax': '0.00', 'instance_id': '0'}],
-                 'status': 'pending', 
                  'created_via': 'checkout',
-                 'version': '3.6.5', '_links': {'self': [{
-                        'href': 'https://www.it/wp-json/wc/v3/orders/121605'}],
-                        'collection': [{
-                        'href': 'https://www.it/wp-json/wc/v3/orders'}]},
                  'currency': 'EUR', 
                  'order_key': 'wc_order_J7VSecMlSkF3Z',
                  'shipping_total': '11.50', 'date_completed': None,
@@ -404,6 +399,7 @@ class WPConnector(models.Model):
                                 'price_unit': shipping_total,
                                 })
                     _logger.info('Create  order: %s' % number)
+
             # Block end limit check:
             if end_page and params['page'] >= end_page + 1:
                 break
@@ -482,7 +478,6 @@ class SaleOrder(models.Model):
             except:
                 error.append(order)
                 _logger.error('Order: %s not updated' % order.name)
-
 
 
     @api.multi
