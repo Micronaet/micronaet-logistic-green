@@ -6,11 +6,11 @@
             <div t-call="web.basic_layout">
                 <div t-foreach="docs" t-as="o">
                     <div class="page">
-                        <t t-foreach="get_labels_for_report(o)" t-as="label" class="row" >  <!--style="page-break-inside: avoid"-->
-                            <table class="table table-bordered"> <!--style="page-break-before:always;"-->
+                        <t t-foreach="get_labels_for_report(o)" t-as="label" class="row" >
+                            <table class="{height:100%; width:100%}">
                                 <tbody>
                                     <tr class="row" >
-                                        <td class="{height:100%; width:100%}">
+                                        <td>
                                             <!-- LABEL: -->
                                             <p>
                                                 <img t-if="res_company.passport_logo"
