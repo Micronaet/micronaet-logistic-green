@@ -8,8 +8,8 @@
                     <div class="page">
                         <table class="table table-bordered">
                             <tbody>
-                                <tr t-foreach="get_labels_for_report(o)" t-as="label" class="row" style="page-break-inside: avoid">
-                                    <td height="248">
+                                <tr t-foreach="get_labels_for_report(o)" t-as="label" class="row" style="page-break-before:always;"> <!--style="page-break-inside: avoid"-->
+                                    <td class="{height:500px}">
                                         <!-- LABEL: -->
                                         <p>
                                             <img t-if="res_company.passport_logo"
