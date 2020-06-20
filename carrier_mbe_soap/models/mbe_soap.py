@@ -22,6 +22,18 @@ class CarrierConnectionSoap(models.Model):
     # -------------------------------------------------------------------------
     #                                  METHODS:
     # -------------------------------------------------------------------------
+    # Utility:
+    def check_size(self, text, size, dotted=False):
+        """ Clean text for SOAP call
+        """
+        text = text or ''
+        if dotted:
+            if text > (size - 3):
+                return '%s...' % text[:size - 3]
+        else
+            if text > size:
+                return text[:size]
+
     # Connection:
     @api.multi
     def get_connection(self):
@@ -35,15 +47,17 @@ class CarrierConnectionSoap(models.Model):
     @api.multi
     def check_reply_status(self, reply):
         """ Get Service connection to make calls:
+            :return Error text if present
         """
         self.ensure_one()
         # Status token (OK, ERROR)
 
+        error = ''
         if reply['Status'] == 'ERROR':
-            _logger.error('%s' % (reply['Errors'], ))  # TODO better!
             # Error[{'id', 'Description'}]
-            return False
-        return True
+            error = '%s' % (reply['Errors'], )  # TODO better!
+            _logger.error(error)
+        return error
 
     # Create data container:
     @api.multi
@@ -74,44 +88,67 @@ class CarrierConnectionSoap(models.Model):
     def get_recipient_container(self, partner):
         """ Return dict for Partner container
         """
-        res = {}
-        # Name 35
-        # CompanyName 35
-        # Nickname 100
-        # Address 100
-        # Address2 35
-        # Address3 35
-        # Phone 50
-        # ZipCode 12
-        # City 50
-        # State 2
-        # Country 2
-        # Email 75
-        # SubzoneId int
-        # SubzoneDesc No restriction?
-
-        return res
+        return {
+            'Name': 'TEST' or partner.name,  # 35
+            'CompanyName': 'TEST',  # 35
+            'Nickname': 'TEST',  # 100
+            'Address': partner.street or '',  # 100
+            'Address2': partner.street2 or '',  # 35
+            'Address3': '',  # 35
+            'Phone': partner.phone or '',  # 50
+            'ZipCode': partner.zip or '',  # 12
+            'City': partner.city or '',  # 50
+            'State': partner.state_id.code or '',  # 2
+            'Country': partner.country_id.code or '',  # 2
+            'Email': partner.email or '',  # 75
+            'SubzoneId': '',  # integer
+            'SubzoneDesc': '',
+        }
 
     @api.multi
     def get_shipment_container(self, order):
         """ Return dict for order shipment
         """
-        res = {}
-        # ShipperType string (COURIERLDV, MBE)
-        # Description string 100
-        # COD boolean
-        # CODValue* decimal
-        # MethodPayment* string (CASH, CHECK)
-        # Insurance boolean
-        # InsuranceValue* decimal
-        # Service* string
-        # Courier* string
-        # CourierService* string
-        # CourierAccount* string
-        # PackageType token (ENVELOPE, DOCUMENTS, GENERIC)
-        # Value* decimal
-        # ShipmentCurrency* string
-        # Referring* string 30
+        # TODO complete fields:
+        data = {
+            'ShipperType': 'MBE',  # string (COURIERLDV, MBE)
+            'Description': self.check_size(
+                order.carrier_description, 100, dotted=True),
+            'COD': False,  #  boolean
+            # 'CODValue': '',  # * decimal
+            'MethodPayment': 'CASH',  # * string (CASH, CHECK)
+            'Insurance': False,  #  boolean
+            # 'InsuranceValue': '',  # * decimal
+            # 'Service': '',  # * string
+            # 'Courier': '',  # * string
+            # 'CourierService': '',  # * string
+            # 'CourierAccount': '',  # * string
+            'PackageType': '',  #  token (ENVELOPE, DOCUMENTS, GENERIC)
+            # 'Value': '',  # * decimal
+            # 'ShipmentCurrency': '',  # * string
+            'Referring': order.name,  # * string 30
+            'InternalNotes': 'ORDINE DA CANCELLARE',  # * string
+            'Notes': 'ORDINE DA CANCELLARE',  # * string
+            # 'SaturdayDelivery': '',  # * boolean
+            # 'SignatureRequired': '',  # * boolean
+            # 'ShipmentOrigin': '',  # * string
+            # 'ShipmentSource': '',  # * int
+            # 'MBESafeValue': '',  # * boolean
+            # 'MBESafeValueValue': '',  # * decimal
+            # 'MBESafeValueDescription': '',  # * string 100
+            # 'LabelFormat': '',  # * token (OLD, NEW)
+            'Items': [],
+        }
+        for parcel in order.parcel_ids:
+            data['Items'].append(
+                {'Item': {
+                    'Weight': parcel.real_weight,
+                    'Dimension': {
+                        'Length': parcel.length,
+                        'Height': parcel.height,
+                        'Width': parcel.width,
+                    }}})
+
         # Items ItemsType
         #    Item ItemType
         #        Weight decimal
@@ -119,11 +156,13 @@ class CarrierConnectionSoap(models.Model):
         #            Lenght decimal
         #            Height decimal
         #            Width decimal
+
         # Products* ProductsType
         #    Product ProductType
         #        SKUCode string
         #        Description string
         #        Quantity decimal
+
         # ProformaInvoice* ProformaInvoiceType
         #        ProformaDetail ProformaDetailType
         #            Amount int
@@ -131,16 +170,6 @@ class CarrierConnectionSoap(models.Model):
         #            Value decimal
         #            Unit string 5
         #            Description string 35
-        # InternalNotes* string
-        # Notes* string
-        # SaturdayDelivery* boolean
-        # SignatureRequired* boolean
-        # ShipmentOrigin* string
-        # ShipmentSource* int
-        # MBESafeValue* boolean
-        # MBESafeValueValue* decimal
-        # MBESafeValueDescription* string 100
-        # LabelFormat* token (OLD, NEW)
         return res
 
     # -------------------------------------------------------------------------
@@ -191,19 +220,56 @@ class SaleOrder(models.Model):
     """
     _inherit = 'sale.order'
 
+    # -------------------------------------------------------------------------
+    # Override methods
+    # -------------------------------------------------------------------------
     @api.multi
-    def update_order_with_soap_reply(self, order, reply):
-        """ Update order data with SOAP reply (error checked in different call)
+    def set_carrier_ok_yes(self):
+        """ Override method for send carrier request
         """
-        # InternalReferenceID 100
-        # SystemReferenceID 30
-        # MasterTrackingMBE string
-        # TrackingMBE*
+        error = self.shipment_request()
+        if error:
+            return self.write_log_chatter_message(error)
+        return super(SaleOrder, self).set_carrier_ok_yes()
+
+    @api.multi
+    def set_carrier_ok_no(self):
+        """ Override method for send carrier request
+        """
+        error = self.delete_shipments_request()
+        if error:
+            return self.write_log_chatter_message(error)
+        return super(SaleOrder, self).set_carrier_ok_no()
+
+    @api.multi
+    def save_order_label(self, order, reply):
+        """ Save order label
+        """
         # Labels* LabelsType
         #    Label LabelType
         #        Stream B64
         #        Type 4
-        order.write({'carrier_soap_state': 'pending'})
+        for label in reply['Labels']:
+            label = label['Label']
+            label_b64 = label['Stream']
+            label_type = label['Type']
+            # TODO save label linked to order
+
+
+    @api.multi
+    def update_order_with_soap_reply(self, order, reply):
+        """ Update order data with SOAP reply (error checked in different call)
+        """
+        master_tracking_id = reply['MasterTrackingMBE']
+        system_reference_id = reply['SystemReferenceID']
+        self.save_order_label(order, reply)
+        # InternalReferenceID 100     TrackingMBE*
+        order.write({
+            'carrier_soap_state': 'pending',
+            'master_tracking_id': master_tracking_id,
+            'system_reference_id': system_reference_id,
+            # TODO carrier_track_id
+        })
 
     # -------------------------------------------------------------------------
     # API CALLS:
@@ -212,69 +278,66 @@ class SaleOrder(models.Model):
     def delete_shipments_request(self):
         """ 4. API Delete Shipment Request: Delete shipment request
         """
+        order = self
         soap_pool = self.env['carrier.connection.soap']
         service = soap_pool.get_connection()
-        for order in self:
-            master_tracking_id = order.master_tracking_id
-            if not master_tracking_id:
-                _logger.error(
-                    'Order %s has no master tracking, cannot delete!' %
-                    order.name)
-                continue
 
-            # -----------------------------------------------------------------
-            # SOAP insert call:
-            # -----------------------------------------------------------------
-            data = soap_pool.get_request_container(system=True)
-            data['MasterTrackingsMBE'] = master_tracking_id  # Repeatable
-            service.DeleteShipmentsRequest(data)
+        master_tracking_id = order.master_tracking_id
+        if not master_tracking_id:
+            error = ('Order %s has no master tracking, cannot delete!' %
+                order.name)
+            return error
+
+        # -----------------------------------------------------------------
+        # SOAP insert call:
+        # -----------------------------------------------------------------
+        data = soap_pool.get_request_container(system=True)
+        data['MasterTrackingMBE'] = master_tracking_id  # Loopable
+        service.DeleteShipmentsRequest(data)
         order.write({
+            # TODO carrier_track_id
             'carrier_soap_state': 'draft',
             'master_tracking_id': False,
+            'system_reference_id': False,
         })
 
     @api.multi
     def shipment_request(self):
         """ 15. API Shipment Request: Insert new carrier request
         """
+        self.ensure_one()
+        order = self
         soap_pool = self.env['carrier.connection.soap']
         service = soap_pool.get_connection()
-        for order in self:
-            soap_connection_id = order.soap_connection_id
-            if not soap_connection_id:
-                _logger.error(
-                    'Order %s has carrier without SOAP ref.!' % order.name)
-                continue
 
-            if order not in 'draft':
-                _logger.error(
-                    'Order %s not in draft mode so no publish!' % order.name)
-                continue
-            if order.carrier_soap_id:
-                _logger.error(
-                    'Order %s has SOAP ID %s cannot publish!' % (
-                        order.name, order.carrier_soap_id))
-                continue
+        soap_connection_id = order.soap_connection_id
+        if not soap_connection_id:
+            return 'Order %s has carrier without SOAP ref.!' % order.name
+        if order not in 'draft':
+            return 'Order %s not in draft mode so no publish!' % order.name
+        if order.carrier_soap_id:
+            return 'Order %s has SOAP ID %s cannot publish!' % (
+                    order.name, order.carrier_soap_id)
 
-            # -----------------------------------------------------------------
-            # SOAP insert call:
-            # -----------------------------------------------------------------
-            data = soap_pool.get_request_container(system=True)
+        # -----------------------------------------------------------------
+        # SOAP insert call:
+        # -----------------------------------------------------------------
+        data = soap_pool.get_request_container(system=True)
 
-            # TODO create data dict
-            data['Recipient'] = soap_pool.get_recipient_container(
-                order.partner_id)  # TODO or shipment address??
-            data['Shipment'] = soap_pool.get_shipment_container(
-                order)
+        # TODO create data dict
+        data['Recipient'] = soap_pool.get_recipient_container(
+            order.partner_id)
+        data['Shipment'] = soap_pool.get_shipment_container(order)
 
-            reply = service.ShipmentRequest(data)
-            if not soap_pool.check_reply_status(reply):
-                _logger.error('Error checking order: %s' % order.name)
+        reply = service.ShipmentRequest(data)
+        error = soap_pool.check_reply_status(reply)
+        if error:  # TODO Check reply
+            return error
+        self.update_order_with_soap_reply(order, reply)
 
-            # TODO Check reply
-            self.update_order_with_soap_reply(order, reply)
 
     master_tracking_id = fields.Integer('Master Tracking')
+    system_reference_id = fields.Integer('System reference ID')
     carrier_soap_id = fields.Integer(
         string='Carrier SOAP ID')
     carrier_soap_state = fields.Selection(
