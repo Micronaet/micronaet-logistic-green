@@ -19,7 +19,6 @@
     'data': [
         'security/ir.model.access.csv',
         'views/soap_view.xml',
-        # 'data/color_data.xml',
     ],
     'external_dependencies': {
         'python': ['zeep'],
