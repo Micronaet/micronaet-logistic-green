@@ -153,7 +153,7 @@ class CarrierConnectionSoap(models.Model):
         required=True)
 
     wsdl_root = fields.Char(
-        'WSDL root', size=40, required=True,
+        'WSDL root', size=140, required=True,
         default='https://www.onlinembe.it/wsdl/OnlineMbeSOAP.wsdl')
     # namespace
     username = fields.Char('Username', size=64, required=True)
@@ -172,7 +172,7 @@ class CarrierConnectionSoap(models.Model):
 
     # Not used for now:
     sam_id = fields.Char('SAM ID', size=4, help='')
-    department_id = fields.Char('SAM ID', size=4, help='')
+    department_id = fields.Char('Department ID', size=4, help='')
 
 
 class CarrierSupplier(models.Model):
@@ -209,6 +209,31 @@ class SaleOrder(models.Model):
     # API CALLS:
     # -------------------------------------------------------------------------
     @api.multi
+    def delete_shipments_request(self):
+        """ 4. API Delete Shipment Request: Delete shipment request
+        """
+        soap_pool = self.env['carrier.connection.soap']
+        service = soap_pool.get_connection()
+        for order in self:
+            master_tracking_id = order.master_tracking_id
+            if not master_tracking_id:
+                _logger.error(
+                    'Order %s has no master tracking, cannot delete!' %
+                    order.name)
+                continue
+
+            # -----------------------------------------------------------------
+            # SOAP insert call:
+            # -----------------------------------------------------------------
+            data = soap_pool.get_request_container(system=True)
+            data['MasterTrackingsMBE'] = master_tracking_id  # Repeatable
+            service.DeleteShipmentsRequest(data)
+        order.write({
+            'carrier_soap_state': 'draft',
+            'master_tracking_id': False,
+        })
+
+    @api.multi
     def shipment_request(self):
         """ 15. API Shipment Request: Insert new carrier request
         """
@@ -234,12 +259,11 @@ class SaleOrder(models.Model):
             # -----------------------------------------------------------------
             # SOAP insert call:
             # -----------------------------------------------------------------
-            data = soap_pool.get_request_container(
-                system=True, store=False)
+            data = soap_pool.get_request_container(system=True)
 
             # TODO create data dict
             data['Recipient'] = soap_pool.get_recipient_container(
-                order.partner_id)  # TODO or shipment addrres??
+                order.partner_id)  # TODO or shipment address??
             data['Shipment'] = soap_pool.get_shipment_container(
                 order)
 
@@ -250,14 +274,14 @@ class SaleOrder(models.Model):
             # TODO Check reply
             self.update_order_with_soap_reply(order, reply)
 
+    master_tracking_id = fields.Integer('Master Tracking')
     carrier_soap_id = fields.Integer(
         string='Carrier SOAP ID')
     carrier_soap_state = fields.Selection(
-        string='Carrier state',
+        string='Carrier state', default='draft',
         selection=[
             ('draft', 'Draft'),
             ('pending', 'Pending'),
             ('sent', 'Sent'),
             ('delivered', 'Delivered'),  # Closed
-        ],
-        required=False, )
+        ])
