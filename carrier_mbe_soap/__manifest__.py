@@ -13,6 +13,7 @@
     'website': 'http://www.micronaet.it',
     'license': 'AGPL-3',
     'depends': [
+        'sale',
         'green_logistic_carrier',  # TODO remove?!
     ],
     'data': [
