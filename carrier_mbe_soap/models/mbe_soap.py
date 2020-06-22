@@ -317,7 +317,7 @@ class SaleOrder(models.Model):
         """
         self.ensure_one()
         order = self
-        soap_pool = self.env['carrier.connection.soap']
+        # soap_pool = self.env['carrier.connection.soap']
 
         import pdb; pdb.set_trace()
         soap_connection = order.carrier_supplier_id.soap_connection_id
@@ -333,15 +333,15 @@ class SaleOrder(models.Model):
         # SOAP insert call:
         # -----------------------------------------------------------------
         service = soap_connection.get_connection()
-        data = soap_pool.get_request_container(system=True)
+        data = soap_connection.get_request_container(system=True)
 
         # TODO create data dict
-        data['Recipient'] = soap_pool.get_recipient_container(
+        data['Recipient'] = soap_connection.get_recipient_container(
             order.partner_id)
-        data['Shipment'] = soap_pool.get_shipment_container(order)
+        data['Shipment'] = soap_connection.get_shipment_container(order)
 
         reply = service.ShipmentRequest(data)
-        error = soap_pool.check_reply_status(reply)
+        error = soap_connection.check_reply_status(reply)
         if error:
             return error
         self.update_order_with_soap_reply(order, reply)
