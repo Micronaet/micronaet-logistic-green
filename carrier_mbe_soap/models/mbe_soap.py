@@ -124,24 +124,25 @@ class SaleOrder(models.Model):
             boolean switch:
         """
         self.ensure_one()
+        connection = self.carrier_supplier_id.soap_connection_id
         data = {}
         if credentials:
             data['Credentials'] = {
-                'Username': self.username,
-                'Passphrase': self.passphrase,
+                'Username': connection.username,
+                'Passphrase': connection.passphrase,
             }
         if internal:
-            data['InternalReferenceID'] = self.internal_reference
+            data['InternalReferenceID'] = connection.internal_reference
         if customer:
-            data['CustomerID'] = self.customer_id
+            data['CustomerID'] = connection.customer_id
         if system:
             if type(system) == bool:
                 field_name = 'System'
             else:
                 field_name = 'SystemType'
-            data[field_name] = self.system
+            data[field_name] = connection.system
         if store:
-            data['StoreID'] = self.store_id
+            data['StoreID'] = connection.store_id
         return data
 
     @api.multi
