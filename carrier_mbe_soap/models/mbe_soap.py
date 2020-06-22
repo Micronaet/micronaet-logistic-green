@@ -415,14 +415,15 @@ class SaleOrder(models.Model):
         path = os.path.expanduser(
             '~/.local/share/Odoo/filestore/%s/label' % order.env.cr.dbname)
         os.system('mkdir -p %s' % path)
-
-        filename = os.path.join(path, '%s.pdf' % order.id)
+        counter = 0
         for label in reply['Labels']['Label']:
+            counter += 1
             label_stream = label['Stream']
             # label_type = label['Type']
+            filename = os.path.join(path, '%s.%s.%s' % (
+                order.id, counter, label_type))
             with open(filename, 'wb') as label_file:
                 label_file.write(label_stream)
-            # TODO save label linked to order
 
     @api.multi
     def update_order_with_soap_reply(self, reply):
