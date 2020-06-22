@@ -114,8 +114,9 @@ class CarrierConnectionSoap(models.Model):
         }
 
     @api.multi
-    def get_shipment_container(self, order):
+    def get_shipment_container(self, order, mode='real'):
         """ Return dict for order shipment
+            mode: real, option
         """
         # TODO complete fields:
         data = {
@@ -144,9 +145,11 @@ class CarrierConnectionSoap(models.Model):
             # 'MBESafeValue': '',  # * boolean
             # 'MBESafeValueValue': '',  # * decimal
             # 'MBESafeValueDescription': '',  # * string 100
-            # 'LabelFormat': '',  # * token (OLD, NEW)
             'Items': [],
         }
+        if mode == 'real':
+            data['LabelFormat'] = 'NEW'  # * token (OLD, NEW)
+
         for parcel in order.parcel_ids:
             data['Items'].append(
                 {'Item': {
@@ -310,10 +313,8 @@ class SaleOrder(models.Model):
         """
         order = self
 
-        import pdb; pdb.set_trace()
         soap_connection = order.carrier_supplier_id.soap_connection_id
         service = soap_connection.get_connection()
-        service.CloseShipmentsRequest()
         master_tracking_id = order.master_tracking_id
         if not master_tracking_id:
             error = _('No master track ID so no confirmation!')
@@ -324,7 +325,6 @@ class SaleOrder(models.Model):
         data = soap_connection.get_request_container(system='SystemType')
         data['MasterTrackingsMBE'] = master_tracking_id
 
-        # Call:
         reply = service.CloseShipmentsRequest(data)
         error = soap_connection.check_reply_status(reply)
         if error:
@@ -403,13 +403,58 @@ class SaleOrder(models.Model):
         data['Recipient'] = soap_connection.get_recipient_container(
             order.partner_id)
         data['Shipment'] = soap_connection.get_shipment_container(order)
-
         reply = service.ShipmentRequest(data)
         import pdb; pdb.set_trace()
         error = soap_connection.check_reply_status(reply)
         if error:
             return error
         self.update_order_with_soap_reply(order, reply)
+
+    master_tracking_id = fields.Char('Master Tracking', size=20)
+    system_reference_id = fields.Char('System reference ID', size=20)
+    carrier_soap_id = fields.Integer(
+        string='Carrier SOAP ID')
+    carrier_soap_state = fields.Selection(
+        string='Carrier state', default='draft',
+        selection=[
+            ('draft', 'Draft'),
+            ('pending', 'Pending'),
+            ('sent', 'Sent'),
+            ('delivered', 'Delivered'),  # Closed
+        ])
+
+    @api.multi
+    def shipment_options_request(self):
+        """ 17. API ShippingOptionsRequest: Get better quotation
+        """
+        self.ensure_one()
+        order = self
+
+        soap_connection = order.carrier_supplier_id.soap_connection_id
+        if not soap_connection:
+            return 'Order %s has carrier without SOAP ref.!' % order.name
+        if order.state not in 'draft':
+            return 'Order %s not in draft mode so no published!' % order.name
+        if order.carrier_soap_id:
+            return 'Order %s has SOAP ID %s cannot publish!' % (
+                    order.name, order.carrier_soap_id)
+
+        # -----------------------------------------------------------------
+        # SOAP insert call:
+        # -----------------------------------------------------------------
+        service = soap_connection.get_connection()
+        data = soap_connection.get_request_container(
+            customer=False, system=True)
+
+        data['Shipment'] = soap_connection.get_shipment_container(
+            order, mode='option')
+        reply = service.ShippingOptionsRequest(data)
+        print(reply)
+        import pdb; pdb.set_trace()
+        error = soap_connection.check_reply_status(reply)
+        if error:
+            return error
+        # Update SOAP data for real call
 
     master_tracking_id = fields.Char('Master Tracking', size=20)
     system_reference_id = fields.Char('System reference ID', size=20)
