@@ -320,8 +320,9 @@ class SaleOrder(models.Model):
         order = self
         soap_pool = self.env['carrier.connection.soap']
 
-        soap_connection_id = order.soap_connection_id
-        if not soap_connection_id:
+        import pdb; pdb.set_trace()
+        soap_connection = order.carrier_supplier_id.soap_connection_id
+        if not soap_connection:
             return 'Order %s has carrier without SOAP ref.!' % order.name
         if order not in 'draft':
             return 'Order %s not in draft mode so no published!' % order.name
@@ -332,8 +333,7 @@ class SaleOrder(models.Model):
         # -----------------------------------------------------------------
         # SOAP insert call:
         # -----------------------------------------------------------------
-        import pdb; pdb.set_trace()
-        service = soap_connection_id.get_connection()
+        service = soap_connection.get_connection()
         data = soap_pool.get_request_container(system=True)
 
         # TODO create data dict
