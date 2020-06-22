@@ -10,6 +10,7 @@
                 <field name="master_tracking_id"/>
                 <field name="system_reference_id"/>
                 <field name="carrier_soap_state" />
+                <field name="carrier_ok" />   <!--Remove-->
             </field>
         </field>
     </record>
