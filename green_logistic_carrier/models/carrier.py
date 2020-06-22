@@ -26,6 +26,12 @@ class CarrierSupplier(models.Model):
     # -------------------------------------------------------------------------
     name = fields.Char('Name')
     account_ref = fields.Char('Account ref.')
+    mode = fields.Selection(
+        string='Mode',
+        selection=[
+            ('carrier', 'Carrier'),
+            ('courier', 'Courier'),
+        ], required=True, default='carrier')
 
 
 class CarrierSupplierMode(models.Model):
@@ -40,6 +46,7 @@ class CarrierSupplierMode(models.Model):
     #                                   COLUMNS:
     # -------------------------------------------------------------------------
     name = fields.Char('Name', required=True)
+    account_ref = fields.Char('Account ref.')
     supplier_id = fields.Many2one('carrier.supplier', 'Carrier', required=True)
 
 
@@ -193,6 +200,14 @@ class SaleOrder(models.Model):
         return True
 
     @api.multi
+    def carrier_get_better_option(self):
+        """ Get better options
+        """
+        # Overridable function:
+        return True
+
+
+    @api.multi
     def set_carrier_ok_yes(self, ):
         """ Set carrier as OK
         """
@@ -272,16 +287,19 @@ class SaleOrder(models.Model):
     # -------------------------------------------------------------------------
     carrier_ok = fields.Boolean('Carrier OK',
         help='Carrier must be confirmed when done!')
-    # TODO Not used:
-    # carrier_shippy = fields.Boolean('Carrier Shippy', default=True,
-    #     help='Carrier is managed by shippy pro (instead manual)!')
-    # Manual:
-    # carrier_manual_weight = fields.Float('Manual weight', digits=(16, 2))
-    # carrier_manual_parcel = fields.Integer('Manual parcels')
 
-    # Shippy:
-    carrier_supplier_id = fields.Many2one('carrier.supplier', 'Carrier')
+    # Carrier:
+    carrier_supplier_id = fields.Many2one(
+        'carrier.supplier', 'Carrier',
+        domain="[('mode', '=', 'carrier')]")
     carrier_mode_id = fields.Many2one('carrier.supplier.mode', 'Mode')
+
+    courier_supplier_id = fields.Many2one(
+        'carrier.supplier', 'Carrier',
+        domain="[('mode', '=', 'courier')]")
+    courier_mode_id = fields.Many2one(
+        'carrier.supplier.mode', 'Mode')
+
     carrier_parcel_template_id = fields.Many2one(
         'carrier.parcel.template', 'Parcel template')
     carrier_check = fields.Text('Carrier check', help='Check carrier address',
@@ -293,11 +311,9 @@ class SaleOrder(models.Model):
     carrier_ensurance = fields.Float('Ensurance', digits=(16, 2))
     carrier_cash_delivery = fields.Float('Cash on delivery', digits=(16, 2))
     carrier_pay_mode = fields.Selection([
-        ('cash', 'Cash'),
-        ], 'Pay mode', default='cash')
-    # carrier_incoterm = fields.selection([
-    #    ('dap', 'DAP'),
-    #    ], 'Pay mode', default='dap')
+        ('CASH', 'Cash'),
+        ('CHECK', 'Check'),
+        ], 'Pay mode', default='CASH')
     parcel_ids = fields.One2many('sale.order.parcel', 'order_id', 'Parcels')
     real_parcel_total = fields.Integer(
         string='Colli', compute='_get_carrier_parcel_total')
@@ -307,7 +323,27 @@ class SaleOrder(models.Model):
     )
 
     # From Carrier:
-    carrier_cost = fields.Float('Cost', digits=(16, 2))
+    carrier_cost = fields.Float(
+        'Cost', digits=(16, 2), help='Net shipment price')
     carrier_track_id = fields.Char('Track ID', size=64)
     # manual_track_id = fields.Char('Track ID (not shippy)', size=64)
     # TODO extra data needed!
+
+    has_cod = fields.Boolean('Has COD')  # CODAvailable
+    has_insurance = fields.Boolean('Has Insurance')  # InsuranceAvailable
+    has_safe_value = fields.Boolean('Has safe value')  # MBESafeValueAvailable
+
+    # 'Service': 'SSE',
+    # 'ServiceDesc': 'MBE Standard',
+
+    # 'Courier': 'TNT',
+    # 'CourierDesc': 'TNT',
+
+    # 'CourierService': 'TNC',
+    # 'CourierServiceDesc': 'Express - Economy',
+
+    # 'NetShipmentPrice': Decimal('6.80'),
+    # 'NetShipmentTotalPrice': Decimal('6.80'),  # ??
+
+    # 'IdSubzone': 125,
+    # 'SubzoneDesc': 'Italia-Zona A',

@@ -43,7 +43,7 @@
                         <group colspan="4" col="5" >
                             <field name="carrier_supplier_id" />
                             <field name="carrier_mode_id" domain="[('supplier_id', '=', carrier_supplier_id)]"/>
-                            <newline/>
+                            <button name="carrier_get_better_option" type="object" string="Get better option" icon="fa-hand-o-left"/>
 
                             <field name="carrier_parcel_template_id" domain="['|',('carrier_supplier_id','=',False),('carrier_supplier_id','=',carrier_supplier_id)]"/>
                             <button name="load_template_parcel" string="Add" type="object" attrs="{'invisible': [('carrier_parcel_template_id','=',False)]}" colspan="1" class="oe_highlight"/>
@@ -95,6 +95,9 @@
                             <separator string="Carrier reply:" colspan="4"/>
                             <field name="carrier_cost" />
                             <field name="carrier_track_id" />
+                            <newline/>
+                            <field name="courier_supplier_id" />
+                            <field name="courier_mode_id" domain="[('supplier_id', '=', courier_supplier_id)]"/>
                             <newline/>
                         </group>
                     </page>

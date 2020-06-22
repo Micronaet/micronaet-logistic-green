@@ -235,13 +235,13 @@ class SaleOrder(models.Model):
         partner = order.partner_id  # TODO destination?
         data = {
             'DestinationInfo': {
-                'ZipCode': '',  # 12
-                'City': '',  # * 50,
-                'State': '',  # * 2
-                'Country': '',  # 2
+                'ZipCode': partner.zip or '',  # 12
+                'City': partner.city or '',  # * 50,
+                'State': partner.state_id.code or '',  # * 2
+                'Country': partner.country_id.code or '',  # 2
                 'idSubzone': '',  # * int
                 },
-            'ShipType': 'EXPORT',  #  token EXPORT, IMPORT, RETURN
+            'ShipType': 'EXPORT',  # token EXPORT, IMPORT, RETURN
             'PackageType': 'GENERIC',  # token ENVELOPE, DOCUMENTS, GENERIC
             'Service': '',  # * string
             'Courier': '',  # * string
@@ -258,6 +258,7 @@ class SaleOrder(models.Model):
 
             'Items': order.get_items_parcel_block(),
         }
+        return data
 
     @api.multi
     def get_items_parcel_block(self):
@@ -276,16 +277,106 @@ class SaleOrder(models.Model):
                     }}})
         return data
 
+    @api.multi
+    def update_with_quotation(self, reply):
+        """ Update order courier fields with reply SOAP
+        """
+        order = self
+        supplier_pool = self.env['carrier.supplier']
+        service_pool = self.env['carrier.supplier.mode']
+
+        try:
+            data = reply['ShippingOptions']['ShippingOption'][0]
+
+            # -----------------------------------------------------------------
+            # A. Courier:
+            # -----------------------------------------------------------------
+            courier_code = data['Courier']
+            courier_name = data['CourierDesc']
+            suppliers = supplier_pool.search([
+                ('account_ref', '=', courier_code),
+                ('mode', '=', 'courier'),
+            ])
+            if suppliers:
+                supplier_id = suppliers[0].id
+            else:
+                supplier_id = supplier_pool.create({
+                    'account_ref': courier_code,
+                    'name': courier_name,
+                    'mode': 'courier',
+                }).id
+
+            # -----------------------------------------------------------------
+            # B. Courier service:
+            # -----------------------------------------------------------------
+            service_code = data['CourierService']
+            service_name = data['CourierServiceDesc']
+            services = service_pool.search([
+                ('account_ref', '=', service_code),
+                ('supplier_id', '=', supplier_id),
+            ])
+            if services:
+                service_id = services[0].id
+            else:
+                supplier_id = service_pool.create({
+                    'account_ref': service_code,
+                    'name': service_name,
+                    'supplier_id': supplier_id,
+                }).id
+
+            # -----------------------------------------------------------------
+            # C. Carrier service:
+            # -----------------------------------------------------------------
+            carrier_id = order.carrier_supplier_id.id
+            carrier_code = data['Service']
+            carrier_name = data['ServiceDesc']
+            carriers = service_pool.search([
+                ('account_ref', '=', carrier_code),
+                ('supplier_id', '=', carrier_id),
+            ])
+            if carriers:
+                carrier_mode_id = carriers[0].id
+            else:
+                carrier_mode_id = service_pool.create({
+                    'account_ref': carrier_code,
+                    'name': carrier_name,
+                    'supplier_id': carrier_id,
+                }).id
+
+            order.write({
+                'carrier_cost': data['NetShipmentPrice'],
+                'has_cod': data['CODAvailable'],
+                'has_insurance': data['InsuranceAvailable'],
+                'has_safe_value': data['MBESafeValueAvailable'],
+                'courier_supplier_id': supplier_id,
+                'courier_mode_id': service_id,
+                'carrier_mode_id': carrier_mode_id,
+            })
+
+            # TODO NetShipmentTotalPrice?
+            # 'IdSubzone': 125,
+            # 'SubzoneDesc': 'Italia-Zona A',
+
+            return ''
+        except:
+            return 'Error updating data on order'
+
     # -------------------------------------------------------------------------
     # Override methods
     # -------------------------------------------------------------------------
+    @api.multi
+    def carrier_get_better_option(self):
+        """ Get better options
+        """
+        return self.shipment_options_request()
+
     @api.multi
     def set_carrier_ok_yes(self):
         """ Override method for send carrier request
         """
         order = self
         # Get options:
-        error = order.shipment_options_request()
+        # error = order.shipment_options_request()
 
         error = order.shipment_request()
         if error:
@@ -497,15 +588,15 @@ class SaleOrder(models.Model):
         data = order.get_request_container(
             customer=False, system=True)
 
-        data['ShipmentParameters'] = order.get_shipment_container()
+        data['ShippingParameters'] = order.get_shipment_parameters_container()
 
         import pdb; pdb.set_trace()
         reply = service.ShippingOptionsRequest(data)
-        print(reply)
         error = order.check_reply_status(reply)
-        if error:
-            return error
-        # Update SOAP data for real call
+        if not error:
+            # Update SOAP data for real call
+            order.update_with_quotation(reply)
+        return error
 
     master_tracking_id = fields.Char('Master Tracking', size=20)
     system_reference_id = fields.Char('System reference ID', size=20)
