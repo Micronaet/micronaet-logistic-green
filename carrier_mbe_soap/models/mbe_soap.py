@@ -30,10 +30,10 @@ class CarrierConnectionSoap(models.Model):
         """
         text = text or ''
         if dotted:
-            if text > (size - 3):
+            if len(text) > (size - 3):
                 return '%s...' % text[:size - 3]
         else:
-            if text > size:
+            if len(text) > size:
                 return text[:size]
 
     # Connection:
