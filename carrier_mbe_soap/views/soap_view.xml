@@ -7,10 +7,11 @@
         <field name="inherit_id" ref="green_logistic_carrier.view_sale_order_form"/>
         <field name="arch" type="xml">
             <field name="carrier_track_id" position="after">
+                <!-- TODO Readonly -->
                 <field name="master_tracking_id"/>
                 <field name="system_reference_id"/>
                 <field name="carrier_soap_state" />
-                <field name="carrier_ok" />   <!--Remove-->
+                <field name="carrier_ok" />   <!-- TODO Remove-->
             </field>
             <button name="set_carrier_ok_no" position="after">
                  <button name="set_carrier_confirmed" string="Confirmed to Carrier" type="object" attrs="{'invisible': [('carrier_soap_state', '!=', 'pending')]}" icon="fa-thumbs-up" colspan="1"/>
@@ -72,6 +73,18 @@
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">carrier.connection.soap</field>
         <field name="view_mode">tree,form</field>
+    </record>
+
+    <!--carrier.supplier-->
+    <record model="ir.ui.view" id="view_carrier_supplier_tree">
+        <field name="name">carrier.supplier.tree</field>
+        <field name="model">carrier.supplier</field>
+        <field name="inherit_id" ref="green_logistic_carrier.view_carrier_supplier_tree"/>
+        <field name="arch" type="xml">
+            <field name="account_ref" position="before">
+                <field name="soap_connection_id" required="1"/>
+            </field>
+        </field>
     </record>
 
     <menuitem name="Carrier SOAP" id="carrier_connection_soap_root_menu" parent="sale.menu_sale_config" sequence="20"/>
