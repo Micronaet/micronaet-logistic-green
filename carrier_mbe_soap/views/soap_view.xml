@@ -12,8 +12,9 @@
                 <field name="carrier_soap_state" />
                 <field name="carrier_ok" />   <!--Remove-->
             </field>
-            <button name="set_carrier_ok_no" position="after"/>
-                 <button name="set_carrier_confirmed" string="Confirmed to Carrier" type="object" attrs="{'invisible': [('carrier_state', '!=', 'pending')]}" icon="fa-mail-reply" colspan="1"/>
+            <button name="set_carrier_ok_no" position="after">
+                 <button name="set_carrier_confirmed" string="Confirmed to Carrier" type="object" attrs="{'invisible': [('carrier_soap_state', '!=', 'pending')]}" icon="fa-thumbs-up" colspan="1"/>
+            </button>
         </field>
     </record>
     <record id="carrier_connection_soap_view_tree" model="ir.ui.view">

@@ -11,6 +11,7 @@ import shutil
 import zeep
 from odoo import models, fields, api
 from odoo import exceptions
+from odoo.tools.translate import _
 
 _logger = logging.getLogger(__name__)
 
@@ -249,12 +250,17 @@ class SaleOrder(models.Model):
         # raise exceptions.ValidationError('Not valid message')
         return super(SaleOrder, self).set_carrier_ok_no()
 
+    # Button event:
     @api.multi
     def set_carrier_confirmed(self):
         """ Carrier confirmed for shipment
         """
+        error = self.close_shipments_request()
+        if error:
+            return self.write_log_chatter_message(error)
         return True
 
+    # Utility:
     @api.multi
     def save_order_label(self, order, reply):
         """ Save order label
@@ -283,7 +289,7 @@ class SaleOrder(models.Model):
         """
         master_tracking_id = reply['MasterTrackingMBE']
         system_reference_id = reply['SystemReferenceID']
-        # self.save_order_label(order, reply)
+        # Note: raw label not printed!
 
         # InternalReferenceID 100
         # TrackingMBE* : {'TrackingMBE': ['RL28102279']
@@ -296,8 +302,45 @@ class SaleOrder(models.Model):
         })
 
     # -------------------------------------------------------------------------
-    # API CALLS:
+    #                            API CALLS:
     # -------------------------------------------------------------------------
+    @api.multi
+    def close_shipments_request(self):
+        """ 2. CloseShipmentsRequest: Close shipment request
+        """
+        order = self
+
+        import pdb; pdb.set_trace()
+        soap_connection = order.carrier_supplier_id.soap_connection_id
+        service = soap_connection.get_connection()
+        service.CloseShipmentsRequest()
+        master_tracking_id = order.master_tracking_id
+        if not master_tracking_id:
+            error = _('No master track ID so no confirmation!')
+            _logger.error(error)
+            return error
+
+        # Prepare data:
+        data = soap_connection.get_request_container(system='SystemType')
+        data['MasterTrackingsMBE'] = master_tracking_id
+
+        # Call:
+        reply = service.CloseShipmentsRequest(data)
+        error = soap_connection.check_reply_status(reply)
+        if error:
+            error = 'Error confirming: Track: %s\n%s' % (
+                master_tracking_id,
+                error,
+            )
+        else:
+            order.write({
+                # TODO carrier_track_id
+                'carrier_soap_state': 'sent',  # TODO need another status?
+            })
+
+            order.save_order_label()
+        return error
+
     @api.multi
     def delete_shipments_request(self):
         """ 4. API Delete Shipment Request: Delete shipment request
@@ -312,14 +355,14 @@ class SaleOrder(models.Model):
             # SOAP insert call:
             data = soap_connection.get_request_container(system='SystemType')
             data['MasterTrackingsMBE'] = master_tracking_id  # Also with Loop
-            import pdb; pdb.set_trace()
             reply = service.DeleteShipmentsRequest(data)
 
             error = soap_connection.check_reply_status(reply)
-            error = 'Error deleting: Track: %s\n%s' % (
-                master_tracking_id,
-                error,
-            )
+            if error:
+                error = 'Error deleting: Track: %s\n%s' % (
+                    master_tracking_id,
+                    error,
+                )
         else:
             _logger.error('Order %s has no master tracking, cannot delete!' %
                 order.name)
@@ -327,7 +370,6 @@ class SaleOrder(models.Model):
         # Check carrier_track_id for permit delete:
         if not error:
             order.write({
-                # TODO carrier_track_id
                 'carrier_soap_state': 'draft',
                 'master_tracking_id': False,
                 'system_reference_id': False,
