@@ -411,22 +411,17 @@ class SaleOrder(models.Model):
         """ Save order label
         """
         order = self
-        # Labels* LabelsType
-        #    Label LabelType
-        #        Stream B64
-        #        Type 4
         import pdb; pdb.set_trace()
         path = os.path.expanduser(
             '~/.local/share/Odoo/filestore/%s/label' % order.env.cr.dbname)
         os.system('mkdir -p %s' % path)
 
         filename = os.path.join(path, '%s.pdf' % order.id)
-        for label in reply['Labels']:
-            label = label['Label']
-            label_b64 = label['Stream']
-            label_type = label['Type']
+        for label in reply['Labels']['Label']:
+            label_stream = label['Stream']
+            # label_type = label['Type']
             with open(filename, 'wb') as label_file:
-                label_file.write(label_b64)
+                label_file.write(label_stream)
             # TODO save label linked to order
 
     @api.multi
@@ -549,7 +544,6 @@ class SaleOrder(models.Model):
             'Recipient': order.get_recipient_container(),
             'Shipment': order.get_shipment_container(),
         })
-        import pdb; pdb.set_trace()
         reply = service.ShipmentRequest(data)
         error = order.check_reply_status(reply)
         if error:
