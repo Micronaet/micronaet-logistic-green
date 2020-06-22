@@ -319,7 +319,6 @@ class SaleOrder(models.Model):
         order = self
         # soap_pool = self.env['carrier.connection.soap']
 
-        import pdb; pdb.set_trace()
         soap_connection = order.carrier_supplier_id.soap_connection_id
         if not soap_connection:
             return 'Order %s has carrier without SOAP ref.!' % order.name
@@ -338,6 +337,7 @@ class SaleOrder(models.Model):
         # TODO create data dict
         data['Recipient'] = soap_connection.get_recipient_container(
             order.partner_id)
+        import pdb; pdb.set_trace()
         data['Shipment'] = soap_connection.get_shipment_container(order)
 
         reply = service.ShipmentRequest(data)
