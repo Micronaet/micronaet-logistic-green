@@ -229,7 +229,6 @@ class SaleOrder(models.Model):
     def set_carrier_ok_yes(self):
         """ Override method for send carrier request
         """
-        import pdb; pdb.set_trace()
         error = self.shipment_request()
         if error:
             return self.write_log_chatter_message(error)
@@ -324,7 +323,7 @@ class SaleOrder(models.Model):
         soap_connection = order.carrier_supplier_id.soap_connection_id
         if not soap_connection:
             return 'Order %s has carrier without SOAP ref.!' % order.name
-        if order not in 'draft':
+        if order.state not in 'draft':
             return 'Order %s not in draft mode so no published!' % order.name
         if order.carrier_soap_id:
             return 'Order %s has SOAP ID %s cannot publish!' % (
