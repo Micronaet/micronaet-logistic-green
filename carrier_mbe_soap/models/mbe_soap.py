@@ -26,18 +26,6 @@ class CarrierConnectionSoap(models.Model):
     # -------------------------------------------------------------------------
     #                                  METHODS:
     # -------------------------------------------------------------------------
-    # Utility:
-    def check_size(self, text, size, dotted=False):
-        """ Clean text for SOAP call
-        """
-        text = text or ''
-        if dotted:
-            if len(text) > (size - 3):
-                return '%s...' % text[:size - 3]
-        else:
-            if len(text) > size:
-                return text[:size]
-
     # Connection:
     @api.multi
     def get_connection(self):
@@ -47,141 +35,6 @@ class CarrierConnectionSoap(models.Model):
 
         client = zeep.Client(self.wsdl_root)
         return client.service
-
-    @api.multi
-    def check_reply_status(self, reply):
-        """ Get Service connection to make calls:
-            :return Error text if present
-        """
-        self.ensure_one()
-        # Status token (OK, ERROR)
-
-        error = ''
-        if reply['Status'] == 'ERROR':
-            # Error[{'id', 'Description'}]
-            error = '%s' % (reply['Errors'], )  # TODO better!
-            _logger.error(error)
-        return error
-
-    # Create data container:
-    @api.multi
-    def get_request_container(
-            self, credentials=True, internal=True, customer=True, system=False,
-            store=False):
-        """ Get Service connection to make calls, parameters are passed as
-            boolean switch:
-        """
-        self.ensure_one()
-        data = {}
-        if credentials:
-            data['Credentials'] = {
-                'Username': self.username,
-                'Passphrase': self.passphrase,
-            }
-        if internal:
-            data['InternalReferenceID'] = self.internal_reference
-        if customer:
-            data['CustomerID'] = self.customer_id
-        if system:
-            if type(system) == bool:
-                field_name = 'System'
-            else:
-                field_name = 'SystemType'
-            data[field_name] = self.system
-        if store:
-            data['StoreID'] = self.store_id
-        return data
-
-    @api.multi
-    def get_recipient_container(self, partner):
-        """ Return dict for Partner container
-        """
-        return {
-            'Name': 'TEST' or partner.name,  # 35
-            'CompanyName': 'TEST',  # 35
-            'Nickname': 'TEST',  # 100
-            'Address': partner.street or '',  # 100
-            'Address2': partner.street2 or '',  # 35
-            'Address3': '',  # 35
-            'Phone': partner.phone or '',  # 50
-            'ZipCode': partner.zip or '',  # 12
-            'City': partner.city or '',  # 50
-            'State': partner.state_id.code or '',  # 2
-            'Country': partner.country_id.code or '',  # 2
-            'Email': partner.email or '',  # 75
-            'SubzoneId': '',  # integer
-            'SubzoneDesc': '',
-        }
-
-    @api.multi
-    def get_shipment_container(self, order, mode='real'):
-        """ Return dict for order shipment
-            mode: real, option
-        """
-        # TODO complete fields:
-        data = {
-            'ShipperType': 'MBE',  # string (COURIERLDV, MBE)
-            'Description': self.check_size(
-                order.carrier_description, 100, dotted=True),
-            'COD': False,  # boolean
-            # 'CODValue': '',  # * decimal
-            'MethodPayment': 'CASH',  # * string (CASH, CHECK)
-            'Insurance': False,  # boolean
-            # 'InsuranceValue': '',  # * decimal
-            # 'Service': '',  # * string
-            # 'Courier': '',  # * string
-            # 'CourierService': '',  # * string
-            # 'CourierAccount': '',  # * string
-            'PackageType': 'GENERIC',  # token (ENVELOPE, DOCUMENTS, GENERIC)
-            # 'Value': '',  # * decimal
-            # 'ShipmentCurrency': '',  # * string
-            'Referring': order.name,  # * string 30
-            'InternalNotes': 'ORDINE DA CANCELLARE',  # * string
-            'Notes': 'ORDINE DA CANCELLARE',  # * string
-            # 'SaturdayDelivery': '',  # * boolean
-            # 'SignatureRequired': '',  # * boolean
-            # 'ShipmentOrigin': '',  # * string
-            # 'ShipmentSource': '',  # * int
-            # 'MBESafeValue': '',  # * boolean
-            # 'MBESafeValueValue': '',  # * decimal
-            # 'MBESafeValueDescription': '',  # * string 100
-            'Items': [],
-        }
-        if mode == 'real':
-            data['LabelFormat'] = 'NEW'  # * token (OLD, NEW)
-
-        for parcel in order.parcel_ids:
-            data['Items'].append(
-                {'Item': {
-                    'Weight': parcel.real_weight,
-                    'Dimensions': {
-                        'Lenght': parcel.length,  # TODO typo but written wrong
-                        'Height': parcel.height,
-                        'Width': parcel.width,
-                    }}})
-
-        # Items ItemsType
-        #    Item ItemType
-        #        Weight decimal
-        #        Dimensions DimensionsType
-        #            Lenght decimal
-        #            Height decimal
-        #            Width decimal
-
-        # Products* ProductsType
-        #    Product ProductType
-        #        SKUCode string
-        #        Description string
-        #        Quantity decimal
-
-        # ProformaInvoice* ProformaInvoiceType
-        #        ProformaDetail ProformaDetailType
-        #            Amount int
-        #            Currency string 10
-        #            Value decimal
-        #            Unit string 5
-        #            Description string 35
-        return data
 
     # -------------------------------------------------------------------------
     #                                   COLUMNS:
@@ -232,24 +85,220 @@ class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
     # -------------------------------------------------------------------------
+    #                            UTILITY:
+    # -------------------------------------------------------------------------
+    # Check utility:
+    @api.multi
+    def check_reply_status(self, reply):
+        """ Get Service connection to make calls:
+            :return Error text if present
+        """
+        self.ensure_one()
+        # Status token (OK, ERROR)
+
+        error = ''
+        if reply['Status'] == 'ERROR':
+            # Error[{'id', 'Description'}]
+            error = '%s' % (reply['Errors'], )  # TODO better!
+            _logger.error(error)
+        return error
+
+    # Format Utility:
+    def check_size(self, text, size, dotted=False):
+        """ Clean text for SOAP call
+        """
+        text = text or ''
+        if dotted:
+            if len(text) > (size - 3):
+                return '%s...' % text[:size - 3]
+        else:
+            if len(text) > size:
+                return text[:size]
+
+    # Create block utility (for container)
+    @api.multi
+    def get_request_container(
+            self, credentials=True, internal=True, customer=True, system=False,
+            store=False):
+        """ Get Service connection to make calls, parameters are passed as
+            boolean switch:
+        """
+        self.ensure_one()
+        data = {}
+        if credentials:
+            data['Credentials'] = {
+                'Username': self.username,
+                'Passphrase': self.passphrase,
+            }
+        if internal:
+            data['InternalReferenceID'] = self.internal_reference
+        if customer:
+            data['CustomerID'] = self.customer_id
+        if system:
+            if type(system) == bool:
+                field_name = 'System'
+            else:
+                field_name = 'SystemType'
+            data[field_name] = self.system
+        if store:
+            data['StoreID'] = self.store_id
+        return data
+
+    @api.multi
+    def get_recipient_container(self):
+        """ Return dict for Partner container
+        """
+        order = self
+        partner = order.partner_id  # TODO destination partner!
+        return {
+            'Name': 'TEST' or partner.name,  # 35
+            'CompanyName': 'TEST',  # 35
+            'Nickname': 'TEST',  # 100
+            'Address': partner.street or '',  # 100
+            'Address2': partner.street2 or '',  # 35
+            'Address3': '',  # 35
+            'Phone': partner.phone or '',  # 50
+            'ZipCode': partner.zip or '',  # 12
+            'City': partner.city or '',  # 50
+            'State': partner.state_id.code or '',  # 2
+            'Country': partner.country_id.code or '',  # 2
+            'Email': partner.email or '',  # 75
+            'SubzoneId': '',  # integer
+            'SubzoneDesc': '',
+        }
+
+    @api.multi
+    def get_shipment_container(self):
+        """ Return dict for order shipment
+        """
+        order = self
+        # TODO complete fields:
+        data = {
+            'ShipperType': 'MBE',  # string (COURIERLDV, MBE)
+            'Description': order.check_size(
+                order.carrier_description, 100, dotted=True),
+            'COD': False,  # boolean
+            # 'CODValue': '',  # * decimal
+            'MethodPayment': 'CASH',  # * string (CASH, CHECK)
+            'Insurance': False,  # boolean
+            # 'InsuranceValue': '',  # * decimal
+            # 'Service': '',  # * string
+            # 'Courier': '',  # * string
+            # 'CourierService': '',  # * string
+            # 'CourierAccount': '',  # * string
+            'PackageType': 'GENERIC',  # token (ENVELOPE, DOCUMENTS, GENERIC)
+            # 'Value': '',  # * decimal
+            # 'ShipmentCurrency': '',  # * string
+            'Referring': order.name,  # * string 30
+            'InternalNotes': 'ORDINE DA CANCELLARE',  # * string
+            'Notes': 'ORDINE DA CANCELLARE',  # * string
+            # 'SaturdayDelivery': '',  # * boolean
+            # 'SignatureRequired': '',  # * boolean
+            # 'ShipmentOrigin': '',  # * string
+            # 'ShipmentSource': '',  # * int
+            # 'MBESafeValue': '',  # * boolean
+            # 'MBESafeValueValue': '',  # * decimal
+            # 'MBESafeValueDescription': '',  # * string 100
+            'LabelFormat': 'NEW',  # * token (OLD, NEW)
+            'Items': order.get_items_parcel_block(),
+        }
+
+        # Items ItemsType
+        #    Item ItemType
+        #        Weight decimal
+        #        Dimensions DimensionsType
+        #            Lenght decimal
+        #            Height decimal
+        #            Width decimal
+
+        # Products* ProductsType
+        #    Product ProductType
+        #        SKUCode string
+        #        Description string
+        #        Quantity decimal
+
+        # ProformaInvoice* ProformaInvoiceType
+        #        ProformaDetail ProformaDetailType
+        #            Amount int
+        #            Currency string 10
+        #            Value decimal
+        #            Unit string 5
+        #            Description string 35
+        return data
+
+    @api.multi
+    def get_shipment_parameters_container(self):
+        """ Return dict for order shipment
+        """
+        order = self
+        partner = order.partner_id  # TODO destination?
+        data = {
+            'DestinationInfo': {
+                'ZipCode': '',  # 12
+                'City': '',  # * 50,
+                'State': '',  # * 2
+                'Country': '',  # 2
+                'idSubzone': '',  # * int
+                },
+            'ShipType': 'EXPORT',  #  token EXPORT, IMPORT, RETURN
+            'PackageType': 'GENERIC',  # token ENVELOPE, DOCUMENTS, GENERIC
+            'Service': '',  # * string
+            'Courier': '',  # * string
+            'CourierService': '',  # * string
+            # 'COD': '',  # * boolean
+            # 'CODValue': '',  # * decimal
+            # 'CODPaymentMethod': '',  # * token CASH CHECK
+            # 'Insurance': '',  # * boolean
+            # 'InsuranceValue': '',  # * decimal
+            # 'SaturdayDelivery': '',  # * boolean
+            # 'SignatureRequired': '',  # * boolean
+            # 'MBESafeValue': '',  # * boolean
+            # 'MBESafeValueValue': '',  # * decimal
+
+            'Items': order.get_items_parcel_block(),
+        }
+
+    @api.multi
+    def get_items_parcel_block(self):
+        """ Return parcels block
+        """
+        order = self
+        data = {}
+        for parcel in order.parcel_ids:
+            data['Items'].append(
+                {'Item': {
+                    'Weight': parcel.real_weight,
+                    'Dimensions': {
+                        'Lenght': parcel.length,  # TODO typo but written wrong
+                        'Height': parcel.height,
+                        'Width': parcel.width,
+                    }}})
+        return data
+
+    # -------------------------------------------------------------------------
     # Override methods
     # -------------------------------------------------------------------------
     @api.multi
     def set_carrier_ok_yes(self):
         """ Override method for send carrier request
         """
-        error = self.shipment_request()
+        order = self
+        # Get options:
+        error = order.shipment_options_request()
+
+        error = order.shipment_request()
         if error:
-            return self.write_log_chatter_message(error)
+            return order.write_log_chatter_message(error)
         return super(SaleOrder, self).set_carrier_ok_yes()
 
     @api.multi
     def set_carrier_ok_no(self):
         """ Override method for send carrier request
         """
-        error = self.delete_shipments_request()
+        order = self
+        error = order.delete_shipments_request()
         if error:
-            return self.write_log_chatter_message(error)
+            return order.write_log_chatter_message(error)
         # raise exceptions.ValidationError('Not valid message')
         return super(SaleOrder, self).set_carrier_ok_no()
 
@@ -258,23 +307,25 @@ class SaleOrder(models.Model):
     def set_carrier_confirmed(self):
         """ Carrier confirmed for shipment
         """
-        error = self.close_shipments_request()
+        order = self
+        error = order.close_shipments_request()
         if error:
-            return self.write_log_chatter_message(error)
+            return order.write_log_chatter_message(error)
         return True
 
     # Utility:
     @api.multi
-    def save_order_label(self, order, reply):
+    def save_order_label(self, reply):
         """ Save order label
         """
+        order = self
         # Labels* LabelsType
         #    Label LabelType
         #        Stream B64
         #        Type 4
         import pdb; pdb.set_trace()
         path = os.path.expanduser(
-            '~/.local/share/Odoo/filestore/%s' % self.env.cr.dbname)
+            '~/.local/share/Odoo/filestore/%s' % order.env.cr.dbname)
         os.system('mkdir -p %s' % path)
 
         filename = os.path.join(path, '%s.pdf' % order.id)
@@ -287,9 +338,10 @@ class SaleOrder(models.Model):
             # TODO save label linked to order
 
     @api.multi
-    def update_order_with_soap_reply(self, order, reply):
+    def update_order_with_soap_reply(self, reply):
         """ Update order data with SOAP reply (error checked in different call)
         """
+        order = self
         master_tracking_id = reply['MasterTrackingMBE']
         system_reference_id = reply['SystemReferenceID']
         # Note: raw label not printed!
@@ -322,11 +374,11 @@ class SaleOrder(models.Model):
             return error
 
         # Prepare data:
-        data = soap_connection.get_request_container(system='SystemType')
+        data = order.get_request_container(system='SystemType')
         data['MasterTrackingsMBE'] = master_tracking_id
 
         reply = service.CloseShipmentsRequest(data)
-        error = soap_connection.check_reply_status(reply)
+        error = order.check_reply_status(reply)
         if error:
             error = 'Error confirming: Track: %s\n%s' % (
                 master_tracking_id,
@@ -338,7 +390,7 @@ class SaleOrder(models.Model):
                 'carrier_soap_state': 'sent',  # TODO need another status?
             })
 
-            order.save_order_label()
+            order.save_order_label(reply)
         return error
 
     @api.multi
@@ -353,11 +405,11 @@ class SaleOrder(models.Model):
         master_tracking_id = order.master_tracking_id
         if master_tracking_id:
             # SOAP insert call:
-            data = soap_connection.get_request_container(system='SystemType')
+            data = order.get_request_container(system='SystemType')
             data['MasterTrackingsMBE'] = master_tracking_id  # Also with Loop
             reply = service.DeleteShipmentsRequest(data)
 
-            error = soap_connection.check_reply_status(reply)
+            error = order.check_reply_status(reply)
             if error:
                 error = 'Error deleting: Track: %s\n%s' % (
                     master_tracking_id,
@@ -396,19 +448,17 @@ class SaleOrder(models.Model):
         # SOAP insert call:
         # -----------------------------------------------------------------
         service = soap_connection.get_connection()
-        data = soap_connection.get_request_container(
-            customer=False, system=True)
+        data = order.get_request_container(customer=False, system=True)
 
         # TODO create data dict
-        data['Recipient'] = soap_connection.get_recipient_container(
-            order.partner_id)
-        data['Shipment'] = soap_connection.get_shipment_container(order)
+        data['Recipient'] = order.get_recipient_container()
+        data['Shipment'] = order.get_shipment_container()
         reply = service.ShipmentRequest(data)
         import pdb; pdb.set_trace()
-        error = soap_connection.check_reply_status(reply)
+        error = order.check_reply_status(reply)
         if error:
             return error
-        self.update_order_with_soap_reply(order, reply)
+        order.update_order_with_soap_reply(reply)
 
     master_tracking_id = fields.Char('Master Tracking', size=20)
     system_reference_id = fields.Char('System reference ID', size=20)
@@ -443,15 +493,15 @@ class SaleOrder(models.Model):
         # SOAP insert call:
         # -----------------------------------------------------------------
         service = soap_connection.get_connection()
-        data = soap_connection.get_request_container(
+        data = order.get_request_container(
             customer=False, system=True)
 
-        data['Shipment'] = soap_connection.get_shipment_container(
-            order, mode='option')
+        data['ShipmentParameters'] = order.get_shipment_container()
+
+        import pdb; pdb.set_trace()
         reply = service.ShippingOptionsRequest(data)
         print(reply)
-        import pdb; pdb.set_trace()
-        error = soap_connection.check_reply_status(reply)
+        error = order.check_reply_status(reply)
         if error:
             return error
         # Update SOAP data for real call
