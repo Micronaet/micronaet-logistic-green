@@ -264,9 +264,9 @@ class SaleOrder(models.Model):
         """ Return parcels block
         """
         order = self
-        data = {}
+        data = []
         for parcel in order.parcel_ids:
-            data['Items'].append(
+            data.append(
                 {'Item': {
                     'Weight': parcel.real_weight,
                     'Dimensions': {
