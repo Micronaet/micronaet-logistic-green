@@ -145,7 +145,7 @@ class CarrierConnectionSoap(models.Model):
             data['Items'].append(
                 {'Item': {
                     'Weight': parcel.real_weight,
-                    'Dimension': {
+                    'Dimensions': {
                         'Length': parcel.length,
                         'Height': parcel.height,
                         'Width': parcel.width,
