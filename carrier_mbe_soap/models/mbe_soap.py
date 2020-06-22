@@ -30,7 +30,7 @@ class CarrierConnectionSoap(models.Model):
         if dotted:
             if text > (size - 3):
                 return '%s...' % text[:size - 3]
-        else
+        else:
             if text > size:
                 return text[:size]
 
@@ -170,7 +170,7 @@ class CarrierConnectionSoap(models.Model):
         #            Value decimal
         #            Unit string 5
         #            Description string 35
-        return res
+        return data
 
     # -------------------------------------------------------------------------
     #                                   COLUMNS:
@@ -310,11 +310,12 @@ class SaleOrder(models.Model):
         soap_pool = self.env['carrier.connection.soap']
         service = soap_pool.get_connection()
 
+        import pdb; pdb.set_trace()
         soap_connection_id = order.soap_connection_id
         if not soap_connection_id:
             return 'Order %s has carrier without SOAP ref.!' % order.name
         if order not in 'draft':
-            return 'Order %s not in draft mode so no publish!' % order.name
+            return 'Order %s not in draft mode so no published!' % order.name
         if order.carrier_soap_id:
             return 'Order %s has SOAP ID %s cannot publish!' % (
                     order.name, order.carrier_soap_id)
@@ -331,7 +332,7 @@ class SaleOrder(models.Model):
 
         reply = service.ShipmentRequest(data)
         error = soap_pool.check_reply_status(reply)
-        if error:  # TODO Check reply
+        if error:
             return error
         self.update_order_with_soap_reply(order, reply)
 
