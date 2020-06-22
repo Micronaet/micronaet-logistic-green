@@ -292,13 +292,14 @@ class SaleOrder(models.Model):
     carrier_supplier_id = fields.Many2one(
         'carrier.supplier', 'Carrier',
         domain="[('mode', '=', 'carrier')]")
-    carrier_mode_id = fields.Many2one('carrier.supplier.mode', 'Mode')
+    carrier_mode_id = fields.Many2one(
+        'carrier.supplier.mode', 'Carrier service')
 
     courier_supplier_id = fields.Many2one(
-        'carrier.supplier', 'Carrier',
+        'carrier.supplier', 'Courier',
         domain="[('mode', '=', 'courier')]")
     courier_mode_id = fields.Many2one(
-        'carrier.supplier.mode', 'Mode')
+        'carrier.supplier.mode', 'Courier service')
 
     carrier_parcel_template_id = fields.Many2one(
         'carrier.parcel.template', 'Parcel template')
