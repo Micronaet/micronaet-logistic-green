@@ -276,6 +276,7 @@ class SaleOrder(models.Model):
                         'Height': parcel.height,
                         'Width': parcel.width,
                     }}})
+        print(data)
         return data
 
     @api.multi
