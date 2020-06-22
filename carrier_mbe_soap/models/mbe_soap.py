@@ -337,9 +337,9 @@ class SaleOrder(models.Model):
         # TODO create data dict
         data['Recipient'] = soap_connection.get_recipient_container(
             order.partner_id)
-        import pdb; pdb.set_trace()
         data['Shipment'] = soap_connection.get_shipment_container(order)
 
+        import pdb; pdb.set_trace()
         reply = service.ShipmentRequest(data)
         error = soap_connection.check_reply_status(reply)
         if error:
