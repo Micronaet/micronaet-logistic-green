@@ -77,7 +77,7 @@ class CarrierConnectionSoap(models.Model):
                 'Passphrase': self.passphrase,
             }
         if internal:
-            data['InternalReferenceID'] = self.internal_reference_id
+            data['InternalReferenceID'] = self.internal_reference
         if customer:
             data['CustomerID'] = self.customer_id
         if system:
