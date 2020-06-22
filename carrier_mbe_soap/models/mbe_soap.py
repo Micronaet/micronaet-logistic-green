@@ -417,7 +417,7 @@ class SaleOrder(models.Model):
         #        Type 4
         import pdb; pdb.set_trace()
         path = os.path.expanduser(
-            '~/.local/share/Odoo/filestore/%s' % order.env.cr.dbname)
+            '~/.local/share/Odoo/filestore/%s/label' % order.env.cr.dbname)
         os.system('mkdir -p %s' % path)
 
         filename = os.path.join(path, '%s.pdf' % order.id)
