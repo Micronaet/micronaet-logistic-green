@@ -250,6 +250,12 @@ class SaleOrder(models.Model):
         return super(SaleOrder, self).set_carrier_ok_no()
 
     @api.multi
+    def set_carrier_confirmed(self):
+        """ Carrier confirmed for shipment
+        """
+        return True
+
+    @api.multi
     def save_order_label(self, order, reply):
         """ Save order label
         """
@@ -356,8 +362,8 @@ class SaleOrder(models.Model):
             order.partner_id)
         data['Shipment'] = soap_connection.get_shipment_container(order)
 
-        import pdb; pdb.set_trace()
         reply = service.ShipmentRequest(data)
+        import pdb; pdb.set_trace()
         error = soap_connection.check_reply_status(reply)
         if error:
             return error
