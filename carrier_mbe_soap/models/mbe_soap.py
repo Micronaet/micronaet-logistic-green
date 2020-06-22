@@ -411,7 +411,6 @@ class SaleOrder(models.Model):
         """ Save order label
         """
         order = self
-        import pdb; pdb.set_trace()
         path = os.path.expanduser(
             '~/.local/share/Odoo/filestore/%s/label' % order.env.cr.dbname)
         os.system('mkdir -p %s' % path)
