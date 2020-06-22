@@ -293,15 +293,15 @@ class SaleOrder(models.Model):
         """ 4. API Delete Shipment Request: Delete shipment request
         """
         order = self
-        soap_pool = self.env['carrier.connection.soap']
         soap_connection = order.carrier_supplier_id.soap_connection_id
         service = soap_connection.get_connection()
 
         master_tracking_id = order.master_tracking_id
         if master_tracking_id:
             # SOAP insert call:
-            data = soap_pool.get_request_container(system=True)
-            data['MasterTrackingMBE'] = master_tracking_id  # Loopable
+            data = soap_connection.get_request_container(system=True)
+            data['MasterTrackingMBE'] = master_tracking_id  # Also with Loop
+            import pdb; pdb.set_trace()
             service.DeleteShipmentsRequest(data)
         else:
             _logger.error('Order %s has no master tracking, cannot delete!' %
