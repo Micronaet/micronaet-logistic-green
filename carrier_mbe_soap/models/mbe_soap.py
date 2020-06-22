@@ -266,17 +266,16 @@ class SaleOrder(models.Model):
         """ Return parcels block
         """
         order = self
-        data = []
+        data = {'Item': []}
         for parcel in order.parcel_ids:
-            data.append(
-                {'Item': {
-                    'Weight': parcel.real_weight,
-                    'Dimensions': {
-                        'Lenght': parcel.length,  # TODO typo but written wrong
-                        'Height': parcel.height,
-                        'Width': parcel.width,
-                    }}})
-        print(data)
+            data['Item'].append({
+                'Weight': parcel.real_weight,
+                'Dimensions': {
+                    'Lenght': parcel.length,  # TODO typo but written wrong
+                    'Height': parcel.height,
+                    'Width': parcel.width,
+                }
+            })
         return data
 
     @api.multi
@@ -347,6 +346,7 @@ class SaleOrder(models.Model):
 
             order.write({
                 'carrier_cost': data['NetShipmentPrice'],
+                'carrier_cost_total': data['NetShipmentTotalPrice'],
                 'has_cod': data['CODAvailable'],
                 'has_insurance': data['InsuranceAvailable'],
                 'has_safe_value': data['MBESafeValueAvailable'],
@@ -546,6 +546,7 @@ class SaleOrder(models.Model):
             'Recipient': order.get_recipient_container(),
             'Shipment': order.get_shipment_container(),
         })
+        print(data)
         reply = service.ShipmentRequest(data)
         error = order.check_reply_status(reply)
         if error:
@@ -564,7 +565,15 @@ class SaleOrder(models.Model):
             ('sent', 'Sent'),
             ('delivered', 'Delivered'),  # Closed
         ])
-
+    delivery_soap_state = fields.Selection(
+        string='Delivery state', default='draft',
+        selection=[
+            ('WAITING_DELIVERY', 'Waiting'),
+            ('PARTIALLY_DELIVERED', 'Partially delivered'),
+            ('DELIVERED', 'Delivered'),
+            ('EXCEPTION', 'Exception'),
+            ('NOT_AVAILABLE', 'Not available'),
+        ])
     @api.multi
     def shipment_options_request(self):
         """ 17. API ShippingOptionsRequest: Get better quotation

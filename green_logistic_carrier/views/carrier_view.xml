@@ -99,6 +99,9 @@
                             <field name="courier_supplier_id" />
                             <field name="courier_mode_id" domain="[('supplier_id', '=', courier_supplier_id)]"/>
                             <newline/>
+                            <field name="carrier_delivery_date" />
+                            <field name="carrier_delivery_sign" />
+                            <newline/>
                         </group>
                     </page>
                 </xpath>

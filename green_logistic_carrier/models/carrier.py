@@ -323,28 +323,21 @@ class SaleOrder(models.Model):
         related='partner_shipping_id.country_id',
     )
 
-    # From Carrier:
+    # Data from Carrier:
     carrier_cost = fields.Float(
         'Cost', digits=(16, 2), help='Net shipment price')
+    carrier_cost_total = fields.Float(
+        'Cost', digits=(16, 2), help='Net shipment total price')
     carrier_track_id = fields.Char('Track ID', size=64)
-    # manual_track_id = fields.Char('Track ID (not shippy)', size=64)
     # TODO extra data needed!
 
     has_cod = fields.Boolean('Has COD')  # CODAvailable
     has_insurance = fields.Boolean('Has Insurance')  # InsuranceAvailable
     has_safe_value = fields.Boolean('Has safe value')  # MBESafeValueAvailable
 
-    # 'Service': 'SSE',
-    # 'ServiceDesc': 'MBE Standard',
+    carrier_delivery_date = fields.Datetime('Delivery date', readonly=True)
+    carrier_delivery_sign = fields.Datetime('Delivery sign', readonly=True)
 
-    # 'Courier': 'TNT',
-    # 'CourierDesc': 'TNT',
-
-    # 'CourierService': 'TNC',
-    # 'CourierServiceDesc': 'Express - Economy',
-
-    # 'NetShipmentPrice': Decimal('6.80'),
     # 'NetShipmentTotalPrice': Decimal('6.80'),  # ??
-
     # 'IdSubzone': 125,
     # 'SubzoneDesc': 'Italia-Zona A',
