@@ -239,6 +239,7 @@ class SaleOrder(models.Model):
     def set_carrier_ok_no(self):
         """ Override method for send carrier request
         """
+        import pdb; pdb.set_trace()
         if self.master_tracking_id:
             error = self.delete_shipments_request()
             if error:
