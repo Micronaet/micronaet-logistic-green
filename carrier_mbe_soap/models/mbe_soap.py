@@ -116,10 +116,10 @@ class CarrierConnectionSoap(models.Model):
             'ShipperType': 'MBE',  # string (COURIERLDV, MBE)
             'Description': self.check_size(
                 order.carrier_description, 100, dotted=True),
-            'COD': False,  # boolean
+            'COD': '',  # boolean
             # 'CODValue': '',  # * decimal
             'MethodPayment': 'CASH',  # * string (CASH, CHECK)
-            'Insurance': False,  # boolean
+            'Insurance': '',  # boolean
             # 'InsuranceValue': '',  # * decimal
             # 'Service': '',  # * string
             # 'Courier': '',  # * string
@@ -146,7 +146,7 @@ class CarrierConnectionSoap(models.Model):
                 {'Item': {
                     'Weight': parcel.real_weight,
                     'Dimensions': {
-                        'Length': parcel.length,
+                        'Lenght': parcel.length,  # TODO typo but written wrong
                         'Height': parcel.height,
                         'Width': parcel.width,
                     }}})
