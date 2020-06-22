@@ -418,7 +418,7 @@ class SaleOrder(models.Model):
         for label in reply['Labels']['Label']:
             counter += 1
             label_stream = label['Stream']
-            # label_type = label['Type']
+            label_type = label['Type']
             filename = os.path.join(path, '%s.%s.%s' % (
                 order.id, counter, label_type))
             with open(filename, 'wb') as label_file:
