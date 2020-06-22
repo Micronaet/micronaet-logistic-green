@@ -436,8 +436,7 @@ class SaleOrder(models.Model):
         order = self
         master_tracking_id = reply['MasterTrackingMBE']
         system_reference_id = reply['SystemReferenceID']
-        # Note: raw label not printed!
-
+        order.save_order_label(reply)
         # InternalReferenceID 100
         # TrackingMBE* : {'TrackingMBE': ['RL28102279']
 
@@ -535,6 +534,10 @@ class SaleOrder(models.Model):
         if order.carrier_soap_id:
             return 'Order %s has SOAP ID %s cannot publish!' % (
                     order.name, order.carrier_soap_id)
+
+        # Write description if not present:
+        if not order.carrier_description:
+            order.set_default_carrier_description()
 
         # -----------------------------------------------------------------
         # SOAP insert call:
