@@ -332,7 +332,8 @@ class SaleOrder(models.Model):
         # SOAP insert call:
         # -----------------------------------------------------------------
         service = soap_connection.get_connection()
-        data = soap_connection.get_request_container(system=True)
+        data = soap_connection.get_request_container(
+            customer=False, system=True)
 
         # TODO create data dict
         data['Recipient'] = soap_connection.get_recipient_container(
