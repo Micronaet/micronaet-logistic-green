@@ -1,6 +1,8 @@
 # Copyright 2019  Micronaet SRL (<http://www.micronaet.it>).
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl.html).
 
+import os
+import sys
 import io
 import xlsxwriter
 import logging
@@ -114,16 +116,16 @@ class CarrierConnectionSoap(models.Model):
             'ShipperType': 'MBE',  # string (COURIERLDV, MBE)
             'Description': self.check_size(
                 order.carrier_description, 100, dotted=True),
-            'COD': False,  #  boolean
+            'COD': False,  # boolean
             # 'CODValue': '',  # * decimal
             'MethodPayment': 'CASH',  # * string (CASH, CHECK)
-            'Insurance': False,  #  boolean
+            'Insurance': False,  # boolean
             # 'InsuranceValue': '',  # * decimal
             # 'Service': '',  # * string
             # 'Courier': '',  # * string
             # 'CourierService': '',  # * string
             # 'CourierAccount': '',  # * string
-            'PackageType': '',  #  token (ENVELOPE, DOCUMENTS, GENERIC)
+            'PackageType': '',  # token (ENVELOPE, DOCUMENTS, GENERIC)
             # 'Value': '',  # * decimal
             # 'ShipmentCurrency': '',  # * string
             'Referring': order.name,  # * string 30
@@ -227,6 +229,7 @@ class SaleOrder(models.Model):
     def set_carrier_ok_yes(self):
         """ Override method for send carrier request
         """
+        import pdb; pdb.set_trace()
         error = self.shipment_request()
         if error:
             return self.write_log_chatter_message(error)
@@ -249,10 +252,16 @@ class SaleOrder(models.Model):
         #    Label LabelType
         #        Stream B64
         #        Type 4
+        import pdb; pdb.set_trace()
+        path = os.path.expanduser(
+            '~/.local/share/Odoo/filestore/%s' % self.cr.dbname)
+        filename = os.path.join(path, '%s.pdf' % order.id)
         for label in reply['Labels']:
             label = label['Label']
             label_b64 = label['Stream']
             label_type = label['Type']
+            with open(filename, 'wb') as label_file:
+                label_file.write(label_b64)
             # TODO save label linked to order
 
 
@@ -263,7 +272,9 @@ class SaleOrder(models.Model):
         master_tracking_id = reply['MasterTrackingMBE']
         system_reference_id = reply['SystemReferenceID']
         self.save_order_label(order, reply)
-        # InternalReferenceID 100     TrackingMBE*
+        # InternalReferenceID 100
+        # TrackingMBE* : {'TrackingMBE': ['RL28102279']
+
         order.write({
             'carrier_soap_state': 'pending',
             'master_tracking_id': master_tracking_id,
@@ -308,9 +319,7 @@ class SaleOrder(models.Model):
         self.ensure_one()
         order = self
         soap_pool = self.env['carrier.connection.soap']
-        service = soap_pool.get_connection()
 
-        import pdb; pdb.set_trace()
         soap_connection_id = order.soap_connection_id
         if not soap_connection_id:
             return 'Order %s has carrier without SOAP ref.!' % order.name
@@ -323,6 +332,8 @@ class SaleOrder(models.Model):
         # -----------------------------------------------------------------
         # SOAP insert call:
         # -----------------------------------------------------------------
+        import pdb; pdb.set_trace()
+        service = soap_connection_id.get_connection()
         data = soap_pool.get_request_container(system=True)
 
         # TODO create data dict
@@ -335,7 +346,6 @@ class SaleOrder(models.Model):
         if error:
             return error
         self.update_order_with_soap_reply(order, reply)
-
 
     master_tracking_id = fields.Integer('Master Tracking')
     system_reference_id = fields.Integer('System reference ID')
