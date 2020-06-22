@@ -82,7 +82,11 @@ class CarrierConnectionSoap(models.Model):
         if customer:
             data['CustomerID'] = self.customer_id
         if system:
-            data['System'] = self.system
+            if type(system) == bool:
+                field_name = 'System'
+            else:
+                field_name = 'SystemType'
+            data[field_name] = self.system
         if store:
             data['StoreID'] = self.store_id
         return data
@@ -293,27 +297,35 @@ class SaleOrder(models.Model):
         """ 4. API Delete Shipment Request: Delete shipment request
         """
         order = self
+        error = ''
         soap_connection = order.carrier_supplier_id.soap_connection_id
         service = soap_connection.get_connection()
 
         master_tracking_id = order.master_tracking_id
         if master_tracking_id:
             # SOAP insert call:
-            data = soap_connection.get_request_container(system=True)
-            data['MasterTrackingMBE'] = master_tracking_id  # Also with Loop
+            data = soap_connection.get_request_container(system='SystemType')
+            data['MasterTrackingsMBE'] = master_tracking_id  # Also with Loop
             import pdb; pdb.set_trace()
-            service.DeleteShipmentsRequest(data)
+            reply = service.DeleteShipmentsRequest(data)
+
+            error = soap_connection.check_reply_status(reply)
+            error = 'Error deleting: Track: %s\n%s' % (
+                master_tracking_id,
+                error,
+            )
         else:
             _logger.error('Order %s has no master tracking, cannot delete!' %
                 order.name)
 
         # Check carrier_track_id for permit delete:
-        order.write({
-            # TODO carrier_track_id
-            'carrier_soap_state': 'draft',
-            'master_tracking_id': False,
-            'system_reference_id': False,
-        })
+        if not error:
+            order.write({
+                # TODO carrier_track_id
+                'carrier_soap_state': 'draft',
+                'master_tracking_id': False,
+                'system_reference_id': False,
+            })
 
     @api.multi
     def shipment_request(self):
