@@ -82,7 +82,8 @@
         <field name="inherit_id" ref="green_logistic_carrier.view_carrier_supplier_tree"/>
         <field name="arch" type="xml">
             <field name="account_ref" position="before">
-                <field name="soap_connection_id" required="1"/>
+                <field name="mode" readonly="1"/>
+                <field name="soap_connection_id" attrs="{'required': [('mode', '=', 'carrier')]}"/>
             </field>
         </field>
     </record>

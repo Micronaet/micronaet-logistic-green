@@ -183,9 +183,9 @@ class SaleOrder(models.Model):
             'MethodPayment': 'CASH',  # * string (CASH, CHECK)
             'Insurance': False,  # boolean
             # 'InsuranceValue': '',  # * decimal
-            # 'Service': '',  # * string
-            # 'Courier': '',  # * string
-            # 'CourierService': '',  # * string
+            'Service': order.carrier_mode_id or '',
+            'Courier': order.courier_supplier_id.account_ref or '',
+            'CourierService': order.courier_mode_id.account_ref or '',
             # 'CourierAccount': '',  # * string
             'PackageType': 'GENERIC',  # token (ENVELOPE, DOCUMENTS, GENERIC)
             # 'Value': '',  # * decimal
@@ -540,13 +540,14 @@ class SaleOrder(models.Model):
         # SOAP insert call:
         # -----------------------------------------------------------------
         service = soap_connection.get_connection()
-        data = order.get_request_container(customer=False, system=True)
 
-        # TODO create data dict
-        data['Recipient'] = order.get_recipient_container()
-        data['Shipment'] = order.get_shipment_container()
-        reply = service.ShipmentRequest(data)
+        data = order.get_request_container(customer=False, system=True)
+        data.update({
+            'Recipient': order.get_recipient_container(),
+            'Shipment': order.get_shipment_container(),
+        })
         import pdb; pdb.set_trace()
+        reply = service.ShipmentRequest(data)
         error = order.check_reply_status(reply)
         if error:
             return error
@@ -590,7 +591,6 @@ class SaleOrder(models.Model):
 
         data['ShippingParameters'] = order.get_shipment_parameters_container()
 
-        import pdb; pdb.set_trace()
         reply = service.ShippingOptionsRequest(data)
         error = order.check_reply_status(reply)
         if not error:
