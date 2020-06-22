@@ -116,16 +116,16 @@ class CarrierConnectionSoap(models.Model):
             'ShipperType': 'MBE',  # string (COURIERLDV, MBE)
             'Description': self.check_size(
                 order.carrier_description, 100, dotted=True),
-            'COD': '',  # boolean
+            'COD': False,  # boolean
             # 'CODValue': '',  # * decimal
             'MethodPayment': 'CASH',  # * string (CASH, CHECK)
-            'Insurance': '',  # boolean
+            'Insurance': False,  # boolean
             # 'InsuranceValue': '',  # * decimal
             # 'Service': '',  # * string
             # 'Courier': '',  # * string
             # 'CourierService': '',  # * string
             # 'CourierAccount': '',  # * string
-            'PackageType': '',  # token (ENVELOPE, DOCUMENTS, GENERIC)
+            'PackageType': 'GENERIC',  # token (ENVELOPE, DOCUMENTS, GENERIC)
             # 'Value': '',  # * decimal
             # 'ShipmentCurrency': '',  # * string
             'Referring': order.name,  # * string 30
