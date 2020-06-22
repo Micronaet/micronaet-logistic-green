@@ -239,15 +239,10 @@ class SaleOrder(models.Model):
     def set_carrier_ok_no(self):
         """ Override method for send carrier request
         """
-        import pdb; pdb.set_trace()
-        if self.master_tracking_id:
-            error = self.delete_shipments_request()
-            if error:
-                return self.write_log_chatter_message(error)
-        else:
-            # raise exceptions.ValidationError('Not valid message')
-            _logger.error('No track ID present, no delete SOAP!')
-
+        error = self.delete_shipments_request()
+        if error:
+            return self.write_log_chatter_message(error)
+        # raise exceptions.ValidationError('Not valid message')
         return super(SaleOrder, self).set_carrier_ok_no()
 
     @api.multi
@@ -299,20 +294,20 @@ class SaleOrder(models.Model):
         """
         order = self
         soap_pool = self.env['carrier.connection.soap']
-        service = soap_pool.get_connection()
+        soap_connection = order.carrier_supplier_id.soap_connection_id
+        service = soap_connection.get_connection()
 
         master_tracking_id = order.master_tracking_id
-        if not master_tracking_id:
-            error = ('Order %s has no master tracking, cannot delete!' %
+        if master_tracking_id:
+            # SOAP insert call:
+            data = soap_pool.get_request_container(system=True)
+            data['MasterTrackingMBE'] = master_tracking_id  # Loopable
+            service.DeleteShipmentsRequest(data)
+        else:
+            _logger.error('Order %s has no master tracking, cannot delete!' %
                 order.name)
-            return error
 
-        # -----------------------------------------------------------------
-        # SOAP insert call:
-        # -----------------------------------------------------------------
-        data = soap_pool.get_request_container(system=True)
-        data['MasterTrackingMBE'] = master_tracking_id  # Loopable
-        service.DeleteShipmentsRequest(data)
+        # Check carrier_track_id for permit delete:
         order.write({
             # TODO carrier_track_id
             'carrier_soap_state': 'draft',
