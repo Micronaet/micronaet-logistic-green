@@ -10,6 +10,7 @@ import base64
 import shutil
 import zeep
 from odoo import models, fields, api
+from odoo import exceptions
 
 _logger = logging.getLogger(__name__)
 
@@ -238,9 +239,14 @@ class SaleOrder(models.Model):
     def set_carrier_ok_no(self):
         """ Override method for send carrier request
         """
-        error = self.delete_shipments_request()
-        if error:
-            return self.write_log_chatter_message(error)
+        if self.master_tracking_id:
+            error = self.delete_shipments_request()
+            if error:
+                return self.write_log_chatter_message(error)
+        else:
+            # raise exceptions.ValidationError('Not valid message')
+            _logger.error('No track ID present, no delete SOAP!')
+
         return super(SaleOrder, self).set_carrier_ok_no()
 
     @api.multi
@@ -253,7 +259,9 @@ class SaleOrder(models.Model):
         #        Type 4
         import pdb; pdb.set_trace()
         path = os.path.expanduser(
-            '~/.local/share/Odoo/filestore/%s' % self.cr.dbname)
+            '~/.local/share/Odoo/filestore/%s' % self.env.cr.dbname)
+        os.system('mkdir -p %s' % path)
+
         filename = os.path.join(path, '%s.pdf' % order.id)
         for label in reply['Labels']:
             label = label['Label']
@@ -263,14 +271,14 @@ class SaleOrder(models.Model):
                 label_file.write(label_b64)
             # TODO save label linked to order
 
-
     @api.multi
     def update_order_with_soap_reply(self, order, reply):
         """ Update order data with SOAP reply (error checked in different call)
         """
         master_tracking_id = reply['MasterTrackingMBE']
         system_reference_id = reply['SystemReferenceID']
-        self.save_order_label(order, reply)
+        # self.save_order_label(order, reply)
+
         # InternalReferenceID 100
         # TrackingMBE* : {'TrackingMBE': ['RL28102279']
 
@@ -278,7 +286,7 @@ class SaleOrder(models.Model):
             'carrier_soap_state': 'pending',
             'master_tracking_id': master_tracking_id,
             'system_reference_id': system_reference_id,
-            # TODO carrier_track_id
+            # TODO carrier_track_id update after with carrier?
         })
 
     # -------------------------------------------------------------------------
@@ -347,8 +355,8 @@ class SaleOrder(models.Model):
             return error
         self.update_order_with_soap_reply(order, reply)
 
-    master_tracking_id = fields.Integer('Master Tracking')
-    system_reference_id = fields.Integer('System reference ID')
+    master_tracking_id = fields.Char('Master Tracking', size=20)
+    system_reference_id = fields.Char('System reference ID', size=20)
     carrier_soap_id = fields.Integer(
         string='Carrier SOAP ID')
     carrier_soap_state = fields.Selection(
