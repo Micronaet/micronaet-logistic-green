@@ -114,6 +114,7 @@ class SaleOrder(models.Model):
         else:
             if len(text) > size:
                 return text[:size]
+        return text
 
     # Create block utility (for container)
     @api.multi
