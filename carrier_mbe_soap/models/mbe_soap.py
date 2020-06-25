@@ -605,7 +605,6 @@ class SaleOrder(models.Model):
         self.ensure_one()
         order = self  # TODO loop?
 
-        import pdb; pdb.set_trace()
         soap_connection = order.carrier_supplier_id.soap_connection_id
         if not soap_connection:
             return 'Order %s has carrier without SOAP ref.!' % order.name
@@ -627,8 +626,9 @@ class SaleOrder(models.Model):
         # WithCourierWaybill * boolean
         # PendingExportToSAM * boolean
 
+        import pdb; pdb.set_trace()
         data['MBEMasterTrackings'] = order.master_tracking_id  # unbounded!
-        reply = service.ShippingOptionsRequest(data)
+        reply = service.ShipmentsListRequest(RequestContainer=data)
         error = order.check_reply_status(reply)
         if not error:
             # Update SOAP data for real call
