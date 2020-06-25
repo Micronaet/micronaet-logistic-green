@@ -1,6 +1,23 @@
 <?xml version="1.0"?>
 <odoo>
     <!--INHERIT-->
+    <record model="ir.ui.view" id="view_sale_order_carrier_search">
+        <field name="name">sale.order.carrier.search</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_sales_order_filter"/>
+        <field name="arch" type="xml">
+            <field name="user_id" position="after">
+                <field name="master_tracking_id" />
+                <field name="system_reference_id" />
+                <field name="carrier_soap_state" />
+                <field name="delivery_soap_state" />
+            </field>
+            <xpath expr="/search/group/filter[2]" position="after">
+                <filter string="Carrier state" domain="[]" context="{'group_by': 'carrier_soap_state'}"/>
+                <filter string="Carrier delivery state" domain="[]" context="{'group_by': 'delivery_soap_state'}"/>
+            </xpath>
+        </field>
+    </record>
     <record model="ir.ui.view" id="view_sale_order_tracking_form">
         <field name="name">sale.order.form</field>
         <field name="model">sale.order</field>

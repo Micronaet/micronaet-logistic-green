@@ -151,7 +151,7 @@ class SaleOrder(models.Model):
         """ Return dict for Partner container
         """
         order = self
-        partner = order.partner_id  # TODO destination partner!
+        partner = order.partner_shipping_id or order.partner_id
         return {
             'Name': 'TEST' or partner.name,  # 35
             'CompanyName': 'TEST',  # 35
@@ -370,6 +370,11 @@ class SaleOrder(models.Model):
     def carrier_get_better_option(self):
         """ Get better options
         """
+        if not self.carrier_supplier_id:
+            raise exceptions.Warning('Need Carrier name to connect!')
+        if not self.parcel_ids:
+            raise exceptions.Warning(
+                'Need almost one parcel line to get quotation!')
         return self.shipment_options_request()
 
     @api.multi
@@ -409,20 +414,32 @@ class SaleOrder(models.Model):
 
     # Utility:
     @api.multi
-    def save_order_label(self, reply):
+    def save_order_label(self, reply, mode='label'):
         """ Save order label
         """
         order = self
         path = os.path.expanduser(
-            '~/.local/share/Odoo/filestore/%s/label' % order.env.cr.dbname)
+            '~/.local/share/Odoo/filestore/%s/%s' % (
+                order.env.cr.dbname, mode))
         os.system('mkdir -p %s' % path)
         counter = 0
-        for label in reply['Labels']['Label']:
-            counter += 1
-            label_stream = label['Stream']
-            label_type = label['Type']
-            filename = os.path.join(path, '%s.%s.%s' % (
-                order.id, counter, label_type))
+        if mode == 'label':
+            label_list = reply['Labels']['Label']
+        else:
+            label_list = [reply['Pdf']]
+
+        for label in label_list:
+            if mode == 'label':
+                counter += 1
+                label_stream = label['Stream']
+                label_type = label['Type']
+                filename = os.path.join(path, '%s.%s.%s' % (
+                    order.id, counter, label_type))
+            else:
+                label_stream = label
+                filename = os.path.join(path, '%s.PDF' % (
+                    order.id))
+
             with open(filename, 'wb') as label_file:
                 label_file.write(label_stream)
 
@@ -433,7 +450,7 @@ class SaleOrder(models.Model):
         order = self
         master_tracking_id = reply['MasterTrackingMBE']
         system_reference_id = reply['SystemReferenceID']
-        order.save_order_label(reply)
+        order.save_order_label(reply, 'label')
         # InternalReferenceID 100
         # TrackingMBE* : {'TrackingMBE': ['RL28102279']
 
@@ -467,6 +484,8 @@ class SaleOrder(models.Model):
 
         reply = service.CloseShipmentsRequest(data)
         error = order.check_reply_status(reply)
+        print(data)
+        print(reply)
         if error:
             error = 'Error confirming: Track: %s\n%s' % (
                 master_tracking_id,
@@ -478,7 +497,10 @@ class SaleOrder(models.Model):
                 'carrier_soap_state': 'sent',  # TODO need another status?
             })
 
-            order.save_order_label(reply)
+            order.save_order_label(reply, 'manifest')
+            # TODO Write?
+            # 'ShipmentClosed': 1,
+            # 'TotalPackages': 2,
         return error
 
     @api.multi
@@ -566,7 +588,7 @@ class SaleOrder(models.Model):
             ('delivered', 'Delivered'),  # Closed
         ])
     delivery_soap_state = fields.Selection(
-        string='Delivery state', default='draft',
+        string='Delivery state', default='WAITING_DELIVERY',
         selection=[
             ('WAITING_DELIVERY', 'Waiting'),
             ('PARTIALLY_DELIVERED', 'Partially delivered'),
@@ -574,6 +596,7 @@ class SaleOrder(models.Model):
             ('EXCEPTION', 'Exception'),
             ('NOT_AVAILABLE', 'Not available'),
         ])
+
     @api.multi
     def shipment_options_request(self):
         """ 17. API ShippingOptionsRequest: Get better quotation

@@ -10,22 +10,31 @@
                 </field>
             </field>
         </record>-->
-         <record model="ir.ui.view" id="view_sale_order_logistic_search">
-             <field name="name">sale.order.logistic.search</field>
-             <field name="model">sale.order</field>
-             <field name="inherit_id" ref="sale.view_sales_order_filter"/>
-             <field name="arch" type="xml">
-                 <field name="user_id" position="after">
-                     <field name="carrier_track_id" />
-                     <field name="carrier_supplier_id" />
-                     <field name="carrier_mode_id" />
-                 </field>
-                 <xpath expr="/search/group/filter[2]" position="after">
-                     <filter string="Carrier supplier" domain="[]" context="{'group_by': 'carrier_supplier_id'}"/>
-                     <filter string="Carrier mode" domain="[]" context="{'group_by': 'carrier_mode_id'}"/>
-                 </xpath>
-             </field>
-         </record>
+        <record model="ir.ui.view" id="view_sale_order_logistic_search">
+            <field name="name">sale.order.logistic.search</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_sales_order_filter"/>
+            <field name="arch" type="xml">
+                <field name="user_id" position="after">
+                    <field name="carrier_track_id" />
+                    <field name="carrier_supplier_id" />
+                    <field name="carrier_mode_id" />
+                    <field name="courier_supplier_id" />
+                    <field name="courier_mode_id" />
+                </field>
+                <xpath expr="/search/group/filter[2]" position="after">
+                    <filter string="Carrier supplier" domain="[]" context="{'group_by': 'carrier_supplier_id'}"/>
+                    <filter string="Carrier mode" domain="[]" context="{'group_by': 'carrier_mode_id'}"/>
+
+                    <filter string="Courier supplier" domain="[]" context="{'group_by': 'courier_supplier_id'}"/>
+                    <filter string="Courier mode" domain="[]" context="{'group_by': 'courier_mode_id'}"/>
+
+                    <filter string="Carrier delivered date" domain="[]" context="{'group_by': 'carrier_delivery_date'}"/>
+                    <filter string="Carrier signed date" domain="[]" context="{'group_by': 'carrier_delivery_sign'}"/>
+                </xpath>
+            </field>
+        </record>
+
         <record model="ir.ui.view" id="view_sale_order_form">
             <field name="name">sale.order.form</field>
             <field name="model">sale.order</field>
