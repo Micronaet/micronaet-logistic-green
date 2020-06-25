@@ -185,7 +185,7 @@ class SaleOrder(models.Model):
             'MethodPayment': 'CASH',  # * string (CASH, CHECK)
             'Insurance': False,  # boolean
             # 'InsuranceValue': '',  # * decimal
-            'Service': order.carrier_mode_id or '',
+            'Service': order.carrier_mode_id.account_ref or '',
             'Courier': order.courier_supplier_id.account_ref or '',
             'CourierService': order.courier_mode_id.account_ref or '',
             # 'CourierAccount': '',  # * string
@@ -475,11 +475,13 @@ class SaleOrder(models.Model):
                 fullname_label = os.path.join(label_path, filename)
                 fullname_parcel = os.path.join(parcel_path, filename)
 
+                # Get number of pages:
                 reply = subprocess.check_output([
                     'pdftk', filename, 'dump_data'])
                 total_pages = int(
                     reply.split('NumberOfPages: ')[-1].split('\n')[0])
 
+                # Split label:
                 half_page = total_pages / 2
                 subprocess.check_output([
                     'pdftk', filename,
@@ -488,6 +490,7 @@ class SaleOrder(models.Model):
                     fullname_label,
                 ])
 
+                # Split parcel label
                 reply = subprocess.check_output([
                     'pdftk', filename,
                     'cat', '%s-%s' % (half_page + 1, total_pages),
@@ -536,8 +539,6 @@ class SaleOrder(models.Model):
 
         reply = service.CloseShipmentsRequest(data)
         error = order.check_reply_status(reply)
-        print(data)
-        print(reply)
         if error:
             error = 'Error confirming: Track: %s\n%s' % (
                 master_tracking_id,
@@ -620,7 +621,7 @@ class SaleOrder(models.Model):
             'Recipient': order.get_recipient_container(),
             'Shipment': order.get_shipment_container(),
         })
-        print(data)
+
         reply = service.ShipmentRequest(data)
         error = order.check_reply_status(reply)
         if error:
