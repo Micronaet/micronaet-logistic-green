@@ -27,11 +27,12 @@
                  <button name="set_carrier_confirmed" string="Confirmed to Carrier" type="object" attrs="{'invisible': [('carrier_soap_state', '!=', 'pending')]}" icon="fa-thumbs-up" colspan="1"/>
             </button>
             <field name="carrier_track_id" position="after">
-                <field name="master_tracking_id" readonly="1"/>
+                <field name="master_tracking_id" /><!--readonly="1"-->
                 <field name="system_reference_id" readonly="1"/>
                 <field name="carrier_soap_state" /><!--TODO readonly="1"-->
                 <field name="delivery_soap_state" readonly="1"/>
                 <field name="carrier_ok" />   <!--TODO invisible="1"-->
+                <button name="shipments_list_request_detail_source" type="object" string="Check MBE information"/>
             </field>
         </field>
     </record>

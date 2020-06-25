@@ -598,6 +598,44 @@ class SaleOrder(models.Model):
         ])
 
     @api.multi
+    def shipments_list_request_detail_source(self):
+        """ 16. Read data from Request
+                Function has 2 ways of call: single order, get period list
+        """
+        self.ensure_one()
+        order = self  # TODO loop?
+
+        import pdb; pdb.set_trace()
+        soap_connection = order.carrier_supplier_id.soap_connection_id
+        if not soap_connection:
+            return 'Order %s has carrier without SOAP ref.!' % order.name
+        if order.carrier_soap_id:
+            return 'Order %s has SOAP ID %s cannot check!' % (
+                    order.name, order.carrier_soap_id)
+        if not order.master_tracking_id:
+            return 'Order %s without master track ID %s cannot check!' % (
+                    order.name, order.carrier_soap_id)
+
+        service = soap_connection.get_connection()
+        data = order.get_request_container(
+            customer=True, system=True,
+            # store=True,
+        )
+        # DateFrom *
+        # DateTo *
+        # MBESafeValue * boolean
+        # WithCourierWaybill * boolean
+        # PendingExportToSAM * boolean
+
+        data['MBEMasterTrackings'] = order.master_tracking_id  # unbounded!
+        reply = service.ShippingOptionsRequest(data)
+        error = order.check_reply_status(reply)
+        if not error:
+            # Update SOAP data for real call
+            order.update_with_quotation(reply)
+        return error
+
+    @api.multi
     def shipment_options_request(self):
         """ 17. API ShippingOptionsRequest: Get better quotation
         """
