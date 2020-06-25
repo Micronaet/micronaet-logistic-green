@@ -279,6 +279,24 @@ class SaleOrder(models.Model):
         return data
 
     @api.multi
+    def update_with_courier_data(self, reply):
+        """ Update with courier data
+        """
+        order = self
+        tracking = reply['ShipmentsFullInfo']['ShipmentFullInfo'][0][
+            'TrackingInfo']
+
+        # Save tracking label
+        self.save_order_label(tracking, mode='tracking')
+
+        # tracking['MasterTrackingMBE']
+        courier_tracking = tracking['CourierMasterTrk']
+        self.write({
+            'carrier_track_id': courier_tracking,
+        })
+
+
+    @api.multi
     def update_with_quotation(self, reply):
         """ Update order courier fields with reply SOAP
         """
@@ -423,13 +441,13 @@ class SaleOrder(models.Model):
                 order.env.cr.dbname, mode))
         os.system('mkdir -p %s' % path)
         counter = 0
-        if mode == 'label':
+        if mode in ('label', 'tracking'):
             label_list = reply['Labels']['Label']
         else:
             label_list = [reply['Pdf']]
 
         for label in label_list:
-            if mode == 'label':
+            if mode in ('label', 'tracking'):
                 counter += 1
                 label_stream = label['Stream']
                 label_type = label['Type']
@@ -617,8 +635,7 @@ class SaleOrder(models.Model):
 
         service = soap_connection.get_connection()
         data = order.get_request_container(
-            customer=True, system=True,
-            # store=True,
+            customer=True, system=True, store=True,
         )
         # DateFrom *
         # DateTo *
@@ -626,13 +643,12 @@ class SaleOrder(models.Model):
         # WithCourierWaybill * boolean
         # PendingExportToSAM * boolean
 
-        import pdb; pdb.set_trace()
         data['MBEMasterTrackings'] = order.master_tracking_id  # unbounded!
         reply = service.ShipmentsListRequest(RequestContainer=data)
         error = order.check_reply_status(reply)
         if not error:
             # Update SOAP data for real call
-            order.update_with_quotation(reply)
+            order.update_with_courier_data(reply)
         return error
 
     @api.multi
