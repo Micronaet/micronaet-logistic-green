@@ -5,6 +5,7 @@ import os
 import sys
 import io
 import xlsxwriter
+import pdb
 import logging
 import subprocess
 import base64
@@ -684,6 +685,7 @@ class SaleOrder(models.Model):
 
         data['MBEMasterTrackings'] = order.master_tracking_id  # unbounded!
         reply = service.ShipmentsListRequest(RequestContainer=data)
+        pdb.set_trace()
         error = order.check_reply_status(reply)
         if not error:
             # Update SOAP data for real call

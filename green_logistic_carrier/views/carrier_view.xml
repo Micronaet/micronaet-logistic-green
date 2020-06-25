@@ -65,9 +65,9 @@
                                     <field name="width" />
                                     <field name="height" />
 
-                                    <field name="real_weight" />
-                                    <field name="weight" />
-                                    <field name="used_weight" sum="total_weight"/>
+                                    <field name="real_weight" sum="total_real"/>
+                                    <field name="weight" sum="total_volumetric"/>
+                                    <!--<field name="used_weight" sum="total_weight"/>-->
                                     <field name="no_label" />
                                 </tree>
                             </field>
