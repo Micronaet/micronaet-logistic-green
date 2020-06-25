@@ -6,6 +6,7 @@ import sys
 import io
 import xlsxwriter
 import logging
+import subprocess
 import base64
 import shutil
 import zeep
@@ -437,9 +438,16 @@ class SaleOrder(models.Model):
         """
         order = self
         path = os.path.expanduser(
-            '~/.local/share/Odoo/filestore/%s/%s' % (
+            '~/.local/share/Odoo/filestore/data/%s/%s' % (
                 order.env.cr.dbname, mode))
+
         os.system('mkdir -p %s' % path)
+        if mode == 'tracking':
+            label_path = os.path.join(path, 'label')
+            parcel_path = os.path.join(path, 'parcel')
+            os.system('mkdir -p %s' % label_path)
+            os.system('mkdir -p %s' % parcel_path)
+
         counter = 0
         if mode in ('label', 'tracking'):
             label_list = reply['Labels']['Label']
@@ -451,15 +459,41 @@ class SaleOrder(models.Model):
                 counter += 1
                 label_stream = label['Stream']
                 label_type = label['Type']
-                filename = os.path.join(path, '%s.%s.%s' % (
-                    order.id, counter, label_type))
+                filename = '%s.%s.%s' % (
+                    order.id, counter, label_type)
+                fullname = os.path.join(path, filename)
             else:
                 label_stream = label
-                filename = os.path.join(path, '%s.PDF' % (
+                fullname = os.path.join(path, '%s.PDF' % (
                     order.id))
 
-            with open(filename, 'wb') as label_file:
+            with open(fullname, 'wb') as label_file:
                 label_file.write(label_stream)
+
+            # Split label for Courier PDF:
+            if label == 'tracking':
+                fullname_label = os.path.join(label_path, filename)
+                fullname_parcel = os.path.join(parcel_path, filename)
+
+                reply = subprocess.check_output([
+                    'pdftk', filename, 'dump_data'])
+                total_pages = int(
+                    reply.split('NumberOfPages: ')[-1].split('\n')[0])
+
+                half_page = total_pages / 2
+                subprocess.check_output([
+                    'pdftk', filename,
+                    'cat', '1-%s' % half_page,
+                    'output',
+                    fullname_label,
+                ])
+
+                reply = subprocess.check_output([
+                    'pdftk', filename,
+                    'cat', '%s-%s' % (half_page + 1, total_pages),
+                    'output',
+                    fullname_parcel,
+                ])
 
     @api.multi
     def update_order_with_soap_reply(self, reply):

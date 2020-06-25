@@ -21,7 +21,7 @@
         'views/soap_view.xml',
     ],
     'external_dependencies': {
-        'python': ['zeep'],
+        'python': ['zeep', 'pypdftk'],
     },
     'application': False,
     'installable': True,
