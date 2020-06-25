@@ -180,21 +180,25 @@ class SaleOrder(models.Model):
             'ShipperType': 'MBE',  # string (COURIERLDV, MBE)
             'Description': order.check_size(
                 order.carrier_description, 100, dotted=True),
-            'COD': False,  # boolean
-            # 'CODValue': '',  # * decimal
-            'MethodPayment': 'CASH',  # * string (CASH, CHECK)
-            'Insurance': False,  # boolean
-            # 'InsuranceValue': '',  # * decimal
+            'MethodPayment': order.carrier_pay_mode or 'CASH',  # * CHECK, CASH
             'Service': order.carrier_mode_id.account_ref or '',
             'Courier': order.courier_supplier_id.account_ref or '',
             'CourierService': order.courier_mode_id.account_ref or '',
-            # 'CourierAccount': '',  # * string
             'PackageType': 'GENERIC',  # token (ENVELOPE, DOCUMENTS, GENERIC)
+            'Referring': order.name,  # * string 30
+            'InternalNotes': 'ORDINE DA CANCELLARE',  # TODO * string
+            'Notes': 'ORDINE DA CANCELLARE',  # * TODO string
+            'LabelFormat': 'NEW',  # * token (OLD, NEW)
+            'Items': order.get_items_parcel_block(),
+
+            # Option not used for now:
+            'Insurance': False,  # boolean
+            'COD': False,  # boolean
+            # 'CODValue': '',  # * decimal
+            # 'InsuranceValue': '',  # * decimal
+            # 'CourierAccount': '',  # * string
             # 'Value': '',  # * decimal
             # 'ShipmentCurrency': '',  # * string
-            'Referring': order.name,  # * string 30
-            'InternalNotes': 'ORDINE DA CANCELLARE',  # * string
-            'Notes': 'ORDINE DA CANCELLARE',  # * string
             # 'SaturdayDelivery': '',  # * boolean
             # 'SignatureRequired': '',  # * boolean
             # 'ShipmentOrigin': '',  # * string
@@ -202,8 +206,6 @@ class SaleOrder(models.Model):
             # 'MBESafeValue': '',  # * boolean
             # 'MBESafeValueValue': '',  # * decimal
             # 'MBESafeValueDescription': '',  # * string 100
-            'LabelFormat': 'NEW',  # * token (OLD, NEW)
-            'Items': order.get_items_parcel_block(),
         }
 
         # Items ItemsType
