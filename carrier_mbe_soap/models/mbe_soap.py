@@ -180,7 +180,8 @@ class SaleOrder(models.Model):
             'ShipperType': 'MBE',  # string (COURIERLDV, MBE)
             'Description': order.check_size(
                 order.carrier_description, 100, dotted=True),
-            'MethodPayment': order.carrier_pay_mode or 'CASH',  # * CHECK, CASH
+            'MethodPayment': 'CASH',
+            # order.carrier_pay_mode or 'CASH',  # * CHECK, CASH
             'Service': order.carrier_mode_id.account_ref or '',
             'Courier': order.courier_supplier_id.account_ref or '',
             'CourierService': order.courier_mode_id.account_ref or '',
@@ -623,6 +624,7 @@ class SaleOrder(models.Model):
             'Recipient': order.get_recipient_container(),
             'Shipment': order.get_shipment_container(),
         })
+        # import pdb; pdb.set_trace()
 
         reply = service.ShipmentRequest(data)
         error = order.check_reply_status(reply)
