@@ -305,12 +305,11 @@ class SaleOrder(models.Model):
         # Choose better quotation:
         quotations = reply['ShippingOptions']['ShippingOption']
         _logger.warning('Quotation founds: %s' % len(quotations))
-        pdb.set_trace()
         for quotation in quotations:
             try:
                 # Check carrier if selected in request:
                 carrier_code = quotation['Service']
-                if carrier_mode_search != carrier_code:
+                if carrier_mode_search and carrier_mode_search != carrier_code:
                     continue
 
                 # Check and save best quotation:
