@@ -176,6 +176,8 @@ class SaleOrder(models.Model):
         """ Return dict for order shipment
         """
         order = self
+        # TODO crossed field (bad solution)
+        note = eval('order.carrier_note or order.wp_customer_note')
         data = {
             'ShipperType': order.shipper_type,
             'Description': order.check_size(
@@ -187,7 +189,7 @@ class SaleOrder(models.Model):
             'PackageType': order.package_type,
             'Referring': order.name,  # * 30
             'InternalNotes': 'ORDINE DA CANCELLARE',  # TODO * string
-            'Notes': 'ORDINE DA CANCELLARE',  # * TODO string
+            'Notes': note,
             'LabelFormat': 'NEW',  # * token (OLD, NEW)
             'Items': order.get_items_parcel_block(),
 
