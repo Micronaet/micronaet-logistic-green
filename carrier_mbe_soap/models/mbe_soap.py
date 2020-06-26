@@ -479,6 +479,7 @@ class SaleOrder(models.Model):
 
             # Split label for Courier PDF:
             if mode == 'tracking':
+                pdb.set_trace()
                 fullname_label = os.path.join(label_path, filename)
                 fullname_parcel = os.path.join(parcel_path, filename)
 
