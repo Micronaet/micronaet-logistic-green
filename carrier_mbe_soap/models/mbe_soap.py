@@ -208,14 +208,6 @@ class SaleOrder(models.Model):
             # 'MBESafeValueDescription': '',  # * string 100
         }
 
-        # Items ItemsType
-        #    Item ItemType
-        #        Weight decimal
-        #        Dimensions DimensionsType
-        #            Lenght decimal
-        #            Height decimal
-        #            Width decimal
-
         # Products* ProductsType
         #    Product ProductType
         #        SKUCode string
@@ -233,7 +225,7 @@ class SaleOrder(models.Model):
 
     @api.multi
     def get_shipment_parameters_container(self):
-        """ Return dict for order shipment
+        """ Return dict for order shipment (for quotation)
         """
         order = self
         partner = order.partner_id  # TODO destination?
@@ -247,9 +239,10 @@ class SaleOrder(models.Model):
                 },
             'ShipType': order.ship_type or '',
             'PackageType': order.package_type or '',
-            'Service': order.carrier_mode_id.account_ref or '',  # * string
-            'Courier': '',  # * string
-            'CourierService': '',  # * string
+            # order.carrier_mode_id.account_ref
+            'Service': '',  # Empty for now * string
+            'Courier': '',  # Empty for now * string
+            'CourierService': '',  # Empty for now * string
             # 'COD': '',  # * boolean
             # 'CODValue': '',  # * decimal
             # 'CODPaymentMethod': '',  # * token CASH CHECK
@@ -305,6 +298,7 @@ class SaleOrder(models.Model):
         order = self
         supplier_pool = self.env['carrier.supplier']
         service_pool = self.env['carrier.supplier.mode']
+        # TODO loop option to get better!
         try:
             data = reply['ShippingOptions']['ShippingOption'][0]
 
@@ -479,7 +473,6 @@ class SaleOrder(models.Model):
 
             # Split label for Courier PDF:
             if mode == 'tracking':
-                pdb.set_trace()
                 fullname_label = os.path.join(label_path, filename)
                 fullname_parcel = os.path.join(parcel_path, filename)
 
@@ -491,7 +484,7 @@ class SaleOrder(models.Model):
                         '\\')[0])
 
                 # Split label:
-                half_page = total_pages / 2
+                half_page = int(total_pages / 2)
                 subprocess.check_output([
                     'pdftk', fullname,
                     'cat', '1-%s' % half_page,
@@ -527,7 +520,9 @@ class SaleOrder(models.Model):
         except:
             courier_track_id = False
 
-        order.save_order_label(reply, 'label')
+        # Label if not Courier is not used:
+        # order.save_order_label(reply, 'label')
+
         # InternalReferenceID 100
         # TrackingMBE* : {'TrackingMBE': ['RL28102279']
 
