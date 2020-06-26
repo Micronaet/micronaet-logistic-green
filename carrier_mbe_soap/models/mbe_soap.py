@@ -299,12 +299,14 @@ class SaleOrder(models.Model):
         carrier_mode_search = order.carrier_mode_id.account_ref
         supplier_pool = self.env['carrier.supplier']
         service_pool = self.env['carrier.supplier.mode']
-        # TODO loop option to get better!
         data = {}
 
         # Choose better quotation:
         quotations = reply['ShippingOptions']['ShippingOption']
-        _logger.warning('Quotation founds: %s' % len(quotations))
+        _logger.warning('Quotation founds: %s [Mode search: %s]' % (
+            len(quotations),
+            carrier_mode_search or 'disabled',
+        ))
         for quotation in quotations:
             try:
                 # Check carrier if selected in request:
@@ -666,11 +668,7 @@ class SaleOrder(models.Model):
         reply = service.ShipmentRequest(data)
         error = order.check_reply_status(reply)
 
-        print('\n\n')
-        print(data)
-        print('\n\n')
-        print(reply)
-        print('\n\n')
+        print('\n%s\n\n%s\n' % (data, reply))
 
         if error:
             return error
@@ -760,7 +758,7 @@ class SaleOrder(models.Model):
         data['ShippingParameters'] = order.get_shipment_parameters_container()
 
         reply = service.ShippingOptionsRequest(data)
-        print('\n%s\n%s\n' % (data, reply))
+        print('\n%s\n\n%s\n' % (data, reply))
         error = order.check_reply_status(reply)
         if not error:
             # Update SOAP data for real call
