@@ -512,6 +512,14 @@ class SaleOrder(models.Model):
         order = self
         master_tracking_id = reply['MasterTrackingMBE']
         system_reference_id = reply['SystemReferenceID']
+
+        try:
+            courier_track_id = reply['TrackingsMBE']['TrackingMBE'][0]
+            if courier_track_id == master_tracking_id:
+                courier_track_id = False
+        except:
+            courier_track_id = False
+
         order.save_order_label(reply, 'label')
         # InternalReferenceID 100
         # TrackingMBE* : {'TrackingMBE': ['RL28102279']
@@ -520,7 +528,7 @@ class SaleOrder(models.Model):
             'carrier_soap_state': 'pending',
             'master_tracking_id': master_tracking_id,
             'system_reference_id': system_reference_id,
-            # TODO carrier_track_id update after with carrier?
+            'carrier_track_id': courier_track_id,
         })
 
     # -------------------------------------------------------------------------
