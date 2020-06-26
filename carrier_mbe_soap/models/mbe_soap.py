@@ -228,7 +228,7 @@ class SaleOrder(models.Model):
         """ Return dict for order shipment (for quotation)
         """
         order = self
-        partner = order.partner_id  # TODO destination?
+        partner = order.partner_shipping_id or order.partner_id
         data = {
             'DestinationInfo': {
                 'ZipCode': partner.zip or '',  # 12
@@ -736,11 +736,7 @@ class SaleOrder(models.Model):
         data['ShippingParameters'] = order.get_shipment_parameters_container()
 
         reply = service.ShippingOptionsRequest(data)
-        print('\n\n\n')
-        print(data)
-        print('\n\n\n')
-        print(reply)
-        print('\n\n\n')
+        print('\n%s\n%s\n' % (data, reply))
         error = order.check_reply_status(reply)
         if not error:
             # Update SOAP data for real call
