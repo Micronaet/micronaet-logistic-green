@@ -296,84 +296,107 @@ class SaleOrder(models.Model):
         """ Update order courier fields with reply SOAP
         """
         order = self
+        carrier_mode_search = order.carrier_mode_id.account_ref
         supplier_pool = self.env['carrier.supplier']
         service_pool = self.env['carrier.supplier.mode']
         # TODO loop option to get better!
-        try:
-            data = reply['ShippingOptions']['ShippingOption'][0]
+        data = {}
 
-            # -----------------------------------------------------------------
-            # A. Courier:
-            # -----------------------------------------------------------------
-            courier_code = data['Courier']
-            courier_name = data['CourierDesc']
-            suppliers = supplier_pool.search([
-                ('account_ref', '=', courier_code),
-                ('mode', '=', 'courier'),
-            ])
-            if suppliers:
-                supplier_id = suppliers[0].id
-            else:
-                supplier_id = supplier_pool.create({
-                    'account_ref': courier_code,
-                    'name': courier_name,
-                    'mode': 'courier',
-                }).id
+        # Choose better quotation:
+        quotations = reply['ShippingOptions']['ShippingOption']
+        _logger.warning('Quotation founds: %s' % len(quotations))
+        for quotation in quotations:
+            try:
+                # Check carrier if selected in request:
+                carrier_code = quotation['Service']
+                if carrier_mode_search != carrier_code:
+                    continue
 
-            # -----------------------------------------------------------------
-            # B. Courier service:
-            # -----------------------------------------------------------------
-            service_code = data['CourierService']
-            service_name = data['CourierServiceDesc']
-            services = service_pool.search([
-                ('account_ref', '=', service_code),
-                ('supplier_id', '=', supplier_id),
-            ])
-            if services:
-                service_id = services[0].id
-            else:
-                supplier_id = service_pool.create({
-                    'account_ref': service_code,
-                    'name': service_name,
-                    'supplier_id': supplier_id,
-                }).id
+                # Check and save best quotation:
+                if not data or (quotation['NetShipmentTotalPrice'] <
+                                data['NetShipmentTotalPrice']):
+                    data = quotation
+            except:
+                _logger.error('Error on quotation: %s' % (sys.exc_info(), ))
 
-            # -----------------------------------------------------------------
-            # C. Carrier service:
-            # -----------------------------------------------------------------
-            carrier_id = order.carrier_supplier_id.id
-            carrier_code = data['Service']
-            carrier_name = data['ServiceDesc']
-            carriers = service_pool.search([
-                ('account_ref', '=', carrier_code),
-                ('supplier_id', '=', carrier_id),
-            ])
-            if carriers:
-                carrier_mode_id = carriers[0].id
-            else:
-                carrier_mode_id = service_pool.create({
-                    'account_ref': carrier_code,
-                    'name': carrier_name,
-                    'supplier_id': carrier_id,
-                }).id
+        # Update order with better quotation:
+        if data:
+            try:
+                # -------------------------------------------------------------
+                # A. Courier:
+                # -------------------------------------------------------------
+                courier_code = data['Courier']
+                courier_name = data['CourierDesc']
+                suppliers = supplier_pool.search([
+                    ('account_ref', '=', courier_code),
+                    ('mode', '=', 'courier'),
+                ])
+                if suppliers:
+                    supplier_id = suppliers[0].id
+                else:
+                    supplier_id = supplier_pool.create({
+                        'account_ref': courier_code,
+                        'name': courier_name,
+                        'mode': 'courier',
+                    }).id
 
-            order.write({
-                'carrier_cost': data['NetShipmentPrice'],
-                'carrier_cost_total': data['NetShipmentTotalPrice'],
-                'has_cod': data['CODAvailable'],
-                'has_insurance': data['InsuranceAvailable'],
-                'has_safe_value': data['MBESafeValueAvailable'],
-                'courier_supplier_id': supplier_id,
-                'courier_mode_id': service_id,
-                'carrier_mode_id': carrier_mode_id,
-            })
+                # -------------------------------------------------------------
+                # B. Courier service:
+                # -------------------------------------------------------------
+                service_code = data['CourierService']
+                service_name = data['CourierServiceDesc']
+                services = service_pool.search([
+                    ('account_ref', '=', service_code),
+                    ('supplier_id', '=', supplier_id),
+                ])
+                if services:
+                    service_id = services[0].id
+                else:
+                    supplier_id = service_pool.create({
+                        'account_ref': service_code,
+                        'name': service_name,
+                        'supplier_id': supplier_id,
+                    }).id
 
-            # TODO NetShipmentTotalPrice?
-            # 'IdSubzone': 125,
-            # 'SubzoneDesc': 'Italia-Zona A',
+                # -------------------------------------------------------------
+                # C. Carrier service:
+                # -------------------------------------------------------------
+                carrier_id = order.carrier_supplier_id.id
+                carrier_code = data['Service']
+                carrier_name = data['ServiceDesc']
+                carriers = service_pool.search([
+                    ('account_ref', '=', carrier_code),
+                    ('supplier_id', '=', carrier_id),
+                ])
+                if carriers:
+                    carrier_mode_id = carriers[0].id
+                else:
+                    carrier_mode_id = service_pool.create({
+                        'account_ref': carrier_code,
+                        'name': carrier_name,
+                        'supplier_id': carrier_id,
+                    }).id
 
-            return ''
-        except:
+                order.write({
+                    'carrier_cost': data['NetShipmentPrice'],
+                    'carrier_cost_total': data['NetShipmentTotalPrice'],
+                    'has_cod': data['CODAvailable'],
+                    'has_insurance': data['InsuranceAvailable'],
+                    'has_safe_value': data['MBESafeValueAvailable'],
+                    'courier_supplier_id': supplier_id,
+                    'courier_mode_id': service_id,
+                    'carrier_mode_id': carrier_mode_id,
+                })
+
+                # TODO NetShipmentTotalPrice?
+                # 'IdSubzone': 125,
+                # 'SubzoneDesc': 'Italia-Zona A',
+
+                return ''
+            except:
+                data = {}  # Used for new check
+
+        if not data:  # Or previous update error
             # Reset data:
             order.write({
                 'carrier_cost': 0.0,
@@ -382,6 +405,7 @@ class SaleOrder(models.Model):
                 'courier_mode_id': False,
             })
             return 'Error updating data on order (clean quotation)'
+        return ''
 
     # -------------------------------------------------------------------------
     # Override methods
