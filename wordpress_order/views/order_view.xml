@@ -50,7 +50,6 @@
                         <button name="wp_wf_failed" type="object" string="Failed" icon="fa-ban" colspan="1"  attrs="{'invisible': [('wp_status', '=', 'failed')]}"  confirm="Order wil be marked as failed, confirm?"/>
                         <newline/>
 
-
                         <field name="wp_id"/>
                         <field name="wp_status"/>
                         <button name="wp_wf_processing" type="object" string="Confirmed payment" icon="fa-money" colspan="1" attrs="{'invisible': [('wp_status', '!=', 'on-hold')]}"/>
@@ -60,6 +59,10 @@
                         <newline/>
 
                         <field name="wp_date_completed"/>
+                        <newline/>
+
+                        <separator string="Customer note" colspan="4"/>
+                        <field name="wp_customer_note" colspan="4" nolabel="1"/>
                         <newline/>
                     </group>
                 </page>

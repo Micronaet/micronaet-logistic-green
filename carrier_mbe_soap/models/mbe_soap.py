@@ -176,24 +176,22 @@ class SaleOrder(models.Model):
         """ Return dict for order shipment
         """
         order = self
-        # TODO complete fields:
         data = {
-            'ShipperType': 'MBE',  # string (COURIERLDV, MBE)
+            'ShipperType': order.shipper_type,  # COURIERLDV, MBE
             'Description': order.check_size(
                 order.carrier_description, 100, dotted=True),
-            'MethodPayment': 'CASH',
-            # order.carrier_pay_mode or 'CASH',  # * CHECK, CASH
+            'MethodPayment': order.carrier_pay_mode or 'CASH',  # * CHECK, CASH
             'Service': order.carrier_mode_id.account_ref or '',
             'Courier': order.courier_supplier_id.account_ref or '',
             'CourierService': order.courier_mode_id.account_ref or '',
             'PackageType': 'GENERIC',  # token (ENVELOPE, DOCUMENTS, GENERIC)
-            'Referring': order.name,  # * string 30
+            'Referring': order.name,  # * 30
             'InternalNotes': 'ORDINE DA CANCELLARE',  # TODO * string
             'Notes': 'ORDINE DA CANCELLARE',  # * TODO string
             'LabelFormat': 'NEW',  # * token (OLD, NEW)
             'Items': order.get_items_parcel_block(),
 
-            # Option not used for now:
+            # TODO Option not used for now:
             'Insurance': False,  # boolean
             'COD': False,  # boolean
             # 'CODValue': '',  # * decimal
@@ -249,7 +247,7 @@ class SaleOrder(models.Model):
                 },
             'ShipType': 'EXPORT',  # token EXPORT, IMPORT, RETURN
             'PackageType': 'GENERIC',  # token ENVELOPE, DOCUMENTS, GENERIC
-            'Service': '',  # * string
+            'Service': order.carrier_mode_id.account_ref or '',  # * string
             'Courier': '',  # * string
             'CourierService': '',  # * string
             # 'COD': '',  # * boolean
@@ -299,7 +297,6 @@ class SaleOrder(models.Model):
         self.write({
             'carrier_track_id': courier_tracking,
         })
-
 
     @api.multi
     def update_with_quotation(self, reply):
@@ -685,7 +682,6 @@ class SaleOrder(models.Model):
 
         data['MBEMasterTrackings'] = order.master_tracking_id  # unbounded!
         reply = service.ShipmentsListRequest(RequestContainer=data)
-        pdb.set_trace()
         error = order.check_reply_status(reply)
         if not error:
             # Update SOAP data for real call
@@ -718,6 +714,11 @@ class SaleOrder(models.Model):
         data['ShippingParameters'] = order.get_shipment_parameters_container()
 
         reply = service.ShippingOptionsRequest(data)
+        print('\n\n\n')
+        print(data)
+        print('\n\n\n')
+        print(reply)
+        print('\n\n\n')
         error = order.check_reply_status(reply)
         if not error:
             # Update SOAP data for real call
@@ -735,4 +736,10 @@ class SaleOrder(models.Model):
             ('pending', 'Pending'),
             ('sent', 'Sent'),
             ('delivered', 'Delivered'),  # Closed
+        ])
+    shipper_type = fields.Selection(
+        string='Shipper type', default='COURIERLDV', required=True,
+        selection=[
+            ('COURIERLDV', 'Courier LDV'),
+            ('MBE', 'MBE'),
         ])

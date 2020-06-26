@@ -202,6 +202,7 @@ class WPConnector(models.Model):
                 status = record['status']
                 payment_method = record['payment_method']
                 prices_include_tax = record['prices_include_tax']
+                customer_note = record['customer_note']
 
                 # Date:
                 date_created = record['date_created']
@@ -255,6 +256,7 @@ class WPConnector(models.Model):
                     'wp_date_created': date_created,
                     'wp_date_modified': date_modified,
                     'wp_date_completed': date_completed,
+                    'wp_customer_note': customer_note,
                     }
                 created = False
                 if sales:
@@ -545,6 +547,7 @@ class SaleOrder(models.Model):
     wp_date_created = fields.Datetime('Wp date created')
     wp_date_modified = fields.Datetime('Wp date modified')
     wp_date_completed = fields.Datetime('Wp date completed')
+    wp_customer_note = fields.Text('WP customer note')
     wp_status = fields.Selection(
         string='Order status', default='pending',
         selection=[
