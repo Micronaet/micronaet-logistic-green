@@ -479,7 +479,6 @@ class SaleOrder(models.Model):
 
             # Split label for Courier PDF:
             if mode == 'tracking':
-                pdb.set_trace()
                 fullname_label = os.path.join(label_path, filename)
                 fullname_parcel = os.path.join(parcel_path, filename)
 
@@ -487,7 +486,8 @@ class SaleOrder(models.Model):
                 output = subprocess.check_output([
                     'pdftk', fullname, 'dump_data'])
                 total_pages = int(
-                    ('%s' % output).split('NumberOfPages: ')[-1].split('\n')[0])
+                    ('%s' % output).split('NumberOfPages: ')[-1].split(
+                        '\\')[0])
 
                 # Split label:
                 half_page = total_pages / 2
@@ -642,7 +642,6 @@ class SaleOrder(models.Model):
             'Recipient': order.get_recipient_container(),
             'Shipment': order.get_shipment_container(),
         })
-        # import pdb; pdb.set_trace()
 
         reply = service.ShipmentRequest(data)
         error = order.check_reply_status(reply)
