@@ -632,6 +632,13 @@ class SaleOrder(models.Model):
 
         reply = service.ShipmentRequest(data)
         error = order.check_reply_status(reply)
+
+        print('\n\n')
+        print(data)
+        print('\n\n')
+        print(reply)
+        print('\n\n')
+
         if error:
             return error
         order.update_order_with_soap_reply(reply)
