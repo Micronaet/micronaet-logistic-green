@@ -478,7 +478,7 @@ class SaleOrder(models.Model):
                 label_file.write(label_stream)
 
             # Split label for Courier PDF:
-            if label == 'tracking':
+            if mode == 'tracking':
                 fullname_label = os.path.join(label_path, filename)
                 fullname_parcel = os.path.join(parcel_path, filename)
 
@@ -515,11 +515,11 @@ class SaleOrder(models.Model):
 
         try:
             # TODO check if always present!
-            pdb.set_trace()
             courier_track_id = reply['CourierMasterTrk']
             if courier_track_id == master_tracking_id:
                 courier_track_id = False
                 # Download label
+            else:
                 order.save_order_label(reply, 'tracking')
 
         except:
