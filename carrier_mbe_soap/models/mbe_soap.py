@@ -177,14 +177,14 @@ class SaleOrder(models.Model):
         """
         order = self
         data = {
-            'ShipperType': order.shipper_type,  # COURIERLDV, MBE
+            'ShipperType': order.shipper_type,
             'Description': order.check_size(
                 order.carrier_description, 100, dotted=True),
-            'MethodPayment': order.carrier_pay_mode or 'CASH',  # * CHECK, CASH
+            'MethodPayment': order.carrier_pay_mode,
             'Service': order.carrier_mode_id.account_ref or '',
             'Courier': order.courier_supplier_id.account_ref or '',
             'CourierService': order.courier_mode_id.account_ref or '',
-            'PackageType': 'GENERIC',  # token (ENVELOPE, DOCUMENTS, GENERIC)
+            'PackageType': order.package_type,
             'Referring': order.name,  # * 30
             'InternalNotes': 'ORDINE DA CANCELLARE',  # TODO * string
             'Notes': 'ORDINE DA CANCELLARE',  # * TODO string
@@ -245,8 +245,8 @@ class SaleOrder(models.Model):
                 'Country': partner.country_id.code or '',  # 2
                 'idSubzone': '',  # * int
                 },
-            'ShipType': 'EXPORT',  # token EXPORT, IMPORT, RETURN
-            'PackageType': 'GENERIC',  # token ENVELOPE, DOCUMENTS, GENERIC
+            'ShipType': order.ship_type or '',
+            'PackageType': order.package_type or '',
             'Service': order.carrier_mode_id.account_ref or '',  # * string
             'Courier': '',  # * string
             'CourierService': '',  # * string
@@ -305,7 +305,6 @@ class SaleOrder(models.Model):
         order = self
         supplier_pool = self.env['carrier.supplier']
         service_pool = self.env['carrier.supplier.mode']
-
         try:
             data = reply['ShippingOptions']['ShippingOption'][0]
 
@@ -381,7 +380,14 @@ class SaleOrder(models.Model):
 
             return ''
         except:
-            return 'Error updating data on order'
+            # Reset data:
+            order.write({
+                'carrier_cost': 0.0,
+                'carrier_mode_id': False,
+                'courier_supplier_id': False,
+                'courier_mode_id': False,
+            })
+            return 'Error updating data on order (clean quotation)'
 
     # -------------------------------------------------------------------------
     # Override methods
@@ -742,4 +748,19 @@ class SaleOrder(models.Model):
         selection=[
             ('COURIERLDV', 'Courier LDV'),
             ('MBE', 'MBE'),
+        ])
+
+    ship_type = fields.Selection(
+        string='Ship type', default='EXPORT', required=True,
+        selection=[
+            ('EXPORT', 'Export'),
+            ('IMPORT', 'Import'),
+            ('RETURN', 'Return'),
+        ])
+    package_type = fields.Selection(
+        string='Package type', default='GENERIC', required=True,
+        selection=[
+            ('GENERIC', 'Generic'),
+            ('ENVELOPE', 'Envelope'),
+            ('DOCUMENTS', 'Documents'),
         ])

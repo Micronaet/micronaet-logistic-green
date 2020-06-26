@@ -35,6 +35,10 @@
 
                 <field name="carrier_ok" />   <!--TODO invisible="1"-->
                 <field name="shipper_type" />
+
+                <field name="ship_type" />
+                <field name="package_type" />
+
                 <button name="shipments_list_request_detail_source" type="object" string="Check MBE information"/>
             </field>
         </field>
