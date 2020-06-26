@@ -487,7 +487,7 @@ class SaleOrder(models.Model):
                 output = subprocess.check_output([
                     'pdftk', fullname, 'dump_data'])
                 total_pages = int(
-                    output.split('NumberOfPages: ')[-1].split('\n')[0])
+                    ('%s' % output).split('NumberOfPages: ')[-1].split('\n')[0])
 
                 # Split label:
                 half_page = total_pages / 2
