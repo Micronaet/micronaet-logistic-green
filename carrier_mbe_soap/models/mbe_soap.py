@@ -465,8 +465,9 @@ class SaleOrder(models.Model):
         """
         order = self
         path = os.path.expanduser(
-            '~/.local/share/Odoo/filestore/data/%s/%s' % (
-                order.env.cr.dbname, mode))
+            '~/.local/share/Odoo/filestore/%s/data/%s' % (
+                order.env.cr.dbname, mode
+            ))
 
         os.system('mkdir -p %s' % path)
         if mode == 'tracking':
