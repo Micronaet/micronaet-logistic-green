@@ -172,7 +172,8 @@ class SaleOrder(models.Model):
         carrier_description = ''
         for line in self.order_line:
             product = line.product_id
-            if product.type == 'service' or product.is_expence:
+            # TODO is_expence is not present:
+            if product.type == 'service':  # or product.is_expence:
                 continue
             carrier_description += '(%s X) %s ' % (
                 int(line.product_uom_qty),
