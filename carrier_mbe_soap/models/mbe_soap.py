@@ -89,6 +89,37 @@ class SaleOrder(models.Model):
     # -------------------------------------------------------------------------
     #                            UTILITY:
     # -------------------------------------------------------------------------
+    @api.multi
+    def carrier_print_label(self):
+        """
+        """
+        return True
+
+    @api.multi
+    def order_form_detail(self):
+        """
+        """
+        # model_pool = self.env['ir.model.data']
+        # tree_view_id = model_pool.get_object_reference(
+        #    'logistic_management', 'view_sale_order_line_logistic_tree')[1]
+        # form_view_id = model_pool.get_object_reference(
+        #    'carrier_mbe_soap', 'view_sale_order_line_logistic_form')[1]
+        tree_view_id = form_view_id = False
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Order details'),
+            'view_type': 'form',
+            'view_mode': 'form,tree',
+            'res_id': self.id,
+            'res_model': 'sale.order',
+            'view_id': tree_view_id,
+            'views': [(form_view_id, 'form'), (tree_view_id, 'tree')],
+            'domain': [],
+            'context': self.env.context,
+            'target': 'current',
+            'nodestroy': False,
+        }
+
     # Check utility:
     @api.multi
     def check_reply_status(self, reply):
@@ -392,7 +423,6 @@ class SaleOrder(models.Model):
                     'carrier_mode_id': carrier_mode_id,
                 })
 
-                # TODO NetShipmentTotalPrice?
                 # 'IdSubzone': 125,
                 # 'SubzoneDesc': 'Italia-Zona A',
 
@@ -626,7 +656,7 @@ class SaleOrder(models.Model):
                 )
         else:
             _logger.error('Order %s has no master tracking, cannot delete!' %
-                order.name)
+                          order.name)
 
         # Check carrier_track_id for permit delete:
         if not error:
@@ -634,7 +664,9 @@ class SaleOrder(models.Model):
                 'carrier_soap_state': 'draft',
                 'master_tracking_id': False,
                 'system_reference_id': False,
+                'carrier_track_id': False,
             })
+        return error
 
     @api.multi
     def shipment_request(self):
@@ -671,7 +703,7 @@ class SaleOrder(models.Model):
         reply = service.ShipmentRequest(data)
         error = order.check_reply_status(reply)
 
-        print('\n%s\n\n%s\n' % (data, reply))
+        _logger.warning('\n%s\n\n%s\n' % (data, reply))
 
         if error:
             return error
@@ -761,7 +793,7 @@ class SaleOrder(models.Model):
         data['ShippingParameters'] = order.get_shipment_parameters_container()
 
         reply = service.ShippingOptionsRequest(data)
-        print('\n%s\n\n%s\n' % (data, reply))
+        _logger.warning('\n%s\n\n%s\n' % (data, reply))
         error = order.check_reply_status(reply)
         if not error:
             # Update SOAP data for real call

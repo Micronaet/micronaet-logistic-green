@@ -1,5 +1,51 @@
 <?xml version="1.0"?>
 <odoo>
+    <!--SHIPMENT VIEWS:-->
+    <record id="carrier_sale_order_tree" model="ir.ui.view">
+        <field name="name">sale.order.shipment</field>
+        <field name="model">sale.order</field>
+        <field name="priority" eval="40"/>
+        <field name="arch" type="xml">
+            <tree string="Sale order for carrier" editable="bottom">
+                <!--<field name="connector_id"/>
+                <field name="wp_date_created"/>
+                -->
+                <field name="name" readonly="1"/>
+                <field name="partner_id" readonly="1"/>
+                <field name="partner_shipping_id" readonly="1"/>
+                <field name="parcel_ids" readonly="1"/>
+                <field name="ship_type"/>
+                <field name="package_type"/>
+
+                <field name="carrier_supplier_id"/>
+                <field name="carrier_mode_id"/>
+                <field name="courier_supplier_id" readonly="1"/>
+                <field name="courier_mode_id" readonly="1"/>
+                <field name="master_tracking_id" readonly="1"/>
+                <field name="carrier_track_id" readonly="1"/>
+                <field name="carrier_cost" readonly="1"/>
+                <!--<field name="carrier_state"/>-->
+                <field name="carrier_ok" invisible="1"/>
+                <button name="carrier_get_better_option" type="object" string="Get better option" icon="fa-hand-o-left fa-x2"/>
+                <button name="set_carrier_ok_yes" string="Delivery confirmed" type="object" attrs="{'invisible': [('carrier_ok', '=', True)]}" icon="fa-dropbox fa-x2" />
+                <button name="set_carrier_ok_no" string="Delivery undo" type="object" attrs="{'invisible': [('carrier_ok', '=', False)]}" icon="fa-mail-reply fa-x2" />
+                <button name="carrier_print_label" type="object" string="Print label" icon="fa-film fa-x2" attrs="{'invisible': [('carrier_track_id', '=', False)]}"/>
+                <button name="order_form_detail" type="object" string="Get better option" icon="fa-arrows fa-x2"/>
+                <field name="state" invisible="1"/>
+                <field name="carrier_soap_state" invisible="1"/>
+                <!--<field name="carrier_delivery_state" invisible="1"/>-->
+                <field name="state" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+    <record id="carrier_sale_order_action" model="ir.actions.act_window">
+        <field name="name">Carrier sale order</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="carrier_sale_order_tree"/>
+    </record>
+
     <!--INHERIT-->
     <record model="ir.ui.view" id="view_sale_order_carrier_search">
         <field name="name">sale.order.carrier.search</field>
@@ -115,4 +161,8 @@
 
     <menuitem name="Carrier SOAP" id="carrier_connection_soap_root_menu" parent="sale.menu_sale_config" sequence="20"/>
         <menuitem id="carrier_connection_soap_menu" parent="carrier_connection_soap_root_menu" action="carrier_connection_soap_action" sequence="10"/>
+
+    <menuitem id="carrier_root_menu" parent="sale.sale_order_menu" name="Carrier" sequence="3"/>
+        <menuitem id="carrier_sale_order_action_menu" parent="carrier_root_menu" action="carrier_sale_order_action" sequence="10"/>
+
 </odoo>
