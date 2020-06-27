@@ -568,13 +568,12 @@ class SaleOrder(models.Model):
         system_reference_id = reply['SystemReferenceID']
 
         try:
-            # TODO check if always present!
-            pdb.set_trace()
             courier_track_id = reply['CourierMasterTrk']
             if courier_track_id == master_tracking_id:
                 courier_track_id = False
                 # Download label
             else:
+                # TODO if raise error no label!
                 order.save_order_label(reply, 'tracking')
 
         except:
