@@ -22,7 +22,7 @@
                 <field name="package_type"/>
 
                 <field name="carrier_supplier_id"/>
-                <field name="carrier_mode_id"/>
+                <field name="carrier_mode_id" domain="[('supplier_id', '=', carrier_supplier_id)]"/>
                 <field name="courier_supplier_id" readonly="1"/>
                 <field name="courier_mode_id" readonly="1"/>
                 <field name="master_tracking_id" readonly="1"/>
