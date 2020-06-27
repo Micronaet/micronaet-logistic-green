@@ -8,4 +8,5 @@ Manage Mailboxed MBE via SOAP
 
 Install dependency before:
 sudo pip install zeep
-sudo pip install pypdftk
+
+sudo apt-get install pdftk
