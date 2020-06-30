@@ -99,7 +99,7 @@ class SaleOrder(models.Model):
         label_path = self.get_folder_root_path('label', root_path=path)
         filename = '%s.1.PDF' % self.id
         fullname = os.path.join(label_path, filename)
-        return self.send_report_to_printer(fullname)
+        return self.send_report_to_cups_printer(fullname)
 
     @api.multi
     def order_form_detail(self):
