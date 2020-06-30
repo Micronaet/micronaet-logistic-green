@@ -17,6 +17,8 @@
         'sale',
         'product',
         'plant_passport',  # Change report total
+        # For CUPS operations (Micronaet/micronaet-logistic branch):
+        'cups_printing',
         ],
     'data': [
         'security/ir.model.access.csv',

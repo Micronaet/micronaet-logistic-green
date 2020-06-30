@@ -9,6 +9,7 @@ import re
 import logging
 from odoo import fields, models, api
 from odoo import _
+from odoo import exceptions
 
 _logger = logging.getLogger(__name__)
 
@@ -138,6 +139,58 @@ class SaleOrder(models.Model):
     """
 
     _inherit = 'sale.order'
+
+    # -------------------------------------------------------------------------
+    # Print action:
+    # -------------------------------------------------------------------------
+    # Button:
+    @api.multi
+    def carrier_print_label(self):
+        """ Print ddt
+        """
+        # TODO Overrided:
+        return True
+
+    # Utility:
+    @api.model
+    def send_report_to_cups_printer(self, fullname, printer_mode):
+        """ Send report to CUPS printer
+            Report file
+            Printer mode
+        """
+        # Parameter:
+        company_pool = self.env['res.company']
+        company = company_pool.search([])[0]
+
+        if not os.path.isfile(fullname):
+            raise exceptions.Warning(
+                'PDF %s not found: %s!' % (printer_mode, fullname))
+
+        # Print:
+        printer_name = eval('company.cups_%s' % printer_mode)
+        if not printer_name:
+            raise exceptions.Warning(
+                _('Printer not found, configure name for %s mode!') % (
+                    printer_name))
+
+        # -o landscape -o fit-to-page -o media=A4
+        # -o page-bottom=N -o page-left=N -o page-right=N -o page-top=N
+        print_command = 'lp -o fit-to-page -o media=A4 -d %s "%s"' % (
+            printer_name,
+            fullname,
+        )
+        self.write_log_chatter_message(_(
+            'Printing %s on %s [%s file]...') % (
+               fullname, printer_name,
+               printer_mode,
+           ))
+
+        try:
+            os.system(print_command)
+        except:
+            raise exceptions.Warning('Error print PDF invoice on %s!' % (
+                company.cups_invoice))
+        return True
 
     # Utility (TODO move in main module)
     @api.model

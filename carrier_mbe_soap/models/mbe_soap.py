@@ -91,9 +91,11 @@ class SaleOrder(models.Model):
     # -------------------------------------------------------------------------
     @api.multi
     def carrier_print_label(self):
+        """ Print label via CUPS
         """
-        """
-        return True
+        fullname = ''
+        mode = 'label'
+        return self.send_report_to_printer(fullname, mode)
 
     @api.multi
     def order_form_detail(self):
@@ -490,18 +492,25 @@ class SaleOrder(models.Model):
             return order.write_log_chatter_message(error)
         return True
 
+    @api.multi
+    def get_folder_root_path(self, mode, root_path=None):
+        """
+        """
+        if root_path is None:
+            root_path = os.path.expanduser(
+                '~/.local/share/Odoo/filestore/%s/data' % self.env.cr.dbname
+                )
+        path = os.path.join(root_path, mode)
+        os.system('mkdir -p %s' % path)
+        return path
+
     # Utility:
     @api.multi
     def save_order_label(self, reply, mode='label'):
         """ Save order label
         """
         order = self
-        path = os.path.expanduser(
-            '~/.local/share/Odoo/filestore/%s/data/%s' % (
-                order.env.cr.dbname, mode
-            ))
-
-        os.system('mkdir -p %s' % path)
+        path = order.get_folder_root_path(mode)
         if mode == 'tracking':
             label_path = os.path.join(path, 'label')
             parcel_path = os.path.join(path, 'parcel')
