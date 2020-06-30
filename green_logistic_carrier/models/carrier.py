@@ -153,43 +153,47 @@ class SaleOrder(models.Model):
 
     # Utility:
     @api.model
-    def send_report_to_cups_printer(self, fullname, printer_mode):
+    def send_report_to_cups_printer(self, fullname, printer_code=False):
         """ Send report to CUPS printer
             Report file
-            Printer mode
+            Printer code (see printers list)
         """
-        # Parameter:
-        company_pool = self.env['res.company']
-        company = company_pool.search([])[0]
+        user_pool = self.env['res.users']
+        printer_pool = self.env['cups.printer']
+        user = user_pool.browse(self.env.uid)
+
+        printer = False
+        if printer_code:
+            printer = printer_pool.search([
+                ('code', '=', printer_code)])
+
+        if not printer:
+            printer = user.default_printer_id or \
+                      user.company_id.default_printer_id or False
+        if not printer:
+            exceptions.Warning('No printer with code: %s or default setup' % (
+                printer_code
+            ))
 
         if not os.path.isfile(fullname):
             raise exceptions.Warning(
-                'PDF %s not found: %s!' % (printer_mode, fullname))
-
-        # Print:
-        printer_name = eval('company.cups_%s' % printer_mode)
-        if not printer_name:
-            raise exceptions.Warning(
-                _('Printer not found, configure name for %s mode!') % (
-                    printer_name))
+                'PDF not found: %s!' % fullname)
 
         # -o landscape -o fit-to-page -o media=A4
         # -o page-bottom=N -o page-left=N -o page-right=N -o page-top=N
+        printer_name = printer.name
         print_command = 'lp -o fit-to-page -o media=A4 -d %s "%s"' % (
             printer_name,
             fullname,
         )
-        self.write_log_chatter_message(_(
-            'Printing %s on %s [%s file]...') % (
-               fullname, printer_name,
-               printer_mode,
-           ))
+        self.write_log_chatter_message(
+            _('Printing %s on %s ...') % (fullname, printer_name))
 
         try:
             os.system(print_command)
         except:
             raise exceptions.Warning('Error print PDF invoice on %s!' % (
-                company.cups_invoice))
+                printer_name))
         return True
 
     # Utility (TODO move in main module)

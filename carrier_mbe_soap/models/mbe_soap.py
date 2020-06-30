@@ -93,9 +93,13 @@ class SaleOrder(models.Model):
     def carrier_print_label(self):
         """ Print label via CUPS
         """
-        fullname = ''
-        mode = 'label'
-        return self.send_report_to_printer(fullname, mode)
+        # TODO mode = 'label_01'
+        pdb.set_trace()
+        path = self.get_folder_root_path('tracking')
+        label_path = self.get_folder_root_path('label', root_path=path)
+        filename = '%s.1.PDF' % self.id
+        fullname = os.path.join(label_path, filename)
+        return self.send_report_to_printer(fullname)
 
     @api.multi
     def order_form_detail(self):
@@ -512,10 +516,8 @@ class SaleOrder(models.Model):
         order = self
         path = order.get_folder_root_path(mode)
         if mode == 'tracking':
-            label_path = os.path.join(path, 'label')
-            parcel_path = os.path.join(path, 'parcel')
-            os.system('mkdir -p %s' % label_path)
-            os.system('mkdir -p %s' % parcel_path)
+            label_path = order.get_folder_root_path('label', root_path=path)
+            parcel_path = order.get_folder_root_path('parcel', root_path=path)
 
         counter = 0
         if mode in ('label', 'tracking'):
