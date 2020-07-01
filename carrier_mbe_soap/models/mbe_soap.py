@@ -94,7 +94,6 @@ class SaleOrder(models.Model):
         """ Print label via CUPS
         """
         # TODO mode = 'label_01'
-        pdb.set_trace()
         path = self.get_folder_root_path('tracking')
         label_path = self.get_folder_root_path('label', root_path=path)
         filename = '%s.1.PDF' % self.id
