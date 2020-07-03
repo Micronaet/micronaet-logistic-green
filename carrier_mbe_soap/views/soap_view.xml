@@ -14,7 +14,7 @@
                 <field name="partner_id" readonly="1"/>
                 <field name="partner_shipping_id" readonly="1"/>
 
-                <field name="carrier_parcel_template_id" domain="['|',('carrier_supplier_id','=',False),('carrier_supplier_id','=',carrier_supplier_id)]"/>
+                <field name="carrier_parcel_template_id" domain="['|',('carrier_supplier_id','=',False),('carrier_supplier_id','=',carrier_supplier_id)]" force_save="1"/>
                 <button name="load_template_parcel" string="Add parcel" icon="fa-plus fa-2x" type="object" attrs="{'invisible': [('carrier_parcel_template_id','=',False)]}" class="oe_highlight"/>
 
                 <field name="parcel_ids" readonly="1"/>
