@@ -345,7 +345,6 @@ class SaleOrder(models.Model):
             len(quotations),
             carrier_mode_search or 'disabled',
         ))
-        pdb.set_trace()
         for quotation in quotations:
             try:
                 # Check carrier if selected in request:

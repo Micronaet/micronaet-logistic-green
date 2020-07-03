@@ -7,6 +7,7 @@ import os
 import sys
 import re
 import logging
+import pdb
 from odoo import fields, models, api
 from odoo import _
 from odoo import exceptions
@@ -243,6 +244,7 @@ class SaleOrder(models.Model):
     def load_template_parcel(self, ):
         """ Load this template
         """
+        pdb.set_trace()
         parcel_pool = self.env['sale.order.parcel']
         template = self.carrier_parcel_template_id
 
