@@ -240,7 +240,6 @@ class SaleOrder(models.Model):
         self.carrier_description = self.sanitize_text(
             carrier_description.strip())
 
-
     @api.multi
     def load_template_parcel(self, ):
         """ Load this template
