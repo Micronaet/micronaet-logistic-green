@@ -556,6 +556,7 @@ class SaleOrder(models.Model):
         """ Save order label
         """
         order = self
+        parcels = len(order.carrier_ids)
         path = order.get_folder_root_path(mode)
         if mode == 'tracking':
             label_path = order.get_folder_root_path('label', root_path=path)
@@ -604,13 +605,14 @@ class SaleOrder(models.Model):
                     fullname_label,
                 ])
 
-                # Split parcel label
-                output = subprocess.check_output([
-                    'pdftk', fullname,
-                    'cat', '%s-%s' % (half_page + 1, total_pages),
-                    'output',
-                    fullname_parcel,
-                ])
+                # Split parcel label (if present)
+                if total_pages > parcels:
+                    output = subprocess.check_output([
+                        'pdftk', fullname,
+                        'cat', '%s-%s' % (half_page + 1, total_pages),
+                        'output',
+                        fullname_parcel,
+                    ])
 
     @api.multi
     def update_order_with_soap_reply(self, reply):
