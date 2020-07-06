@@ -185,12 +185,16 @@ class SaleOrder(models.Model):
     @api.multi
     def get_request_container(
             self, credentials=True, internal=True, customer=True, system=False,
-            store=False):
+            store=False, force_connection=False):
         """ Get Service connection to make calls, parameters are passed as
             boolean switch:
         """
         self.ensure_one()
-        connection = self.carrier_supplier_id.soap_connection_id
+        # Generic call, check order before after supplier
+        connection = force_connection or \
+                     self.soap_connection_id or \
+                     self.carrier_supplier_id.soap_connection_id
+        _logger.warning('Used %s connection!' % connection.name)
         data = {}
         if credentials:
             data['Credentials'] = {
@@ -651,7 +655,8 @@ class SaleOrder(models.Model):
         """
         order = self
 
-        soap_connection = order.carrier_supplier_id.soap_connection_id
+        # soap_connection = order.carrier_supplier_id.soap_connection_id
+        soap_connection = order.soap_connection_id
         service = soap_connection.get_connection()
         master_tracking_id = order.master_tracking_id
         if not master_tracking_id:
@@ -688,7 +693,8 @@ class SaleOrder(models.Model):
         """
         order = self
         error = ''
-        soap_connection = order.carrier_supplier_id.soap_connection_id
+        # soap_connection = order.carrier_supplier_id.soap_connection_id
+        soap_connection = order.soap_connection_id
         service = soap_connection.get_connection()
 
         master_tracking_id = order.master_tracking_id
@@ -724,9 +730,11 @@ class SaleOrder(models.Model):
         """
         self.ensure_one()
         order = self
-        # soap_pool = self.env['carrier.connection.soap']
 
-        soap_connection = order.carrier_supplier_id.soap_connection_id
+        # soap_pool = self.env['carrier.connection.soap']
+        # soap_connection = order.carrier_supplier_id.soap_connection_id
+
+        soap_connection = order.soap_connection_id
         if not soap_connection:
             return 'Order %s has carrier without SOAP ref.!' % order.name
         if order.state not in 'draft':
@@ -793,9 +801,11 @@ class SaleOrder(models.Model):
         self.ensure_one()
         order = self  # TODO loop?
 
-        soap_connection = order.carrier_supplier_id.soap_connection_id
+        # soap_connection = order.carrier_supplier_id.soap_connection_id
+        soap_connection = order.soap_connection_id
+
         if not soap_connection:
-            return 'Order %s has carrier without SOAP ref.!' % order.name
+            return 'Order %s without SOAP ref.!' % order.name
         if order.carrier_soap_id:
             return 'Order %s has SOAP ID %s cannot check!' % (
                     order.name, order.carrier_soap_id)
@@ -828,7 +838,7 @@ class SaleOrder(models.Model):
         self.ensure_one()
         order = self
 
-        pdb.set_trace()
+        # Carrier connection (B)
         soap_connection = order.carrier_supplier_id.soap_connection_id
         if not soap_connection:
             return 'Order %s has carrier without SOAP ref.!' % order.name
@@ -841,11 +851,6 @@ class SaleOrder(models.Model):
         # ---------------------------------------------------------------------
         # SOAP insert call:
         # ---------------------------------------------------------------------
-        # Generate data for request:
-        data = order.get_request_container(
-            customer=False, system=True)
-        data['ShippingParameters'] = order.get_shipment_parameters_container()
-
         # A. Economy request:
         all_services = [
             item.soap_connection_id for item in self.parcel_ids
@@ -858,6 +863,13 @@ class SaleOrder(models.Model):
         error = ''
         reply_list = []
         for connection in all_services:
+            # Generate data for request:
+            data = order.get_request_container(
+                customer=False, system=True, force_connection=connection)
+            data[
+                'ShippingParameters'] = order.\
+                get_shipment_parameters_container()
+
             service = connection.get_connection()
             reply = service.ShippingOptionsRequest(data)
             _logger.warning('\n%s\n\n%s\n' % (data, reply))
