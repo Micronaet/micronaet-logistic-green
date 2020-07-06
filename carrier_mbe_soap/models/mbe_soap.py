@@ -613,6 +613,8 @@ class SaleOrder(models.Model):
                         'output',
                         fullname_parcel,
                     ])
+                else:
+                    _logger.error('No parcel label present')
 
     @api.multi
     def update_order_with_soap_reply(self, reply):
