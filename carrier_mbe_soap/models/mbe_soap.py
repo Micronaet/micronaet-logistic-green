@@ -828,6 +828,7 @@ class SaleOrder(models.Model):
         self.ensure_one()
         order = self
 
+        pdb.set_trace()
         soap_connection = order.carrier_supplier_id.soap_connection_id
         if not soap_connection:
             return 'Order %s has carrier without SOAP ref.!' % order.name
