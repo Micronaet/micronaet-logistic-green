@@ -357,7 +357,7 @@ class SaleOrder(models.Model):
         })
 
     @api.multi
-    def update_with_quotation(self, reply):
+    def update_with_quotation(self, reply_list):
         """ Update order courier fields with reply SOAP
         """
         order = self
@@ -366,17 +366,23 @@ class SaleOrder(models.Model):
         service_pool = self.env['carrier.supplier.mode']
         data = {}
 
+        # Unificate quotations in one list:
+        quotation_list = []
+        for reply in reply_list:
+            quotations = reply['ShippingOptions']['ShippingOption']
+            _logger.warning('Quotation founds: %s [Mode search: %s]' % (
+                len(quotations),
+                carrier_mode_search or 'disabled',
+            ))
+            quotation_list.extend(quotations)
+
         # Choose better quotation:
-        quotations = reply['ShippingOptions']['ShippingOption']
-        _logger.warning('Quotation founds: %s [Mode search: %s]' % (
-            len(quotations),
-            carrier_mode_search or 'disabled',
-        ))
-        for quotation in quotations:
+        for quotation in quotation_list:
             try:
                 # Check carrier if selected in request:
                 carrier_code = quotation['Service']
-                if carrier_mode_search and carrier_mode_search != carrier_code:
+                if (carrier_mode_search and carrier_mode_search !=
+                        carrier_code):
                     continue
 
                 # Check and save best quotation:
@@ -384,7 +390,8 @@ class SaleOrder(models.Model):
                                 data['NetShipmentTotalPrice']):
                     data = quotation
             except:
-                _logger.error('Error on quotation: %s' % (sys.exc_info(), ))
+                _logger.error('Error on quotation: %s' % (
+                    sys.exc_info(), ))
 
         # Update order with better quotation:
         if data:
@@ -820,21 +827,37 @@ class SaleOrder(models.Model):
             return 'Order %s has SOAP ID %s cannot publish!' % (
                     order.name, order.carrier_soap_id)
 
-        # -----------------------------------------------------------------
+        # ---------------------------------------------------------------------
         # SOAP insert call:
-        # -----------------------------------------------------------------
-        service = soap_connection.get_connection()
+        # ---------------------------------------------------------------------
+        # Generate data for request:
         data = order.get_request_container(
             customer=False, system=True)
-
         data['ShippingParameters'] = order.get_shipment_parameters_container()
 
-        reply = service.ShippingOptionsRequest(data)
-        _logger.warning('\n%s\n\n%s\n' % (data, reply))
-        error = order.check_reply_status(reply)
+        pdb.set_trace()
+
+        # A. Economy request:
+        all_services = [
+            item.soap_connection_id for item in self.parcel_ids
+            if item.soap_connection_id]
+
+        # B. Standard request:
+        all_services.append(soap_connection)
+        all_services = set(all_services)
+
+        error = ''
+        reply_list = []
+        for connection in all_services:
+            service = connection.get_connection()
+            reply = service.ShippingOptionsRequest(data)
+            _logger.warning('\n%s\n\n%s\n' % (data, reply))
+            error += order.check_reply_status(reply)
+            reply_list.append(reply)
+
         if not error:
             # Update SOAP data for real call
-            order.update_with_quotation(reply)
+            order.update_with_quotation(reply_list)
         return error
 
     master_tracking_id = fields.Char('Master Tracking', size=20)
