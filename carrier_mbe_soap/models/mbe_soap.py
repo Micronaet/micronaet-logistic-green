@@ -525,6 +525,7 @@ class SaleOrder(models.Model):
         if error:
             return order.write_log_chatter_message(error)
         # raise exceptions.ValidationError('Not valid message')
+        pdb.set_trace()
         return super(SaleOrder, self).set_carrier_ok_no()
 
     # Button event:
