@@ -658,8 +658,8 @@ class SaleOrder(models.Model):
         """
         order = self
 
-        # soap_connection = order.carrier_supplier_id.soap_connection_id
-        soap_connection = order.soap_connection_id
+        soap_connection = order.soap_connection_id or \
+            order.carrier_supplier_id.soap_connection_id
         service = soap_connection.get_connection()
         master_tracking_id = order.master_tracking_id
         if not master_tracking_id:
