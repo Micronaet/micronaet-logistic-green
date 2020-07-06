@@ -364,14 +364,13 @@ class SaleOrder(models.Model):
     def update_with_quotation(self, reply_list):
         """ Update order courier fields with reply SOAP
         """
-        pdb.set_trace()
         order = self
         carrier_mode_search = order.carrier_mode_id.account_ref
         supplier_pool = self.env['carrier.supplier']
         service_pool = self.env['carrier.supplier.mode']
         better = {}
 
-        # Unificate quotations in one list:
+        # Join quotations in one list:
         quotation_list = []
         for connection, reply in reply_list:
             quotations = reply['ShippingOptions']['ShippingOption']

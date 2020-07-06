@@ -1,5 +1,17 @@
 <?xml version="1.0"?>
 <odoo>
+        <!--sale.oder-->
+        <record id="view_sale_order_line_soap_form" model="ir.ui.view">
+            <field name="name">sale.order.soap.wordpress</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+                <field name="payment_term_id" position="after">
+                    <field name="soap_connection_id" attrs="{'invisible': [('soap_connection_id', '=', False)]}"/>
+                </field>
+            </field>
+        </record>
+
         <!--carrier.parcel.template-->
         <record model="ir.ui.view" id="view_carrier_parcel_template_soap_tree">
             <field name="name">carrier.parcel.template.tree</field>
@@ -111,7 +123,7 @@
                 <field name="ship_type" />
                 <field name="package_type" />
 
-                <button name="shipments_list_request_detail_source" type="object" string="Check MBE information"/>
+                <button name="shipments_list_request_detail_source" type="object" string="Check MBE information" invisible="1"/>
             </field>
         </field>
     </record>
