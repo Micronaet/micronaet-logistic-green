@@ -360,25 +360,26 @@ class SaleOrder(models.Model):
     def update_with_quotation(self, reply_list):
         """ Update order courier fields with reply SOAP
         """
-        pdb.set_trace()
         order = self
         carrier_mode_search = order.carrier_mode_id.account_ref
         supplier_pool = self.env['carrier.supplier']
         service_pool = self.env['carrier.supplier.mode']
-        data = {}
+        better = {}
 
         # Unificate quotations in one list:
         quotation_list = []
-        for reply in reply_list:
+        for connection, reply in reply_list:
             quotations = reply['ShippingOptions']['ShippingOption']
             _logger.warning('Quotation founds: %s [Mode search: %s]' % (
                 len(quotations),
                 carrier_mode_search or 'disabled',
             ))
-            quotation_list.extend(quotations)
+            for quotation in quotations:
+                quotation_list.append(connection, quotation)
 
         # Choose better quotation:
-        for quotation in quotation_list:
+        for record in quotation_list:
+            connection, quotation = record
             try:
                 # Check carrier if selected in request:
                 carrier_code = quotation['Service']
@@ -387,15 +388,16 @@ class SaleOrder(models.Model):
                     continue
 
                 # Check and save best quotation:
-                if not data or (quotation['NetShipmentTotalPrice'] <
-                                data['NetShipmentTotalPrice']):
-                    data = quotation
+                if not better or (quotation['NetShipmentTotalPrice'] <
+                                  better[1]['NetShipmentTotalPrice']):
+                    better = record
             except:
                 _logger.error('Error on quotation: %s' % (
                     sys.exc_info(), ))
 
         # Update order with better quotation:
-        if data:
+        if better:
+            connection, data = better
             try:
                 # -------------------------------------------------------------
                 # A. Courier:
@@ -453,6 +455,7 @@ class SaleOrder(models.Model):
                     }).id
 
                 order.write({
+                    'soap_connection_id': connection.id,
                     'carrier_cost': data['NetShipmentPrice'],
                     'carrier_cost_total': data['NetShipmentTotalPrice'],
                     'has_cod': data['CODAvailable'],
@@ -473,6 +476,7 @@ class SaleOrder(models.Model):
         if not data:  # Or previous update error
             # Reset data:
             order.write({
+                'soap_connection_id': False,
                 'carrier_cost': 0.0,
                 'carrier_mode_id': False,
                 'courier_supplier_id': False,
