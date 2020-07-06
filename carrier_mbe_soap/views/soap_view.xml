@@ -1,5 +1,27 @@
 <?xml version="1.0"?>
 <odoo>
+        <!--carrier.parcel.template-->
+        <record model="ir.ui.view" id="view_carrier_parcel_template_soap_tree">
+            <field name="name">carrier.parcel.template.tree</field>
+            <field name="model">carrier.parcel.template</field>
+            <field name="inherit_id" ref="green_logistic_carrier.view_carrier_parcel_template_tree" />
+            <field name="arch" type="xml">
+                <field name="carrier_supplier_id" position="after">
+                    <field name="soap_connection_id" />
+                </field>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="view_carrier_parcel_template_soap_form">
+            <field name="name">carrier.parcel.template.form</field>
+            <field name="model">carrier.parcel.template</field>
+            <field name="inherit_id" ref="green_logistic_carrier.view_carrier_parcel_template_form" />
+            <field name="arch" type="xml">
+                <field name="carrier_supplier_id" position="after">
+                    <field name="soap_connection_id" />
+                </field>
+            </field>
+        </record>
+
     <!--SHIPMENT VIEWS:-->
     <record id="carrier_sale_order_tree" model="ir.ui.view">
         <field name="name">sale.order.shipment</field>
@@ -14,7 +36,7 @@
                 <field name="partner_id" readonly="1"/>
                 <field name="partner_shipping_id" readonly="1"/>
 
-                <field name="carrier_parcel_template_id" domain="['|',('carrier_supplier_id','=',False),('carrier_supplier_id','=',carrier_supplier_id)]" force_save="1"/>
+                <field name="carrier_parcel_template_id" domain="['|',('carrier_supplier_id','=',False),('carrier_supplier_id','=',carrier_supplier_id)]" />
                 <button name="load_template_parcel" string="Add parcel" icon="fa-plus fa-2x" type="object" attrs="{'invisible': [('carrier_parcel_template_id','=',False)]}" class="oe_highlight"/>
 
                 <field name="parcel_ids" readonly="1"/>

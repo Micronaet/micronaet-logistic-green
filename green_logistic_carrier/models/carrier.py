@@ -240,19 +240,11 @@ class SaleOrder(models.Model):
         self.carrier_description = self.sanitize_text(
             carrier_description.strip())
 
-    '''
-    @api.multi
-    @api.onchange('carrier_parcel_template_id')
-    def onchange_carrier_parcel_template_id(self):
-        _logger.warning('Template ID: %s' % self.carrier_parcel_template_id)
-        })'''
 
     @api.multi
     def load_template_parcel(self, ):
         """ Load this template
         """
-        print(self.carrier_parcel_template_id)
-        pdb.set_trace()
         parcel_pool = self.env['sale.order.parcel']
         template = self.carrier_parcel_template_id
 

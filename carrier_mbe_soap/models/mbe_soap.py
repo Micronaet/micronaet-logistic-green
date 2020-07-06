@@ -81,6 +81,18 @@ class CarrierSupplier(models.Model):
         string='SOAP Connection')
 
 
+class CarrierParcelTemplate(models.Model):
+    """ Model name: Parcels template
+    """
+
+    _inherit = 'carrier.parcel.template'
+
+    soap_connection_id = fields.Many2one(
+        comodel_name='carrier.connection.soap',
+        string='SOAP Connection',
+        help='Force SOAP connection for small package')
+
+
 class SaleOrder(models.Model):
     """ Model name: Sale order
     """
