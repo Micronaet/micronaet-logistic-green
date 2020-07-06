@@ -360,6 +360,7 @@ class SaleOrder(models.Model):
     def update_with_quotation(self, reply_list):
         """ Update order courier fields with reply SOAP
         """
+        pdb.set_trace()
         order = self
         carrier_mode_search = order.carrier_mode_id.account_ref
         supplier_pool = self.env['carrier.supplier']
@@ -375,7 +376,7 @@ class SaleOrder(models.Model):
                 carrier_mode_search or 'disabled',
             ))
             for quotation in quotations:
-                quotation_list.append(connection, quotation)
+                quotation_list.append((connection, quotation))
 
         # Choose better quotation:
         for record in quotation_list:
