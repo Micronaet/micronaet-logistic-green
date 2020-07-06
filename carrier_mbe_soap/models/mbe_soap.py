@@ -99,6 +99,23 @@ class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
     # -------------------------------------------------------------------------
+    # Override
+    # -------------------------------------------------------------------------
+    @api.multi
+    def load_template_parcel(self, ):
+        """ Override template for update
+        """
+        line = super(SaleOrder, self).load_template_parcel()
+
+        parcel_pool = self.env['sale.order.parcel']
+
+        parcel_pool.write(line.id, {
+            'soap_connection_id':
+                self.carrier_parcel_template_id.soap_connection_id.id,
+        })
+        return line
+
+    # -------------------------------------------------------------------------
     #                            UTILITY:
     # -------------------------------------------------------------------------
     @api.multi
@@ -855,3 +872,15 @@ class SaleOrder(models.Model):
             ('ENVELOPE', 'Envelope'),
             ('DOCUMENTS', 'Documents'),
         ])
+
+
+class SaleOrderParcel(models.Model):
+    """ Model name: Parcels for sale order
+    """
+
+    _inherit = 'sale.order.parcel'
+
+    soap_connection_id = fields.Many2one(
+        comodel_name='carrier.connection.soap',
+        string='SOAP Connection',
+        help='Force SOAP connection for small package')

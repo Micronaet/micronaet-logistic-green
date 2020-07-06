@@ -248,14 +248,13 @@ class SaleOrder(models.Model):
         parcel_pool = self.env['sale.order.parcel']
         template = self.carrier_parcel_template_id
 
-        parcel_pool.create({
+        return parcel_pool.create({
             'order_id': self.id,
             'length': template.length,
             'width': template.width,
             'height': template.height,
             'no_label': template.no_label,
             })
-        return True
 
     @api.multi
     def carrier_get_better_option(self):
