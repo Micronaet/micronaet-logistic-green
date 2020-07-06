@@ -525,7 +525,6 @@ class SaleOrder(models.Model):
         if error:
             return order.write_log_chatter_message(error)
         # raise exceptions.ValidationError('Not valid message')
-        pdb.set_trace()
         return super(SaleOrder, self).set_carrier_ok_no()
 
     # Button event:
@@ -697,8 +696,8 @@ class SaleOrder(models.Model):
         """
         order = self
         error = ''
-        # soap_connection = order.carrier_supplier_id.soap_connection_id
-        soap_connection = order.soap_connection_id
+        soap_connection = order.soap_connection_id or \
+            order.carrier_supplier_id.soap_connection_id
         service = soap_connection.get_connection()
 
         master_tracking_id = order.master_tracking_id
