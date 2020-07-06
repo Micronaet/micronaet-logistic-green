@@ -756,6 +756,10 @@ class SaleOrder(models.Model):
 
     master_tracking_id = fields.Char('Master Tracking', size=20)
     system_reference_id = fields.Char('System reference ID', size=20)
+    soap_connection_id = fields.Many2one(
+        comodel_name='carrier.connection.soap',
+        string='SOAP Connection',
+        help='Soap connection used for better quotation')
     carrier_soap_id = fields.Integer(
         string='Carrier SOAP ID')
     carrier_soap_state = fields.Selection(
@@ -852,7 +856,7 @@ class SaleOrder(models.Model):
             reply = service.ShippingOptionsRequest(data)
             _logger.warning('\n%s\n\n%s\n' % (data, reply))
             error += order.check_reply_status(reply)
-            reply_list.append(reply)
+            reply_list.append((connection, reply))
 
         if not error:
             # Update SOAP data for real call
