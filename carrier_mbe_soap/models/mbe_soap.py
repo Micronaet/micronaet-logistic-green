@@ -106,12 +106,13 @@ class SaleOrder(models.Model):
         """ Override template for update
         """
         line = super(SaleOrder, self).load_template_parcel()
+        data = {
+            'real_weight': self.parcel_weight_tree,
+        }
         if self.carrier_parcel_template_id.soap_connection_id:
-            line.write({
-                'soap_connection_id':
-                    self.carrier_parcel_template_id.soap_connection_id.id,
-                'real_weight': self.parcel_weight_tree,
-            })
+            data['soap_connection_id'] = \
+                self.carrier_parcel_template_id.soap_connection_id.id
+        line.write(data)
         return line
 
     # -------------------------------------------------------------------------
