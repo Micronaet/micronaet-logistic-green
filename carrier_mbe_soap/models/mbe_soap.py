@@ -745,6 +745,9 @@ class SaleOrder(models.Model):
                 'master_tracking_id': False,
                 'system_reference_id': False,
                 'carrier_track_id': False,
+                'carrier_mode_id': False,
+                'courier_supplier_id': False,
+                'courier_mode_id': False,
             })
         return error
 
