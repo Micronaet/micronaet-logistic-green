@@ -110,7 +110,7 @@ class SaleOrder(models.Model):
             line.write({
                 'soap_connection_id':
                     self.carrier_parcel_template_id.soap_connection_id.id,
-                'weight': line.parcel_weight_tree,
+                'real_weight': self.parcel_weight_tree,
             })
         return line
 
