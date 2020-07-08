@@ -555,7 +555,6 @@ class SaleOrder(models.Model):
     def save_order_label(self, reply, mode='label'):
         """ Save order label
         """
-        pdb.set_trace()
         order = self
         parcels = len(order.parcel_ids)
         path = order.get_folder_root_path(mode)
