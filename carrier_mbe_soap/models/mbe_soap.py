@@ -597,13 +597,16 @@ class SaleOrder(models.Model):
                         '\\')[0])
 
                 # Split label:
-                half_page = int(total_pages / 2)
-                subprocess.check_output([
-                    'pdftk', fullname,
-                    'cat', '1-%s' % half_page,
-                    'output',
-                    fullname_label,
-                ])
+                if total_pages > parcels:
+                    half_page = int(total_pages / 2)
+                    subprocess.check_output([
+                        'pdftk', fullname,
+                        'cat', '1-%s' % half_page,
+                        'output',
+                        fullname_label,
+                    ])
+                else:  # Label complete is label!
+                    shutil.copy(fullname, fullname_label)
 
                 # Split parcel label (if present)
                 if total_pages > parcels:
