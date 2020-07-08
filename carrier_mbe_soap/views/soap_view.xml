@@ -58,6 +58,7 @@
 
                 <field name="carrier_supplier_id"/>
                 <field name="carrier_mode_id" domain="[('supplier_id', '=', carrier_supplier_id)]"/>
+                <button name="carrier_get_better_option" type="object" string="Get better option" icon="fa-hand-o-right fa-2x" />
                 <field name="courier_supplier_id" readonly="1"/>
                 <field name="courier_mode_id" readonly="1"/>
                 <field name="master_tracking_id" readonly="1"/>
@@ -65,7 +66,6 @@
                 <field name="carrier_cost" readonly="1"/>
                 <!--<field name="carrier_state"/>-->
                 <field name="carrier_ok" invisible="1"/>
-                <button name="carrier_get_better_option" type="object" string="Get better option" icon="fa-hand-o-left fa-2x"/>
                 <button name="set_carrier_ok_yes" string="Delivery confirmed" type="object" attrs="{'invisible': [('carrier_ok', '=', True)]}" icon="fa-dropbox fa-2x" />
                 <button name="set_carrier_ok_no" string="Delivery undo" type="object" attrs="{'invisible': [('carrier_ok', '=', False)]}" icon="fa-mail-reply fa-2x" />
                 <button name="carrier_print_label" type="object" string="Print label" icon="fa-film fa-2x" attrs="{'invisible': [('carrier_track_id', '=', False)]}"/>
@@ -109,7 +109,9 @@
         <field name="inherit_id" ref="green_logistic_carrier.view_sale_order_form"/>
         <field name="arch" type="xml">
             <button name="set_carrier_ok_no" position="after">
-                 <button name="set_carrier_confirmed" string="Confirmed to Carrier" type="object" attrs="{'invisible': [('carrier_soap_state', '!=', 'pending')]}" icon="fa-thumbs-up" colspan="1"/>
+                 <!--<button name="set_carrier_confirmed" string="Confirmed to Carrier" type="object" attrs="{'invisible': [('carrier_soap_state', '!=', 'pending')]}" icon="fa-thumbs-up" colspan="1"/>-->
+                 <button name="carrier_print_label" type="object" string="Print label" icon="fa-film fa-2x" attrs="{'invisible': [('carrier_track_id', '=', False)]}"/>
+
             </button>
             <field name="carrier_track_id" position="after">
                 <field name="master_tracking_id" /><!--readonly="1"-->
@@ -173,6 +175,10 @@
 
                         <field name="sam_id"/>
                         <field name="department_id"/>
+
+                        <field name="auto_print_label" />
+                        <field name="cups_printer_id" />
+
                     </group>
                 </sheet>
             </form>

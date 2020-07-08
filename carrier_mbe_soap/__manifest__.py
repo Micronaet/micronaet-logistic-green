@@ -15,6 +15,7 @@
     'depends': [
         'sale',
         'green_logistic_carrier',  # TODO remove?!
+        'cups_printing',  # CUPS print module
     ],
     'data': [
         'security/ir.model.access.csv',

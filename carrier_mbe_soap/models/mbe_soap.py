@@ -65,6 +65,11 @@ class CarrierConnectionSoap(models.Model):
     store_id = fields.Char(
         'Store ID', size=4, required=True, help='Code used for some calls')
 
+    auto_print_label = fields.Boolean(
+        'Autoprint label', help='Print label when delivery was sent')
+    cups_printer_id = fields.Many2one(
+        'cups.printer', 'CUPS printer', help='Label order print with this')
+
     # Not used for now:
     sam_id = fields.Char('SAM ID', size=4, help='')
     department_id = fields.Char('Department ID', size=4, help='')
@@ -127,7 +132,8 @@ class SaleOrder(models.Model):
         label_path = self.get_folder_root_path('label', root_path=path)
         filename = '%s.1.PDF' % self.id
         fullname = os.path.join(label_path, filename)
-        return self.send_report_to_cups_printer(fullname)
+        printer_code = self.soap_connection_id.cups_printer_id.code
+        return self.send_report_to_cups_printer(fullname, printer_code)
 
     @api.multi
     def order_form_detail(self):
@@ -510,12 +516,23 @@ class SaleOrder(models.Model):
         """ Override method for send carrier request
         """
         order = self
-        # Get options:
-        # error = order.shipment_options_request()
 
+        # Get options if not present:
+        if not order.courier_supplier_id:
+            error = order.shipment_options_request()
+            if error:
+                return order.write_log_chatter_message(error)
+
+        # Create request:
         error = order.shipment_request()
         if error:
             return order.write_log_chatter_message(error)
+
+        # Print also labels?
+        if order.soap_connection_id.auto_print_label:
+            _logger.warning('Auto print label on request!')
+            order.carrier_print_label()
+
         return super(SaleOrder, self).set_carrier_ok_yes()
 
     @api.multi
