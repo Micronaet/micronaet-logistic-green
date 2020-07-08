@@ -555,8 +555,9 @@ class SaleOrder(models.Model):
     def save_order_label(self, reply, mode='label'):
         """ Save order label
         """
+        pdb.set_trace()
         order = self
-        parcels = len(order.carrier_ids)
+        parcels = len(order.parcel_ids)
         path = order.get_folder_root_path(mode)
         if mode == 'tracking':
             label_path = order.get_folder_root_path('label', root_path=path)
@@ -567,7 +568,6 @@ class SaleOrder(models.Model):
             label_list = reply['Labels']['Label']
         else:
             label_list = [reply['Pdf']]
-
         for label in label_list:
             if mode in ('label', 'tracking'):
                 counter += 1
