@@ -110,6 +110,7 @@ class SaleOrder(models.Model):
             line.write({
                 'soap_connection_id':
                     self.carrier_parcel_template_id.soap_connection_id.id,
+                'weight': line.parcel_weight_tree,
             })
         return line
 
@@ -772,6 +773,8 @@ class SaleOrder(models.Model):
             return error
         order.update_order_with_soap_reply(reply)
 
+    parcel_weight_tree = fields.Float(
+        'Weight', help='Tree view only for fast insert parcel')
     master_tracking_id = fields.Char('Master Tracking', size=20)
     system_reference_id = fields.Char('System reference ID', size=20)
     soap_connection_id = fields.Many2one(

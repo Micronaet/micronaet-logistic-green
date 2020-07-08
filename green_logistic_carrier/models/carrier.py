@@ -358,7 +358,8 @@ class SaleOrder(models.Model):
 
     carrier_parcel_template_id = fields.Many2one(
         'carrier.parcel.template', 'Parcel template')
-    carrier_check = fields.Text('Carrier check', help='Check carrier address',
+    carrier_check = fields.Text(
+        'Carrier check', help='Check carrier address',
         compute='_get_carrier_check_address', widget='html')
     carrier_description = fields.Text('Carrier description')
     carrier_note = fields.Text('Carrier note')
