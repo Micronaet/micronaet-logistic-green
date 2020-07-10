@@ -785,6 +785,7 @@ class SaleOrder(models.Model):
             'Shipment': order.get_shipment_container(),
         })
 
+        print(data)
         reply = service.ShipmentRequest(data)
         error = order.check_reply_status(reply)
 
