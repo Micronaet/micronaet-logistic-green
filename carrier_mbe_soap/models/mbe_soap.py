@@ -235,7 +235,7 @@ class SaleOrder(models.Model):
             'CompanyName': 'TEST',  # 35
             'Nickname': 'TEST',  # 100
             'Address': partner.street or '',  # 100
-            'Address2': partner.street2 or '',  # 35
+            'Address2': (partner.street2 or '')[:35],  # 35
             'Address3': '',  # 35
             'Phone': partner.phone or '',  # 50
             'ZipCode': partner.zip or '',  # 12
