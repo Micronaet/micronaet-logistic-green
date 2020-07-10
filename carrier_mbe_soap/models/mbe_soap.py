@@ -210,6 +210,7 @@ class SaleOrder(models.Model):
                 'Passphrase': connection.passphrase,
             }
         if internal:
+            data['InternalReferenceID'] = connection.internal_reference
             data['internalReferenceID'] = connection.internal_reference
         if customer:
             data['CustomerID'] = connection.customer_id
