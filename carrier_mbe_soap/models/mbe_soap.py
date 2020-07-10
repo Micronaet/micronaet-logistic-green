@@ -779,14 +779,13 @@ class SaleOrder(models.Model):
         # SOAP insert call:
         # -----------------------------------------------------------------
         service = soap_connection.get_connection()
-        #pdb.set_trace()
-        print(data)
         data = order.get_request_container(customer=False, system=True)
         data.update({
             'Recipient': order.get_recipient_container(),
             'Shipment': order.get_shipment_container(),
         })
 
+        print(data)
         reply = service.ShipmentRequest(data)
         error = order.check_reply_status(reply)
 
