@@ -211,7 +211,7 @@ class SaleOrder(models.Model):
             }
         if internal:
             data['InternalReferenceID'] = connection.internal_reference
-            data['internalReferenceID'] = connection.internal_reference
+            # data['internalReferenceID'] = connection.internal_reference
         if customer:
             data['CustomerID'] = connection.customer_id
         if system:
@@ -779,7 +779,8 @@ class SaleOrder(models.Model):
         # SOAP insert call:
         # -----------------------------------------------------------------
         service = soap_connection.get_connection()
-        pdb.set_trace()
+        #pdb.set_trace()
+        print(data)
         data = order.get_request_container(customer=False, system=True)
         data.update({
             'Recipient': order.get_recipient_container(),
