@@ -223,7 +223,11 @@ class WPConnector(models.Model):
                 params['per_page'] * (params['page'] - 1),
                 params['per_page'] * params['page'],
                 ))
-            reply = wcapi.get('orders', params=params)
+            try:
+                reply = wcapi.get('orders', params=params)
+            except:
+                _logger.error('Error calling WP: \n%s' % (sys.exc_info(), ))
+                continue
             params['page'] += 1
             if not reply.ok:  # status_code >= 300:
                 _logger.error('Error: %s' % reply.text)
