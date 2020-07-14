@@ -513,34 +513,46 @@ class SaleOrder(models.Model):
         return self.shipment_options_request()
 
     @api.multi
+    def log_error(self, error):
+        """ Log error in chatter and in console
+        """
+        order = self
+        _logger.error('Order: %s [%s]' % (order.name, error))
+        order.write_log_chatter_message(error)
+        return False
+
+    @api.multi
     def set_carrier_ok_yes(self):
         """ Override method for send carrier request
         """
         order = self
 
+        # ---------------------------------------------------------------------
+        # Check options:
+        # ---------------------------------------------------------------------
         # Get options if not present:
         if not order.manage_delivery:
-            return order.write_log_chatter_message(
+            return order.log_error(
                 _('Order not delivery managed from ODOO'))
 
         if order.carrier_soap_state in ('sent', 'delivered'):
-            return order.write_log_chatter_message(
+            return order.log_error(
                 _('Order sent or delivered cannot confirm!'))
 
         if not order.carrier_supplier_id or not order.parcel_ids:
-            return order.write_log_chatter_message(
+            return order.log_error(
                 _('Need carrier name and parcel data for get quotation'))
 
         # Get options if not present:
         if not order.courier_supplier_id:
             error = order.shipment_options_request()
             if error:
-                return order.write_log_chatter_message(error)
+                return order.log_error(error)
 
         # Create request:
         error = order.shipment_request()
         if error:
-            return order.write_log_chatter_message(error)
+            return order.log_error(error)
 
         # Print also labels?
         if order.soap_connection_id.auto_print_label:
@@ -554,9 +566,29 @@ class SaleOrder(models.Model):
         """ Override method for send carrier request
         """
         order = self
+
+        # ---------------------------------------------------------------------
+        # Check options:
+        # ---------------------------------------------------------------------
+        # Get options if not present:
+        if not order.manage_delivery:
+            return order.log_error(
+                _('Order not delivery managed from ODOO'))
+
+        if order.carrier_soap_state in ('sent', 'delivered'):
+            return order.log_error(
+                _('Order sent or delivered cannot confirm!'))
+
+        # Get options if not present:
+        if not order.courier_supplier_id:
+            error = order.shipment_options_request()
+            if error:
+                return order.log_error(error)
+
         error = order.delete_shipments_request()
         if error:
-            return order.write_log_chatter_message(error)
+            return order.log_error(error)
+
         # raise exceptions.ValidationError('Not valid message')
         return super(SaleOrder, self).set_carrier_ok_no()
 
