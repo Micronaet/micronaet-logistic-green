@@ -186,6 +186,9 @@ class WPConnector(models.Model):
     def button_load_order(self):
         """ Load order from Wordpress
         """
+        extend_params = self.context.get('extend_params')
+        pdb.set_trace()
+
         # Pool used:
         product_pool = self.env['product.product']
         sale_pool = self.env['sale.order']
@@ -203,6 +206,10 @@ class WPConnector(models.Model):
             'per_page': self.order_limit,
             'page': start_page,
         }
+        if extend_params:
+            _logger.warning(
+                'Extending params for call: %s' % (extend_params, ))
+            params.update(extend_params)
 
         while True:
             # Log:
