@@ -33,7 +33,7 @@ connector_ids = connector_pool.search([('name', '=', name)])
 if not connector_ids:
     print('Error no %s connector found' % name)
     sys.exit()
-print('Found connector name: %s' %s name)
+print('Found connector name: %s' % name)
 
 now = ('%s' % datetime.now())[:19].replace(' ', 'T')
 now = now + 'T'

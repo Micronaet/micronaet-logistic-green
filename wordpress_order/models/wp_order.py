@@ -208,8 +208,8 @@ class WPConnector(models.Model):
         }
 
         # B. External parameters (update):
-        extend_params = self.context.get('extend_params')
         pdb.set_trace()
+        extend_params = self.context.get('extend_params')
         if extend_params:
             _logger.warning(
                 'Extending params for call: %s' % (extend_params, ))
