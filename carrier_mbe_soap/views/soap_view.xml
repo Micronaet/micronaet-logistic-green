@@ -24,6 +24,18 @@
                    order.set_carrier_ok_no()
 			</field>
 		</record>
+		<record model="ir.actions.server" id="ir_actions_server_order_carrier_sent">
+			<field name="name">Carrier: sent orders</field>
+			<field name="model_id" ref="model_sale_order"/>
+			<field name="sequence">3</field>
+			<field name="type">ir.actions.server</field>
+			<field name="multi">true</field>
+			<field name="state">code</field>
+			<field name="code">
+				for order in records:
+                   order.write({'carrier_soap_state': 'sent', })
+			</field>
+		</record>
 
         <!--sale.oder-->
         <record id="view_sale_order_line_soap_form" model="ir.ui.view">
