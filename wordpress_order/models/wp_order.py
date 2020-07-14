@@ -186,8 +186,6 @@ class WPConnector(models.Model):
     def button_load_order(self):
         """ Load order from Wordpress
         """
-        extend_params = self.context.get('extend_params')
-        pdb.set_trace()
 
         # Pool used:
         product_pool = self.env['product.product']
@@ -196,20 +194,29 @@ class WPConnector(models.Model):
 
         wcapi = self.get_connector()
 
+        # ---------------------------------------------------------------------
         # Parameters:
+        # ---------------------------------------------------------------------
+        # A. ODOO Parameters:
         connector_id = self.id
         start_page = self.order_start_page
-        end_page = self.order_stop_page
 
-        # WP parameters:
+        # WP params:
         params = {
             'per_page': self.order_limit,
             'page': start_page,
         }
+
+        # B. External parameters (update):
+        extend_params = self.context.get('extend_params')
+        pdb.set_trace()
         if extend_params:
             _logger.warning(
                 'Extending params for call: %s' % (extend_params, ))
             params.update(extend_params)
+
+        # C. Both check:
+        end_page = self.env.context.get('end_page', self.order_stop_page)
 
         while True:
             # Log:

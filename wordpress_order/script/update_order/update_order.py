@@ -26,16 +26,25 @@ odoo = erppeek.Client(
     )
 
 # Pool used:
-order_pool = odoo.model('sale.order')
+connector_pool = odoo.model('wp.connector')
+name = 'Vendita Piante [OLD]'
+connector_ids = connector_pool.search([('name', '=', name)])
+if not connector_ids:
+    print('Error no %s connector found' % name)
 
 now = ('%s' % datetime.now())[:19].replace(' ', 'T')
 now = now + 'T'
 
-context = {
+odoo.context = {
     'extend_params': {
         'after': now,
+
+        'per_page': 50,
+        'page': 1,
     },
+    'end_page': 50,
 }
 
 import pdb; pdb.set_trace()
-order_pool.button_load_order(context=context)
+connector_pool.button_load_order(connector_ids)
+
