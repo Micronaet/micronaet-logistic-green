@@ -3,6 +3,7 @@
 
 import logging
 import sys
+import pdb
 from odoo import models, fields, api
 from odoo.tools.translate import _
 
@@ -59,6 +60,31 @@ class WPConnector(models.Model):
             else:
                 return False
 
+        def get_state_id(partner_block):
+            """ Extract name from record
+                record: wordpress partner block
+            """
+            city_pool = self.env['res.city']
+            state_pool = self.env['res.country.state']
+
+            city_name = partner_block['city']
+            cities = city_pool.search([
+                ('name', '=ilike', city_name),
+                ])
+            if not cities:
+                return False
+            if len(cities) > 1:
+                _logger.error('More than one city!')
+                return False
+
+            province_code = cities[0].province_id.code
+            states = state_pool.search([('code', '=', province_code)])
+
+            if not states:
+                return False
+
+            return states[0].id
+
         def same_partner_check(odoo_data):
             """ Check if same partner
             """
@@ -78,6 +104,7 @@ class WPConnector(models.Model):
         # A. Billing partner:
         # ---------------------------------------------------------------------
         odoo_data = {}
+        pdb.set_trace()
         for mode in ('billing', 'shipping'):
             partner_block = record[mode]
 
@@ -87,6 +114,7 @@ class WPConnector(models.Model):
                 'customer': True,
                 'name': get_name(partner_block),
                 'country_id': get_country_id(partner_block),
+                'state_id': get_state_id(partner_block),
                 'street': partner_block['address_1'],
                 'street2': partner_block['address_2'],
                 'city': partner_block['city'],

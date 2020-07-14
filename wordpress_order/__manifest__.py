@@ -15,6 +15,7 @@
     'depends': [
         'wordpress_connector',
         'sale',
+        'l10n_it_province',  # For city localization
     ],
     'data': [
         'views/order_view.xml',
