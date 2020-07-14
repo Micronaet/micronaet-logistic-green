@@ -1,6 +1,6 @@
 import os
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta
 import erppeek
 import ConfigParser
 
@@ -35,12 +35,13 @@ if not connector_ids:
     sys.exit()
 print('Found connector name: %s' % name)
 
-now = ('%s' % datetime.now())[:19].replace(' ', 'T')
-now = now + 'T'
+now = ('%s' % (datetime.now() - timedelta(days=1)))[:10]
+after = '%sT00:00:00Z' % now
+print('Updating from %s' % after)
 
 odoo.context = {
     'extend_params': {
-        'after': now,
+        'after': after,
 
         'per_page': 50,
         'page': 1,
@@ -48,6 +49,6 @@ odoo.context = {
     'end_page': 50,
 }
 
-import pdb; pdb.set_trace()
 connector_pool.button_load_order(connector_ids)
+print('Update done!')
 

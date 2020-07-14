@@ -104,7 +104,6 @@ class WPConnector(models.Model):
         # A. Billing partner:
         # ---------------------------------------------------------------------
         odoo_data = {}
-        pdb.set_trace()
         for mode in ('billing', 'shipping'):
             partner_block = record[mode]
 
@@ -208,8 +207,7 @@ class WPConnector(models.Model):
         }
 
         # B. External parameters (update):
-        pdb.set_trace()
-        extend_params = self.context.get('extend_params')
+        extend_params = self.env.context.get('extend_params')
         if extend_params:
             _logger.warning(
                 'Extending params for call: %s' % (extend_params, ))
