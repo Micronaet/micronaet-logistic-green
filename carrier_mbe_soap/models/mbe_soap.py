@@ -519,6 +519,19 @@ class SaleOrder(models.Model):
         order = self
 
         # Get options if not present:
+        if not order.manage_delivery:
+            return order.write_log_chatter_message(
+                _('Order not delivery managed from ODOO'))
+
+        if order.carrier_soap_state in ('sent', 'delivered'):
+            return order.write_log_chatter_message(
+                _('Order sent or delivered cannot confirm!'))
+
+        if not order.carrier_supplier_id or not order.parcel_ids:
+            return order.write_log_chatter_message(
+                _('Need carrier name and parcel data for get quotation'))
+
+        # Get options if not present:
         if not order.courier_supplier_id:
             error = order.shipment_options_request()
             if error:
@@ -531,7 +544,7 @@ class SaleOrder(models.Model):
 
         # Print also labels?
         if order.soap_connection_id.auto_print_label:
-            _logger.warning('Auto print label on request!')
+            _logger.warning(_('Auto print label on request!'))
             order.carrier_print_label()
 
         return super(SaleOrder, self).set_carrier_ok_yes()

@@ -21,6 +21,16 @@
                 </page>
             </field>
         </record>
+
+        <!--Override for filter:-->
+        <record id="carrier_mbe_soap.carrier_sale_order_action" model="ir.actions.act_window">
+            <field name="name">Carrier sale order</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.order</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('manage_delivery', '=', True)]</field>
+            <field name="view_id" ref="carrier_mbe_soap.carrier_sale_order_tree"/>
+        </record>
     </data>
 </openerp>
 

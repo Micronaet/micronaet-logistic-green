@@ -16,6 +16,7 @@
         'base',
         'wordpress_order',
         'green_logistic_carrier',
+        'carrier_mbe_soap',  # To filter view order
         'sale',
     ],
     'data': [
