@@ -1,4 +1,5 @@
 import os
+import sys
 from datetime import datetime
 import erppeek
 import ConfigParser
@@ -16,6 +17,7 @@ user = config.get('dbaccess', 'user')
 pwd = config.get('dbaccess', 'pwd')
 server = config.get('dbaccess', 'server')
 port = config.get('dbaccess', 'port')   # verify if it's necessary: getint
+name = config.get('dbaccess', 'connector_name')
 
 # -----------------------------------------------------------------------------
 # Connect to ODOO:
@@ -27,10 +29,11 @@ odoo = erppeek.Client(
 
 # Pool used:
 connector_pool = odoo.model('wp.connector')
-name = 'Vendita Piante [OLD]'
 connector_ids = connector_pool.search([('name', '=', name)])
 if not connector_ids:
     print('Error no %s connector found' % name)
+    sys.exit()
+print('Found connector name: %s' %s name)
 
 now = ('%s' % datetime.now())[:19].replace(' ', 'T')
 now = now + 'T'
