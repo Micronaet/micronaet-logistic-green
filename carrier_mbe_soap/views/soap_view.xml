@@ -33,8 +33,7 @@
 			<field name="state">code</field>
 			<field name="code">
 				for order in records:
-                    if order.carrier_track_id and order.carrier_soap_state == 'pending':
-                        order.write({'carrier_soap_state': 'sent', })
+                    order.set_carrier_ok_sent)
 			</field>
 		</record>
 

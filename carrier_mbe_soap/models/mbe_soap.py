@@ -592,6 +592,19 @@ class SaleOrder(models.Model):
         # raise exceptions.ValidationError('Not valid message')
         return super(SaleOrder, self).set_carrier_ok_no()
 
+    @api.multi
+    def set_carrier_ok_sent(self):
+        """ Consider sent the carrier record
+        """
+        order = self
+
+        if order.carrier_track_id and order.carrier_soap_state == 'pending':
+            order.write({'carrier_soap_state': 'sent', })
+            order.write_log_chatter_message('Carrier order is sent!')
+        else:
+            return order.log_error(
+                _('Order must be in pending state with track ID'))
+
     # Button event:
     @api.multi
     def set_carrier_confirmed(self):
