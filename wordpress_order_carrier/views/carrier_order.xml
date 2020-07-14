@@ -7,7 +7,7 @@
             <field name="inherit_id" ref="sale.view_order_form"/>
             <field name="arch" type="xml">
                 <field name="origin" position="after">
-                    <field name="manage_logistic" />
+                    <field name="manage_delivery" />
                 </field>
             </field>
         </record>
@@ -16,8 +16,8 @@
             <field name="model">sale.order</field>
             <field name="inherit_id" ref="green_logistic_carrier.view_sale_order_form"/>
             <field name="arch" type="xml">
-                <page string="Carrier" position="attributes">
-                    <attribute name="attrs">{'invisible': [('manage_logistic', '=', False)]}</attribute>
+                <page name="carrier_page" position="attributes">
+                    <attribute name="attrs">{'invisible': [('manage_delivery', '=', False)]}</attribute>
                 </page>
             </field>
         </record>

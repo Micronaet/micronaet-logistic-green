@@ -200,6 +200,7 @@ class WPConnector(models.Model):
         # Parameters:
         # ---------------------------------------------------------------------
         # A. ODOO Parameters:
+        manage_delivery = self.manage_delivery
         connector_id = self.id
         start_page = self.order_start_page
 
@@ -314,6 +315,7 @@ class WPConnector(models.Model):
                     order = sales[0]
                 else:  # Create mode
                     order_data.update({
+                        'manage_delivery': manage_delivery,
                         'connector_id': connector_id,
                         'wp_id': wp_id,
                         'name': number,
