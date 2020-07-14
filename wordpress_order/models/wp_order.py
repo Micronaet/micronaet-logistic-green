@@ -543,6 +543,8 @@ class SaleOrder(models.Model):
     #                                   COLUMNS:
     # -------------------------------------------------------------------------
     wp_id = fields.Integer('Wp ID')
+    manage_delivery = fields.Boolean(
+        'Manage delivery', help='This order manage delivery in ODOO')
     connector_id = fields.Many2one('wp.connector', 'Connector')
     wp_date_created = fields.Datetime('Wp date created')
     wp_date_modified = fields.Datetime('Wp date modified')

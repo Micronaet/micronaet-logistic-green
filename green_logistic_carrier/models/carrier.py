@@ -149,7 +149,7 @@ class SaleOrder(models.Model):
     def carrier_print_label(self):
         """ Print ddt
         """
-        # TODO Overrided:
+        # Will be Override:
         return True
 
     # Utility:
@@ -182,6 +182,7 @@ class SaleOrder(models.Model):
         # -o page-bottom=N -o page-left=N -o page-right=N -o page-top=N
         printer_name = printer.name
         # media=Custom.10x10cm
+        # -o landscape -o fit-to-page -o media=Custom.2x2
         print_command = 'lp -o fit-to-page -o media=A6 -d %s "%s"' % (
             printer_name,
             fullname,
@@ -341,7 +342,8 @@ class SaleOrder(models.Model):
     # -------------------------------------------------------------------------
     #                                   COLUMNS:
     # -------------------------------------------------------------------------
-    carrier_ok = fields.Boolean('Carrier OK',
+    carrier_ok = fields.Boolean(
+        'Carrier OK',
         help='Carrier must be confirmed when done!')
 
     # Carrier:
