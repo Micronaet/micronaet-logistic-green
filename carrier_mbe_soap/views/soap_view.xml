@@ -12,16 +12,16 @@
                    order.set_carrier_ok_yes()
 			</field>
 		</record>
-		<record model="ir.actions.server" id="ir_actions_server_order_carrier_confirm">
-			<field name="name">Carrier: confirm orders</field>
+		<record model="ir.actions.server" id="ir_actions_server_order_carrier_cancel">
+			<field name="name">Carrier: cancel orders</field>
 			<field name="model_id" ref="model_sale_order"/>
-			<field name="sequence">1</field>
+			<field name="sequence">2</field>
 			<field name="type">ir.actions.server</field>
 			<field name="multi">true</field>
 			<field name="state">code</field>
 			<field name="code">
 				for order in records:
-                   order.set_carrier_ok_yes()
+                   order.set_carrier_ok_no()
 			</field>
 		</record>
 
