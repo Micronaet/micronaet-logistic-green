@@ -18,7 +18,7 @@ class WPConnector(models.Model):
     # Columns:
     manage_delivery = fields.Boolean(
         'Manage delivery',
-        help='The new order will be merked for manage delivery in ODOO')
+        help='The new order will be marked for manage delivery in ODOO')
     order_start_page = fields.Integer(
         'Order start page', default=1,
         help='Start reading orders from page',

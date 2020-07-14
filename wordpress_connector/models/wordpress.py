@@ -139,7 +139,7 @@ class WPConnector(models.Model):
     company_id = fields.Many2one('res.company', 'Company', required=True)
     mode = fields.Selection([
         ('out', 'ODOO > WP'),
-         ('in', 'WP > ODOO'),
+        ('in', 'WP > ODOO'),
         ], 'Mode', required=True, default='in',
         help='Tags, Attributes, Terms, Category, Products direction for sync'
              '(Order always vs ODOO)'

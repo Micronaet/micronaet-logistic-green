@@ -19,6 +19,8 @@
         'plant_passport',  # Change report total
         # For CUPS operations (Micronaet/micronaet-logistic branch):
         'cups_printing',
+        'wordpress_order',  # For selection of order
+        'green_logistic_management',
         ],
     'data': [
         'security/ir.model.access.csv',
