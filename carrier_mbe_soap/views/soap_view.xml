@@ -82,6 +82,23 @@
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">sale.order</field>
         <field name="view_mode">tree,form</field>
+        <field name="domain">[('carrier_soap_state', 'in', ('draft', 'pending'))]</field>
+        <field name="view_id" ref="carrier_sale_order_tree"/>
+    </record>
+    <record id="carrier_sale_order_action_sent" model="ir.actions.act_window">
+        <field name="name">Carrier order sent</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('carrier_soap_state', '=', 'sent')]</field>
+        <field name="view_id" ref="carrier_sale_order_tree"/>
+    </record>
+    <record id="carrier_sale_order_action_delivered" model="ir.actions.act_window">
+        <field name="name">Carrier order delivered</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('carrier_soap_state', '=', 'delivered'),]</field>
         <field name="view_id" ref="carrier_sale_order_tree"/>
     </record>
 
@@ -209,5 +226,7 @@
 
     <menuitem id="carrier_root_menu" parent="sale.sale_order_menu" name="Carrier" sequence="3"/>
         <menuitem id="carrier_sale_order_action_menu" parent="carrier_root_menu" action="carrier_sale_order_action" sequence="10"/>
+        <menuitem id="carrier_sale_order_action_sent_menu" parent="carrier_root_menu" action="carrier_sale_order_action_sent" sequence="20"/>
+        <menuitem id="carrier_sale_order_action_delivered_menu" parent="carrier_root_menu" action="carrier_sale_order_action_delivered" sequence="30"/>
 
 </odoo>
