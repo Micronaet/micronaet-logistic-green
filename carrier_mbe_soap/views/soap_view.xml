@@ -76,8 +76,9 @@
         <field name="name">sale.order.shipment</field>
         <field name="model">sale.order</field>
         <field name="priority" eval="40"/>
+
         <field name="arch" type="xml">
-            <tree string="Sale order for carrier" editable="bottom" decoration-muted="carrier_soap_state == 'draft' and parcel_ids == [] and not carrier_supplier_id" decoration-info="carrier_soap_state == 'pending'">
+            <tree string="Sale order for carrier" editable="bottom" decoration-muted="carrier_soap_state == 'draft' and (len(parcel_ids) == 0 or not carrier_supplier_id)" decoration-info="carrier_soap_state == 'pending'" decoration-success="carrier_soap_state == 'delivered'">
                 <!--<field name="connector_id"/>
                 <field name="wp_date_created"/>
                 -->
