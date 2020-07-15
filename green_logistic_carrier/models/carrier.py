@@ -181,9 +181,15 @@ class SaleOrder(models.Model):
         # -o landscape -o fit-to-page -o media=A4
         # -o page-bottom=N -o page-left=N -o page-right=N -o page-top=N
         printer_name = printer.name
+        options = printer.options or ''
+
         # media=Custom.10x10cm
         # -o landscape -o fit-to-page -o media=Custom.2x2
-        print_command = 'lp -o fit-to-page -o media=A6 -d %s "%s"' % (
+
+        # -o fit-to-page -o media=A6
+        # -o media=Custom.4x4in
+        print_command = 'lp %s -d %s "%s"' % (
+            options,
             printer_name,
             fullname,
         )
