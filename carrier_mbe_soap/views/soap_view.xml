@@ -44,7 +44,7 @@
             <field name="inherit_id" ref="sale.view_order_form"/>
             <field name="arch" type="xml">
                 <field name="payment_term_id" position="after">
-                    <field name="soap_connection_id" attrs="{'invisible': [('soap_connection_id', '=', False)]}"/>
+                    <field name="soap_connection_id" /> <!--attrs="{'invisible': [('soap_connection_id', '=', False)]}"-->
                 </field>
             </field>
         </record>

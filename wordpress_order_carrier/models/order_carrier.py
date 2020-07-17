@@ -14,7 +14,6 @@ class SaleOrder(models.Model):
     def shipments_get_tracking_result(self):
         """ 18. Get tracking information
         """
-        pdb.set_trace()
         self.ensure_one()
         order = self  # TODO loop?
 
@@ -32,17 +31,25 @@ class SaleOrder(models.Model):
         service = soap_connection.get_connection()
         pdb.set_trace()
         data = order.get_request_container(
-            system=True, internal=True, store=False)
+            system=True, internal=True, customer=False, store=False)
 
         data['TrackingMBE'] = order.master_tracking_id
         reply = service.TrackingRequest(RequestContainer=data)
         error = order.check_reply_status(reply)
         if not error:
             # Update SOAP data for real call
-            order.update_with_courier_data(reply)
-            # TODO change
+            tracking_status = reply.get('TrackingStatus')
+            if tracking_status != order.delivery_soap_state:
+                # -------------------------------------------------------------
+                #                            Changed
+                # -------------------------------------------------------------
+                # 1. Change only tracking status:
+                order.write({
+                    'delivery_soap_state': tracking_status,
+                })
+
+                # 2. Update ODOO and Wordpress:
+                if tracking_status == 'DELIVERED':
+                    order.update_with_courier_data('delivered')
+
         return error
-
-
-
-

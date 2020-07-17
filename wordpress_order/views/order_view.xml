@@ -47,7 +47,7 @@
                         <button name="wp_wf_completed" type="object" string="Completed" icon="fa-thumbs-up" colspan="1" attrs="{'invisible': [('wp_status', '=', 'completed')]}" confirm="This operation will end the order process, confirm?"/>
                         <button name="wp_wf_refunded" type="object" string="Refunded" icon="fa-exchange" colspan="1" attrs="{'invisible': [('wp_status', '=', 'refunded')]}" confirm="Order will be marked as refunded, confirm?"/>
                         <button name="wp_wf_refresh_status" type="object" string="Refresh" icon="fa-refresh" colspan="1"/>
-                        <button name="shipments_get_tracking_result" type="object" string="Check delivery" icon="fa-question" colspan="1" attrs="{'invisible': [('wp_status', '!=', 'completed')]}" />
+                        <button name="shipments_get_tracking_result" type="object" string="Check delivery" icon="fa-question" colspan="1"  /><!--attrs="{'invisible': [('wp_status', '!=', 'completed')]}"-->
 
                         <button name="wp_wf_cancelled" type="object" string="Cancelled" icon="fa-mail-reply" colspan="1"  attrs="{'invisible': [('wp_status', '=', 'cancelled')]}"  confirm="Order wil be marked as cancelled, confirm?"/>
                         <button name="wp_wf_failed" type="object" string="Failed" icon="fa-ban" colspan="1"  attrs="{'invisible': [('wp_status', '=', 'failed')]}"  confirm="Order wil be marked as failed, confirm?"/>
