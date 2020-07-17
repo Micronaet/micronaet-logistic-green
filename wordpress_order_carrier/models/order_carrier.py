@@ -14,6 +14,7 @@ class SaleOrder(models.Model):
     def shipments_get_tracking_result(self):
         """ 18. Get tracking information
         """
+        pdb.set_trace()
         self.ensure_one()
         order = self  # TODO loop?
 
