@@ -137,7 +137,7 @@ class SaleOrder(models.Model):
 
     @api.multi
     def order_form_detail(self):
-        """
+        """ Return order form
         """
         # model_pool = self.env['ir.model.data']
         # tree_view_id = model_pool.get_object_reference(
@@ -596,10 +596,15 @@ class SaleOrder(models.Model):
     def set_carrier_ok_sent(self):
         """ Consider sent the carrier record
         """
+        self.ensure_one()
         order = self
 
         if order.carrier_track_id and order.carrier_soap_state == 'pending':
-            order.write({'carrier_soap_state': 'sent', })
+            order.write({
+                'carrier_soap_state': 'sent',
+            })
+            # Always update wordpress:
+            order.wp_wf_set_to_state('completed')
             order.write_log_chatter_message('Carrier order is sent!')
         else:
             return order.log_error(
@@ -610,6 +615,7 @@ class SaleOrder(models.Model):
     def set_carrier_confirmed(self):
         """ Carrier confirmed for shipment
         """
+        self.ensure_one()
         order = self
         error = order.close_shipments_request()
         if error:

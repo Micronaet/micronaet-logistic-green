@@ -601,6 +601,12 @@ class SaleOrder(models.Model):
         """
         return self.wp_wf_set_to_state('failed')
 
+    @api.multi
+    def shipments_get_tracking_result(self):
+        """ Future function to check delivery
+        """
+        return True
+
     # -------------------------------------------------------------------------
     #                                   COLUMNS:
     # -------------------------------------------------------------------------

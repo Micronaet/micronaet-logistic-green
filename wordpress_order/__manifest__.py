@@ -14,6 +14,7 @@
     'license': 'AGPL-3',
     'depends': [
         'wordpress_connector',
+        # 'wordpress_order',
         'sale',
         'l10n_it_province',  # For city localization
     ],
