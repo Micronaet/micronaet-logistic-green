@@ -220,6 +220,7 @@ class WPConnector(models.Model):
         # C. Both check:
         end_page = self.env.context.get('end_page', self.order_stop_page)
 
+        update_order_reached = []
         while True:
             # Log:
             _logger.info('Reading orders from %s [Record %s-%s]' % (
@@ -450,10 +451,22 @@ class WPConnector(models.Model):
                                 'price_unit': shipping_total,
                                 })
                     _logger.info('Create  order: %s' % number)
+                    # After updating the web site:
+                    if status == 'processing':
+                        update_order_reached.append(order)
 
             # Block end limit check:
             if end_page and params['page'] >= end_page + 1:
                 break
+
+        # Update order from processing to sent-to-gsped (if regular import):
+        if not manage_delivery:
+            _logger.warning('Order are managed from Wordpress')
+            return True
+
+        _logger.warning('Order are managed from ODOO')
+        for order in update_order_reached:
+            order.wp_wf_set_to_state('sent-to-gsped')
         return True
 
 
@@ -530,10 +543,9 @@ class SaleOrder(models.Model):
                 error.append(order)
                 _logger.error('Order: %s not updated' % order.name)
 
-
     @api.multi
     def wp_wf_set_to_state(self, state):
-        """ Update status to state passed (utility called from WF button
+        """ Update status to state passed (utility called from WF button)
         """
         data = {
             'status': state,
@@ -559,7 +571,8 @@ class SaleOrder(models.Model):
     def wp_wf_processing(self):
         """ Update status to processing
         """
-        return self.wp_wf_set_to_state('processing')
+        # return self.wp_wf_set_to_state('processing')
+        return self.wp_wf_set_to_state('sent-to-gsped')
 
     @api.multi
     def wp_wf_completed(self):
