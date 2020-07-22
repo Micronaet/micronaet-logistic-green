@@ -51,5 +51,4 @@ class SaleOrder(models.Model):
                 # 2. Update ODOO and Wordpress:
                 if tracking_status == 'DELIVERED':
                     order.update_with_courier_data('delivered')
-
         return error
