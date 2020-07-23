@@ -40,5 +40,5 @@ print('Found sent order # %s' % len(order_ids))
 
 for order_id in order_ids:
     result = order_pool.shipments_get_tracking_result(order_id)
-    print result or ('Order %s updated!' % order_id)
+    print(result or ('Order %s updated!' % order_id))
 print('Check order delivery done!')
