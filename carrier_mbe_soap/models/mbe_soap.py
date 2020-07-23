@@ -162,20 +162,19 @@ class SaleOrder(models.Model):
 
     # Check utility:
     @api.multi
-    def check_reply_status(self, reply):
+    def check_reply_status(self, reply, console_log=True):
         """ Get Service connection to make calls:
             :return Error text if present
         """
         self.ensure_one()
-        # Status token (OK, ERROR)
 
         error_text = ''
-        pdb.set_trace()
-        if reply['Status'] == 'ERROR':
+        if reply['Status'] == 'ERROR':  # Status token (OK, ERROR)
             # Error[{'id', 'Description'}]
             # error_text = '%s' % (reply['Errors'], )  # TODO better!
-            for error in reply['Errors']:
-                error_text += error['Error']['Description']
+            for error_block in reply['Errors']['Error']:
+                error_text += error_block['Description'].replace('\n', ' ')
+        if console_log:
             _logger.error(error_text)
         return error_text
 
