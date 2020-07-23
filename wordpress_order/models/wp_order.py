@@ -25,10 +25,12 @@ class AccountPaymentTerm(models.Model):
         payment_ids = self.search([('wp_payment_code', '=', code)])
         if payment_ids:
             return payment_ids[0]
-        return self.create({
+        pdb.set_trace()
+        record = self.create({
             'name': code,
             'wp_payment_code': code,
-        }).id
+        })
+        return record.id
 
     wp_payment_code = fields.Char(
         string='Wordpress payment code',
@@ -253,7 +255,6 @@ class WPConnector(models.Model):
         end_page = self.env.context.get('end_page', self.order_stop_page)
 
         update_order_reached = []
-        pdb.set_trace()
         while True:
             # Log:
             _logger.info('Reading orders from %s [Record %s-%s]' % (
