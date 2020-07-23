@@ -51,4 +51,3 @@ odoo.context = {
 
 connector_pool.button_load_order(connector_ids)
 print('Update done!')
-
