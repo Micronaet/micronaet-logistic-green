@@ -16,7 +16,7 @@ dbname = config.get('dbaccess', 'dbname')
 user = config.get('dbaccess', 'user')
 pwd = config.get('dbaccess', 'pwd')
 server = config.get('dbaccess', 'server')
-port = config.get('dbaccess', 'port')   # verify if it's necessary: getint
+port = config.get('dbaccess', 'port')  # verify if it's necessary: getint
 name = config.get('dbaccess', 'connector_name')
 
 # -----------------------------------------------------------------------------
