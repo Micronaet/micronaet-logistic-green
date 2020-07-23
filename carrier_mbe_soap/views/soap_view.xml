@@ -144,7 +144,7 @@
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">sale.order</field>
         <field name="view_mode">tree,form</field>
-        <field name="domain">[('carrier_soap_state', 'in', ('draft', 'pending'))]</field>
+        <field name="domain">[('carrier_soap_state', 'in', ('draft', 'pending')),('wp_status', 'not in', ('on-hold', 'pending'))]</field>
         <field name="view_id" ref="carrier_sale_order_tree"/>
     </record>
     <record id="carrier_sale_order_action_sent" model="ir.actions.act_window">
