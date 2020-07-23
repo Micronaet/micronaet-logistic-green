@@ -10,6 +10,31 @@ from odoo.tools.translate import _
 _logger = logging.getLogger(__name__)
 
 
+class AccountPaymentTerm(models.Model):
+    """ Model name: Extend payment term
+    """
+    _inherit = 'account.payment.term'
+
+    @api.model
+    def get_payment_id_from_wordpress(self, code):
+        """ Get or create payment from amazon code
+        """
+        if not code:
+            return False
+
+        payment_ids = self.search([('wp_payment_code', '=', code)])
+        if payment_ids:
+            return payment_ids[0]
+        return self.create({
+            'name': code,
+            'wp_payment_code': code,
+        }).id
+
+    wp_payment_code = fields.Char(
+        string='Wordpress payment code',
+        size=25)
+
+
 class WPConnector(models.Model):
     """ Model name: Connector
     """
@@ -265,6 +290,8 @@ class WPConnector(models.Model):
                 date_modified = record['date_modified']
                 date_completed = record['date_completed']
 
+                payment_term_id = payment_pool.get_payment_id_from_wordpress(
+                    payment_method)
                 sales = sale_pool.search([
                     # Wordpress Key:
                     ('connector_id', '=', connector_id),
@@ -308,6 +335,7 @@ class WPConnector(models.Model):
                     'wp_date_modified': date_modified,
                     'wp_date_completed': date_completed,
                     'wp_customer_note': customer_note,
+                    'payment_term_id': payment_term_id,
                     }
                 created = False
                 if sales:
