@@ -72,6 +72,26 @@
         </record>
 
     <!--SHIPMENT VIEWS:-->
+    <record id="carrier_sale_order_error_detail_form" model="ir.ui.view">
+        <field name="name">sale.order.shipment</field>
+        <field name="model">sale.order</field>
+        <field name="priority" eval="40"/>
+        <field name="arch" type="xml">
+            <form string="Error detail">
+                <header>
+                    <button string="Close" special="cancel" />
+                </header>
+                <sheet>
+                    <group>
+                        <separator string="Last error detail:" colspan="4"/>
+                        <field name="soap_last_error" colspan="4" nolabel="1" readonly="1"/>
+                    </group>
+                </sheet>
+                <footer></footer>
+            </form>
+        </field>
+    </record>
+
     <record id="carrier_sale_order_tree" model="ir.ui.view">
         <field name="name">sale.order.shipment</field>
         <field name="model">sale.order</field>

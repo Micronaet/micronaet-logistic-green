@@ -174,6 +174,7 @@ class SaleOrder(models.Model):
             # error_text = '%s' % (reply['Errors'], )  # TODO better!
             for error_block in reply['Errors']['Error']:
                 error_text += error_block['Description'].replace('\n', ' ')
+                error_text += '\n'
         if console_log:
             _logger.error(error_text)
         return error_text
@@ -505,7 +506,26 @@ class SaleOrder(models.Model):
     def soap_comment_last_error(self):
         """ Last error comment pop up
         """
-        return True
+        model_pool = self.env['ir.model.data']
+        form_view_id = model_pool.get_object_reference(
+            'carrier_mbe_soap', 'carrier_sale_order_error_detail_form')[1]
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Error details'),
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_id': self.id,
+            'res_model': 'sale.order',
+            'view_id': form_view_id,
+            'views': [(form_view_id, 'form')],
+            'domain': [],
+            'context': self.env.context,
+            'target': 'new',
+            'nodestroy': False,
+            'flags': {
+                'form': {'action_buttons': False},
+            },
+        }
 
     # -------------------------------------------------------------------------
     # Override methods
