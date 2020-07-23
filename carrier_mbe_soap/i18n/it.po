@@ -91,7 +91,7 @@ msgstr "Ordine con corriere"
 #: model:ir.model.fields,field_description:carrier_mbe_soap.field_sale_order_carrier_soap_state
 #: model:ir.ui.view,arch_db:carrier_mbe_soap.view_sale_order_carrier_search
 msgid "Carrier state"
-msgstr "Stato corriere
+msgstr "Stato corriere"
 
 #. module: carrier_mbe_soap
 #: model:ir.actions.server,name:carrier_mbe_soap.ir_actions_server_order_carrier_cancel
@@ -493,4 +493,3 @@ msgstr "In attesa"
 #: model:ir.model.fields,field_description:carrier_mbe_soap.field_sale_order_parcel_weight_tree
 msgid "Weight"
 msgstr "Peso"
-
