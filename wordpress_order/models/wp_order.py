@@ -27,7 +27,7 @@ class AccountPaymentTerm(models.Model):
             return payment_ids[0].id
         record = self.create({
             'name': code,
-            'wp_payment_code': code,
+            'wp_payment_code': code.replace('_').title(),
         })
         return record.id
 
