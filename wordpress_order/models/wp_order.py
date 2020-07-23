@@ -224,6 +224,7 @@ class WPConnector(models.Model):
         product_pool = self.env['product.product']
         sale_pool = self.env['sale.order']
         line_pool = self.env['sale.order.line']
+        payment_pool = self.env['account.payment.term']
 
         wcapi = self.get_connector()
 
