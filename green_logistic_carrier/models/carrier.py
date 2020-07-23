@@ -304,19 +304,32 @@ class SaleOrder(models.Model):
         def get_partner_data(partner):
             """ Embedded function to check partner data
             """
+            error_check = not all((
+                partner.name,
+                partner.street,
+                partner.zip,
+                partner.city,
+                partner.state_id,
+                partner.country_id,
+                partner.phone,  # mandatory for carrier?
+                # partner.property_account_position_id,
+            ))
 
-            return '%s %s %s - %s %s [%s %s] %s - %s<br/>' % (
-                partner.name or '',
-                partner.street or format_error(_('Address')),
-                partner.street2 or '',
-                partner.zip or format_error(_('ZIP')),
-                partner.city or format_error(_('City')),
-                partner.state_id.name or format_error(_('State')),
-                partner.country_id.name or format_error(_('Country')),
-                partner.phone or format_error(_('Phone')),
-                partner.property_account_position_id.name or format_error(
-                    _('Pos. fisc.')),
-                )
+            return (
+                error_check,
+                '%s %s %s - %s %s [%s %s] %s - %s<br/>' % (
+                    partner.name or '',
+                    partner.street or format_error(_('Address')),
+                    partner.street2 or '',
+                    partner.zip or format_error(_('ZIP')),
+                    partner.city or format_error(_('City')),
+                    partner.state_id.name or format_error(_('State')),
+                    partner.country_id.name or format_error(_('Country')),
+                    partner.phone or format_error(_('Phone')),
+                    partner.property_account_position_id.name or format_error(
+                        _('Pos. fisc.')),
+                    )
+            )
 
         partner = self.partner_invoice_id
         if self.fiscal_position_id != partner.property_account_position_id:
@@ -329,12 +342,16 @@ class SaleOrder(models.Model):
             check_fiscal = ''
 
         mask = _('%s<b>ORD.:</b> %s\n<b>INV.:</b> %s\n<b>DELIV.:</b> %s')
+        error1, partner1_text = get_partner_data(self.partner_id)
+        error2, partner2_text = get_partner_data(partner)
+        error3, partner3_text = get_partner_data(self.partner_shipping_id)
         self.carrier_check = mask % (
             check_fiscal,
-            get_partner_data(self.partner_id),
-            get_partner_data(partner),
-            get_partner_data(self.partner_shipping_id),
+            partner1_text,
+            partner2_text,
+            partner3_text,
             )
+        self.carrier_check_error = error1 or error2 or error3
 
     @api.multi
     def _get_carrier_parcel_total(self):
@@ -369,8 +386,12 @@ class SaleOrder(models.Model):
     carrier_parcel_template_id = fields.Many2one(
         'carrier.parcel.template', 'Parcel template')
     carrier_check = fields.Text(
-        'Carrier check', help='Check carrier address',
+        'Carrier check', help='Check carrier address', multi=True,
         compute='_get_carrier_check_address', widget='html')
+    carrier_check_error = fields.Text(
+        'Carrier check', help='Check carrier address error', multi=True,
+        compute='_get_carrier_check_address', widget='html')
+
     carrier_description = fields.Text('Carrier description')
     carrier_note = fields.Text('Carrier note')
     carrier_stock_note = fields.Text('Stock operator note')
