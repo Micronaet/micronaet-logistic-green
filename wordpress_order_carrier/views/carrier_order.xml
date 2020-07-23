@@ -13,13 +13,27 @@
                     <sheet>
                         <group>
                             <separator string="Last error detail:" colspan="4"/>
-                            <field name="carrier_check" colspan="4" nolabel="1" readonly="1"/>
+                            <field name="carrier_check" colspan="4" nolabel="1" readonly="1" widget="html"/>
                         </group>
                     </sheet>
                     <footer></footer>
                 </form>
             </field>
         </record>
+        <record id="carrier_sale_order_check_partner_tree" model="ir.ui.view">
+            <field name="name">sale.order.shipment</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="carrier_mbe_soap.carrier_sale_order_tree"/>
+
+            <field name="arch" type="xml">
+                <field name="partner_shipping_id" position="after">
+                    <field name="carrier_check_error" invisible="1"/>
+                    <field name="carrier_check" invisible="1"/>
+                    <button name="partner_error_present_view" string="Partner error present" type="object" attrs="{'invisible': [('carrier_check_error', '=', False)]}" icon="fa-exclamation-triangle fa-2x" />
+                </field>
+            </field>
+        </record>
+
         <record model="ir.ui.view" id="view_sale_order_manage_logistic_form">
             <field name="name">sale.order.manage.logistic.form</field>
             <field name="model">sale.order</field>
