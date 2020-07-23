@@ -1,0 +1,496 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* carrier_mbe_soap
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 11.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-07-23 17:26+0000\n"
+"PO-Revision-Date: 2020-07-23 17:26+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: carrier_mbe_soap
+#: model:ir.ui.view,arch_db:carrier_mbe_soap.carrier_sale_order_tree
+msgid "Add parcel"
+msgstr "Aggiungi collo"
+
+#. module: carrier_mbe_soap
+#: code:addons/carrier_mbe_soap/models/mbe_soap.py:601
+#, python-format
+msgid "Auto print label on request!"
+msgstr "Stampa automaticamente le etichette alla richiesta!"
+
+#. module: carrier_mbe_soap
+#: model:ir.model.fields,field_description:carrier_mbe_soap.field_carrier_connection_soap_auto_print_label
+msgid "Autoprint label"
+msgstr "Stampa automatica etichette"
+
+#. module: carrier_mbe_soap
+#: model:ir.model.fields,field_description:carrier_mbe_soap.field_carrier_connection_soap_cups_printer_id
+msgid "CUPS printer"
+msgstr "Stampanti CUPS"
+
+#. module: carrier_mbe_soap
+#: model:ir.ui.menu,name:carrier_mbe_soap.carrier_root_menu
+msgid "Carrier"
+msgstr "Corriere"
+
+#. module: carrier_mbe_soap
+#: model:ir.ui.menu,name:carrier_mbe_soap.carrier_connection_soap_root_menu
+msgid "Carrier SOAP"
+msgstr "Corriere SOAP"
+
+#. module: carrier_mbe_soap
+#: model:ir.actions.act_window,name:carrier_mbe_soap.carrier_connection_soap_action
+#: model:ir.ui.menu,name:carrier_mbe_soap.carrier_connection_soap_menu
+#: model:ir.ui.view,arch_db:carrier_mbe_soap.carrier_connection_soap_view_form
+#: model:ir.ui.view,arch_db:carrier_mbe_soap.carrier_connection_soap_view_tree
+msgid "Carrier SOAP Connection"
+msgstr "Connessione SOAP Corriere"
+
+#. module: carrier_mbe_soap
+#: model:ir.model.fields,field_description:carrier_mbe_soap.field_sale_order_carrier_soap_id
+msgid "Carrier SOAP ID"
+msgstr "Corriere SOAP ID"
+
+#. module: carrier_mbe_soap
+#: model:ir.model,name:carrier_mbe_soap.model_carrier_connection_soap
+msgid "Carrier connection SOAP"
+msgstr "Connessione SOAP corriere"
+
+#. module: carrier_mbe_soap
+#: model:ir.ui.view,arch_db:carrier_mbe_soap.view_sale_order_carrier_search
+msgid "Carrier delivery state"
+msgstr "Stato consegna corriere"
+
+#. module: carrier_mbe_soap
+#: model:ir.ui.menu,name:carrier_mbe_soap.carrier_sale_order_action_delivered_menu
+msgid "Carrier order delivered"
+msgstr "Ordini consegnato"
+
+#. module: carrier_mbe_soap
+#: model:ir.ui.menu,name:carrier_mbe_soap.carrier_sale_order_action_sent_menu
+msgid "Carrier order sent"
+msgstr "Ordini spediti"
+
+#. module: carrier_mbe_soap
+#: model:ir.actions.act_window,name:carrier_mbe_soap.carrier_sale_order_action
+#: model:ir.actions.act_window,name:carrier_mbe_soap.carrier_sale_order_action_delivered
+#: model:ir.actions.act_window,name:carrier_mbe_soap.carrier_sale_order_action_sent
+#: model:ir.ui.menu,name:carrier_mbe_soap.carrier_sale_order_action_menu
+msgid "Carrier sale order"
+msgstr "Ordine con corriere"
+
+#. module: carrier_mbe_soap
+#: model:ir.model.fields,field_description:carrier_mbe_soap.field_sale_order_carrier_soap_state
+#: model:ir.ui.view,arch_db:carrier_mbe_soap.view_sale_order_carrier_search
+msgid "Carrier state"
+msgstr "Stato corriere
+
+#. module: carrier_mbe_soap
+#: model:ir.actions.server,name:carrier_mbe_soap.ir_actions_server_order_carrier_cancel
+msgid "Carrier: cancel orders"
+msgstr "Consegna: annulla presa"
+
+#. module: carrier_mbe_soap
+#: model:ir.actions.server,name:carrier_mbe_soap.ir_actions_server_order_carrier_confirm
+msgid "Carrier: confirm orders"
+msgstr "Consegna: richiedi presa"
+
+#. module: carrier_mbe_soap
+#: model:ir.actions.server,name:carrier_mbe_soap.ir_actions_server_order_carrier_sent
+msgid "Carrier: sent orders"
+msgstr "Consegna: ordine spedito"
+
+#. module: carrier_mbe_soap
+#: model:ir.ui.view,arch_db:carrier_mbe_soap.view_sale_order_tracking_form
+msgid "Check MBE information"
+msgstr "Controlla informazioni MBE"
+
+#. module: carrier_mbe_soap
+#: model:ir.ui.view,arch_db:carrier_mbe_soap.carrier_sale_order_error_detail_form
+msgid "Close"
+msgstr "Chiudi"
+
+#. module: carrier_mbe_soap
+#: model:ir.model.fields,help:carrier_mbe_soap.field_carrier_connection_soap_internal_reference
+msgid "Code assigned to every call and returned, used as ID"
+msgstr "Codice assegnato ad ogni chiamata e ritornato dal sistema, utilizzare come ID"
+
+#. module: carrier_mbe_soap
+#: model:ir.model.fields,help:carrier_mbe_soap.field_carrier_connection_soap_customer_id
+msgid "Code found in web management"
+msgstr "Codice trovato nella gestione web"
+
+#. module: carrier_mbe_soap
+#: model:ir.model.fields,help:carrier_mbe_soap.field_carrier_connection_soap_store_id
+msgid "Code used for some calls"
+msgstr "Codice utilizzato per alcune chiamate"
+
+#. module: carrier_mbe_soap
+#: model:ir.model.fields,field_description:carrier_mbe_soap.field_carrier_connection_soap_company_id
+msgid "Company"
+msgstr "Azienda"
+
+#. module: carrier_mbe_soap
+#: selection:sale.order,shipper_type:0
+msgid "Courier LDV"
+msgstr "LDV Spedizioniere"
+
+#. module: carrier_mbe_soap
+#: model:ir.model.fields,field_description:carrier_mbe_soap.field_carrier_connection_soap_create_uid
+msgid "Created by"
+msgstr "Creato da"
+
+#. module: carrier_mbe_soap
+#: model:ir.model.fields,field_description:carrier_mbe_soap.field_carrier_connection_soap_create_date
+msgid "Created on"
+msgstr "Creato il"
+
+#. module: carrier_mbe_soap
+#: model:ir.model.fields,field_description:carrier_mbe_soap.field_carrier_connection_soap_customer_id
+msgid "Customer ID"
+msgstr "ID Cliente"
+
+#. module: carrier_mbe_soap
+#: selection:sale.order,carrier_soap_state:0
+#: selection:sale.order,delivery_soap_state:0
+msgid "Delivered"
+msgstr "Consegnato"
+
+#. module: carrier_mbe_soap
+#: model:ir.ui.view,arch_db:carrier_mbe_soap.carrier_sale_order_tree
+msgid "Delivery confirmed"
+msgstr "Dati corriere confermati"
+
+#. module: carrier_mbe_soap
+#: model:ir.model.fields,field_description:carrier_mbe_soap.field_sale_order_delivery_soap_state
+msgid "Delivery state"
+msgstr "Stato consegna"
+
+#. module: carrier_mbe_soap
+#: model:ir.ui.view,arch_db:carrier_mbe_soap.carrier_sale_order_tree
+msgid "Delivery undo"
+msgstr "Sblocca dati corriere"
+
+#. module: carrier_mbe_soap
+#: model:ir.model.fields,field_description:carrier_mbe_soap.field_carrier_connection_soap_department_id
+msgid "Department ID"
+msgstr "ID Dipartimento"
+
+#. module: carrier_mbe_soap
+#: model:ir.model.fields,field_description:carrier_mbe_soap.field_carrier_connection_soap_display_name
+msgid "Display Name"
+msgstr "Nome Completo"
+
+#. module: carrier_mbe_soap
+#: selection:sale.order,package_type:0
+msgid "Documents"
+msgstr "Documenti"
+
+#. module: carrier_mbe_soap
+#: selection:sale.order,carrier_soap_state:0
+msgid "Draft"
+msgstr "Bozza"
+
+#. module: carrier_mbe_soap
+#: selection:sale.order,package_type:0
+msgid "Envelope"
+msgstr "Busta"
+
+#. module: carrier_mbe_soap
+#: model:ir.ui.view,arch_db:carrier_mbe_soap.carrier_sale_order_error_detail_form
+msgid "Error detail"
+msgstr "Dettaglio errore"
+
+#. module: carrier_mbe_soap
+#: selection:sale.order,delivery_soap_state:0
+msgid "Exception"
+msgstr "Eccezione"
+
+#. module: carrier_mbe_soap
+#: selection:sale.order,ship_type:0
+msgid "Export"
+msgstr "Export"
+
+#. module: carrier_mbe_soap
+#: model:ir.model.fields,help:carrier_mbe_soap.field_carrier_parcel_template_soap_connection_id
+#: model:ir.model.fields,help:carrier_mbe_soap.field_sale_order_parcel_soap_connection_id
+msgid "Force SOAP connection for small package"
+msgstr "Forza connessione per piccoli pacchi"
+
+#. module: carrier_mbe_soap
+#: selection:sale.order,package_type:0
+msgid "Generic"
+msgstr "Generico"
+
+#. module: carrier_mbe_soap
+#: model:ir.ui.view,arch_db:carrier_mbe_soap.carrier_sale_order_tree
+msgid "Get better option"
+msgstr "Richiedi migliore quotazione"
+
+#. module: carrier_mbe_soap
+#: model:ir.model.fields,field_description:carrier_mbe_soap.field_carrier_connection_soap_id
+msgid "ID"
+msgstr "ID"
+
+#. module: carrier_mbe_soap
+#: selection:sale.order,ship_type:0
+msgid "Import"
+msgstr "Importa"
+
+#. module: carrier_mbe_soap
+#: model:ir.model.fields,field_description:carrier_mbe_soap.field_carrier_connection_soap_internal_reference
+msgid "Internal reference"
+msgstr "Riferimento interno"
+
+#. module: carrier_mbe_soap
+#: model:ir.model.fields,help:carrier_mbe_soap.field_carrier_connection_soap_cups_printer_id
+msgid "Label order print with this"
+msgstr "Etichetta ordine stampata con questo"
+
+#. module: carrier_mbe_soap
+#: model:ir.model.fields,field_description:carrier_mbe_soap.field_carrier_connection_soap___last_update
+msgid "Last Modified on"
+msgstr "Data di ultima modifica"
+
+#. module: carrier_mbe_soap
+#: model:ir.model.fields,field_description:carrier_mbe_soap.field_carrier_connection_soap_write_uid
+msgid "Last Updated by"
+msgstr "Ultima modifica di"
+
+#. module: carrier_mbe_soap
+#: model:ir.model.fields,field_description:carrier_mbe_soap.field_carrier_connection_soap_write_date
+msgid "Last Updated on"
+msgstr "Ultima modifica il"
+
+#. module: carrier_mbe_soap
+#: model:ir.ui.view,arch_db:carrier_mbe_soap.carrier_sale_order_error_detail_form
+msgid "Last error detail:"
+msgstr "Dettaglio ultimo errore:"
+
+#. module: carrier_mbe_soap
+#: model:ir.ui.view,arch_db:carrier_mbe_soap.carrier_sale_order_tree
+msgid "Last error present"
+msgstr "Errore presente"
+
+#. module: carrier_mbe_soap
+#: selection:sale.order,shipper_type:0
+msgid "MBE"
+msgstr "MBE"
+
+#. module: carrier_mbe_soap
+#: model:ir.model.fields,field_description:carrier_mbe_soap.field_sale_order_master_tracking_id
+msgid "Master Tracking"
+msgstr "Tracking master"
+
+#. module: carrier_mbe_soap
+#: model:ir.model.fields,field_description:carrier_mbe_soap.field_carrier_connection_soap_name
+msgid "Name"
+msgstr "Nome"
+
+#. module: carrier_mbe_soap
+#: code:addons/carrier_mbe_soap/models/mbe_soap.py:576
+#, python-format
+msgid "Need carrier name and parcel data for get quotation"
+msgstr "Richiesto nome corriere e colli per richiedere la quotazione"
+
+#. module: carrier_mbe_soap
+#: code:addons/carrier_mbe_soap/models/mbe_soap.py:799
+#, python-format
+msgid "No master track ID so no confirmation!"
+msgstr "Non presente il master tracking ID quindi non confermato!"
+
+#. module: carrier_mbe_soap
+#: selection:sale.order,delivery_soap_state:0
+msgid "Not available"
+msgstr "Non disponibile"
+
+#. module: carrier_mbe_soap
+#: model:ir.model.fields,help:carrier_mbe_soap.field_carrier_connection_soap_system
+msgid "Old way to manage marketplace country"
+msgstr "Vecchia modalità di gestire la nazione del marketplace"
+
+#. module: carrier_mbe_soap
+#: code:addons/carrier_mbe_soap/models/mbe_soap.py:176
+#, python-format
+msgid "Order details"
+msgstr "Dettagli ordine"
+
+#. module: carrier_mbe_soap
+#: code:addons/carrier_mbe_soap/models/mbe_soap.py:658
+#, python-format
+msgid "Order must be in pending state with track ID"
+msgstr "Order must be in pending state with track ID"
+
+#. module: carrier_mbe_soap
+#: code:addons/carrier_mbe_soap/models/mbe_soap.py:568
+#: code:addons/carrier_mbe_soap/models/mbe_soap.py:618
+#, python-format
+msgid "Order not delivery managed from ODOO"
+msgstr "Ordine senza gestione consegna da ODOO"
+
+#. module: carrier_mbe_soap
+#: code:addons/carrier_mbe_soap/models/mbe_soap.py:622
+#, python-format
+msgid "Order sent or delivered cannot cancel!"
+msgstr "Ordine spedito o consegnato, non possibile cancellare!"
+
+#. module: carrier_mbe_soap
+#: code:addons/carrier_mbe_soap/models/mbe_soap.py:572
+#, python-format
+msgid "Order sent or delivered cannot confirm!"
+msgstr "Ordine spedito o consegnato non possibile confermare!"
+
+#. module: carrier_mbe_soap
+#: model:ir.model.fields,field_description:carrier_mbe_soap.field_sale_order_package_type
+msgid "Package type"
+msgstr "Tipo imballo"
+
+#. module: carrier_mbe_soap
+#: model:ir.model,name:carrier_mbe_soap.model_carrier_supplier
+msgid "Parcel supplier"
+msgstr "Corriere selezionato"
+
+#. module: carrier_mbe_soap
+#: model:ir.model,name:carrier_mbe_soap.model_carrier_parcel_template
+msgid "Parcel template"
+msgstr "Modello collo"
+
+#. module: carrier_mbe_soap
+#: selection:sale.order,delivery_soap_state:0
+msgid "Partially delivered"
+msgstr "Consegnato parzialmente"
+
+#. module: carrier_mbe_soap
+#: code:addons/carrier_mbe_soap/models/mbe_soap.py:116
+#, python-format
+msgid "Partner error details"
+msgstr "Dettaglio errore partner"
+
+#. module: carrier_mbe_soap
+#: model:ir.model.fields,field_description:carrier_mbe_soap.field_carrier_connection_soap_passphrase
+msgid "Passphrase"
+msgstr "Frase segreta"
+
+#. module: carrier_mbe_soap
+#: selection:sale.order,carrier_soap_state:0
+msgid "Pending"
+msgstr "Pendente"
+
+#. module: carrier_mbe_soap
+#: model:ir.ui.view,arch_db:carrier_mbe_soap.carrier_sale_order_tree
+#: model:ir.ui.view,arch_db:carrier_mbe_soap.view_sale_order_tracking_form
+msgid "Print label"
+msgstr "Stampa etichetta"
+
+#. module: carrier_mbe_soap
+#: model:ir.model.fields,help:carrier_mbe_soap.field_carrier_connection_soap_auto_print_label
+msgid "Print label when delivery was sent"
+msgstr "Stampa etichetta quanto la consegna viene confermata"
+
+#. module: carrier_mbe_soap
+#: model:ir.model,name:carrier_mbe_soap.model_sale_order
+msgid "Quotation"
+msgstr "Preventivo"
+
+#. module: carrier_mbe_soap
+#: selection:sale.order,ship_type:0
+msgid "Return"
+msgstr "Ritorno"
+
+#. module: carrier_mbe_soap
+#: model:ir.model.fields,field_description:carrier_mbe_soap.field_carrier_connection_soap_sam_id
+msgid "SAM ID"
+msgstr "SAM ID"
+
+#. module: carrier_mbe_soap
+#: model:ir.model.fields,field_description:carrier_mbe_soap.field_carrier_parcel_template_soap_connection_id
+#: model:ir.model.fields,field_description:carrier_mbe_soap.field_carrier_supplier_soap_connection_id
+#: model:ir.model.fields,field_description:carrier_mbe_soap.field_sale_order_parcel_soap_connection_id
+#: model:ir.model.fields,field_description:carrier_mbe_soap.field_sale_order_soap_connection_id
+msgid "SOAP Connection"
+msgstr "Connessione SOAP"
+
+#. module: carrier_mbe_soap
+#: model:ir.ui.view,arch_db:carrier_mbe_soap.carrier_sale_order_tree
+msgid "Sale order for carrier"
+msgstr "Ordine di vendita con consegna"
+
+#. module: carrier_mbe_soap
+#: model:ir.model,name:carrier_mbe_soap.model_sale_order_parcel
+msgid "Sale order parcel"
+msgstr "Colli ordine"
+
+#. module: carrier_mbe_soap
+#: selection:sale.order,carrier_soap_state:0
+msgid "Sent"
+msgstr "Spedito"
+
+#. module: carrier_mbe_soap
+#: model:ir.model.fields,field_description:carrier_mbe_soap.field_sale_order_ship_type
+msgid "Ship type"
+msgstr "Tipo spedizione"
+
+#. module: carrier_mbe_soap
+#: model:ir.model.fields,field_description:carrier_mbe_soap.field_sale_order_shipper_type
+msgid "Shipper type"
+msgstr "Tipo consegna"
+
+#. module: carrier_mbe_soap
+#: model:ir.model.fields,help:carrier_mbe_soap.field_sale_order_soap_connection_id
+msgid "Soap connection used for better quotation"
+msgstr "Connessione utilizzata per migliore quotazione"
+
+#. module: carrier_mbe_soap
+#: model:ir.model.fields,field_description:carrier_mbe_soap.field_carrier_connection_soap_store_id
+msgid "Store ID"
+msgstr "ID Store"
+
+#. module: carrier_mbe_soap
+#: model:ir.model.fields,field_description:carrier_mbe_soap.field_carrier_connection_soap_system
+msgid "System"
+msgstr "Sistema"
+
+#. module: carrier_mbe_soap
+#: model:ir.model.fields,field_description:carrier_mbe_soap.field_sale_order_system_reference_id
+msgid "System reference ID"
+msgstr "ID riferimento sistema"
+
+#. module: carrier_mbe_soap
+#: code:addons/carrier_mbe_soap/models/mbe_soap.py:580
+#, python-format
+msgid "Track ID yet present, cannot regenerate, cancel and reassign if needed"
+msgstr "ID Track già presente, non è possibile riassegnare, annulla e riassegnare se occorre"
+
+#. module: carrier_mbe_soap
+#: model:ir.model.fields,help:carrier_mbe_soap.field_sale_order_parcel_weight_tree
+msgid "Tree view only for fast insert parcel"
+msgstr "Vista modo lista per inserimento veloce colli"
+
+#. module: carrier_mbe_soap
+#: model:ir.model.fields,field_description:carrier_mbe_soap.field_carrier_connection_soap_username
+msgid "Username"
+msgstr "Nome utente"
+
+#. module: carrier_mbe_soap
+#: model:ir.model.fields,field_description:carrier_mbe_soap.field_carrier_connection_soap_wsdl_root
+msgid "WSDL root"
+msgstr "WSDL root"
+
+#. module: carrier_mbe_soap
+#: selection:sale.order,delivery_soap_state:0
+msgid "Waiting"
+msgstr "In attesa"
+
+#. module: carrier_mbe_soap
+#: model:ir.model.fields,field_description:carrier_mbe_soap.field_sale_order_parcel_weight_tree
+msgid "Weight"
+msgstr "Peso"
+
