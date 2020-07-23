@@ -8,7 +8,6 @@ from odoo import fields, models, api
 import logging
 from odoo import _
 
-
 _logger = logging.getLogger(__name__)
 
 
@@ -79,6 +78,7 @@ class SaleOrder(models.Model):
                 })
 
                 # 2. Update ODOO and Wordpress:
-                if tracking_status == 'DELIVERED':
+                if order.connector_id.manage_web_status and \
+                        tracking_status == 'DELIVERED':
                     order.update_with_courier_data('delivered')
         return error
