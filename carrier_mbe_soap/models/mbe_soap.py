@@ -614,7 +614,7 @@ class SaleOrder(models.Model):
 
         if order.carrier_soap_state in ('sent', 'delivered'):
             return order.log_error(
-                _('Order sent or delivered cannot confirm!'))
+                _('Order sent or delivered cannot cancel!'))
 
         # Get options if not present:
         if not order.courier_supplier_id:
