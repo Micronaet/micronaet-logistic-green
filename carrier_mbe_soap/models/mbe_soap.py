@@ -586,6 +586,11 @@ class SaleOrder(models.Model):
         if error:
             return order.log_error(error)
 
+        # Clean error (if present)
+        order.write({
+            'soap_last_error': False,
+        })
+
         # 3. Print also labels:
         if order.soap_connection_id.auto_print_label:
             _logger.warning(_('Auto print label on request!'))
