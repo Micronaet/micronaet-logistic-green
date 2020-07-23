@@ -24,7 +24,7 @@ class AccountPaymentTerm(models.Model):
 
         payment_ids = self.search([('wp_payment_code', '=', code)])
         if payment_ids:
-            return payment_ids[0]
+            return payment_ids[0].id
         record = self.create({
             'name': code,
             'wp_payment_code': code,
