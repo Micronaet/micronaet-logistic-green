@@ -11,6 +11,31 @@ class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
     @api.multi
+    def soap_comment_partner_error(self):
+        """ Last error comment pop up
+        """
+        model_pool = self.env['ir.model.data']
+        form_view_id = model_pool.get_object_reference(
+            'wordpress_order', 'carrier_sale_order_partner_error_form')[1]
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Partner error details'),
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_id': self.id,
+            'res_model': 'sale.order',
+            'view_id': form_view_id,
+            'views': [(form_view_id, 'form')],
+            'domain': [],
+            'context': self.env.context,
+            'target': 'new',
+            'nodestroy': False,
+            'flags': {
+                'form': {'action_buttons': False},
+            },
+        }
+
+    @api.multi
     def shipments_get_tracking_result(self):
         """ 18. Get tracking information
         """

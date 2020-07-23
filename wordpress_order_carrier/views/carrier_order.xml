@@ -1,6 +1,25 @@
 <?xml version="1.0"?>
 <openerp>
     <data>
+        <record id="carrier_sale_order_partner_error_form" model="ir.ui.view">
+            <field name="name">sale.order.shipment</field>
+            <field name="model">sale.order</field>
+            <field name="priority" eval="40"/>
+            <field name="arch" type="xml">
+                <form string="Error partner detail">
+                    <header>
+                        <button string="Close" special="cancel" />
+                    </header>
+                    <sheet>
+                        <group>
+                            <separator string="Last error detail:" colspan="4"/>
+                            <field name="carrier_check" colspan="4" nolabel="1" readonly="1"/>
+                        </group>
+                    </sheet>
+                    <footer></footer>
+                </form>
+            </field>
+        </record>
         <record model="ir.ui.view" id="view_sale_order_manage_logistic_form">
             <field name="name">sale.order.manage.logistic.form</field>
             <field name="model">sale.order</field>
