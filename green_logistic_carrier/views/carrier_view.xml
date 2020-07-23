@@ -10,6 +10,7 @@
                 </field>
             </field>
         </record>-->
+
         <record model="ir.ui.view" id="view_sale_order_logistic_search">
             <field name="name">sale.order.logistic.search</field>
             <field name="model">sale.order</field>

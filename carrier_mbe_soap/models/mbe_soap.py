@@ -503,15 +503,15 @@ class SaleOrder(models.Model):
         return ''
 
     @api.multi
-    def soap_comment_last_error(self):
+    def soap_comment_partner_error(self):
         """ Last error comment pop up
         """
         model_pool = self.env['ir.model.data']
         form_view_id = model_pool.get_object_reference(
-            'carrier_mbe_soap', 'carrier_sale_order_error_detail_form')[1]
+            'wordpress_order', 'carrier_sale_order_partner_error_form')[1]
         return {
             'type': 'ir.actions.act_window',
-            'name': _('Error details'),
+            'name': _('Partner error details'),
             'view_type': 'form',
             'view_mode': 'form',
             'res_id': self.id,

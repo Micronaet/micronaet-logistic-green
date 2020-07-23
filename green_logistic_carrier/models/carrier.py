@@ -295,7 +295,7 @@ class SaleOrder(models.Model):
     def _get_carrier_check_address(self):
         """ Check address for delivery
         """
-        self.ensure_one()
+        # self.ensure_one()
 
         # Function:
         def format_error(field):
@@ -330,28 +330,29 @@ class SaleOrder(models.Model):
                         _('Pos. fisc.')),
                     )
             )
+        for order in self:
+            partner = order.partner_invoice_id
+            if order.fiscal_position_id != \
+                    partner.property_account_position_id:
+                check_fiscal = format_error(
+                    _('Fiscal pos.: Order: %s, Partner %s<br/>') % (
+                        order.fiscal_position_id.name,
+                        partner.property_account_position_id.name,
+                        ))
+            else:
+                check_fiscal = ''
 
-        partner = self.partner_invoice_id
-        if self.fiscal_position_id != partner.property_account_position_id:
-            check_fiscal = format_error(
-                _('Fiscal pos.: Order: %s, Partner %s<br/>') % (
-                    self.fiscal_position_id.name,
-                    partner.property_account_position_id.name,
-                    ))
-        else:
-            check_fiscal = ''
-
-        mask = _('%s<b>ORD.:</b> %s\n<b>INV.:</b> %s\n<b>DELIV.:</b> %s')
-        error1, partner1_text = get_partner_data(self.partner_id)
-        error2, partner2_text = get_partner_data(partner)
-        error3, partner3_text = get_partner_data(self.partner_shipping_id)
-        self.carrier_check = mask % (
-            check_fiscal,
-            partner1_text,
-            partner2_text,
-            partner3_text,
-            )
-        self.carrier_check_error = error1 or error2 or error3
+            mask = _('%s<b>ORD.:</b> %s\n<b>INV.:</b> %s\n<b>DELIV.:</b> %s')
+            error1, partner1_text = get_partner_data(order.partner_id)
+            error2, partner2_text = get_partner_data(partner)
+            error3, partner3_text = get_partner_data(order.partner_shipping_id)
+            order.carrier_check = mask % (
+                check_fiscal,
+                partner1_text,
+                partner2_text,
+                partner3_text,
+                )
+            order.carrier_check_error = error1 or error2 or error3
 
     @api.multi
     def _get_carrier_parcel_total(self):
