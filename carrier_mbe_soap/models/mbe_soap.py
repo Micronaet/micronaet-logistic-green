@@ -627,7 +627,7 @@ class SaleOrder(models.Model):
 
         # Clean previous order:
         order.write({
-            'soal_last_error': False,
+            'soap_last_error': False,
         })
 
         # raise exceptions.ValidationError('Not valid message')
