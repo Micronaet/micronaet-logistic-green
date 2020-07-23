@@ -253,6 +253,7 @@ class WPConnector(models.Model):
         end_page = self.env.context.get('end_page', self.order_stop_page)
 
         update_order_reached = []
+        pdb.set_trace()
         while True:
             # Log:
             _logger.info('Reading orders from %s [Record %s-%s]' % (
