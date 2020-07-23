@@ -575,6 +575,11 @@ class SaleOrder(models.Model):
             return order.log_error(
                 _('Need carrier name and parcel data for get quotation'))
 
+        if order.carrier_track_id:
+            return order.log_error(
+                _('Track ID yet present, cannot regenerate, '
+                  'cancel and reassign if needed'))
+
         # 1. Get options if not present courier:
         if not order.courier_supplier_id:
             error = order.shipment_options_request()
