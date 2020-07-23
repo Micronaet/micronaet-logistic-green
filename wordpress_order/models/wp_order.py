@@ -623,7 +623,7 @@ class SaleOrder(models.Model):
     manage_delivery = fields.Boolean(
         'Manage delivery', help='This order manage delivery in ODOO')
     connector_id = fields.Many2one('wp.connector', 'Connector')
-    soap_last_error = fields.Char('SOAP Last Error', size=100)
+    soap_last_error = fields.Text('SOAP Last Error')
     wp_date_created = fields.Datetime('Wp date created')
     wp_date_modified = fields.Datetime('Wp date modified')
     wp_date_completed = fields.Datetime('Wp date completed')
