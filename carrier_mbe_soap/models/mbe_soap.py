@@ -557,7 +557,6 @@ class SaleOrder(models.Model):
         """ Override method for send carrier request
         """
         order = self
-        pdb.set_trace()
 
         # ---------------------------------------------------------------------
         # Check options:
@@ -625,6 +624,11 @@ class SaleOrder(models.Model):
         error = order.delete_shipments_request()
         if error:
             return order.log_error(error)
+
+        # Clean previous order:
+        order.write({
+            'soal_last_error': False,
+        })
 
         # raise exceptions.ValidationError('Not valid message')
         return super(SaleOrder, self).set_carrier_ok_no()
