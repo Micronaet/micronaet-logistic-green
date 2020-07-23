@@ -16,7 +16,9 @@
         <field name="inherit_id" ref="wordpress_connector.wp_connector_view_form" />
         <field name="arch" type="xml">
             <field name="mode" position="after">
+                <field name="demo_partner" />
                 <field name="manage_delivery" />
+                <field name="manage_web_status"/>
             </field>
             <xpath expr="//page[1]" position="after">
                 <page name="order_publish_page" string="Order input">

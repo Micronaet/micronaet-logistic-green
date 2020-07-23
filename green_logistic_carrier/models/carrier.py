@@ -278,7 +278,8 @@ class SaleOrder(models.Model):
 
         # Check if order needs to be passed in ready status:
         self.carrier_ok = True
-        # self.logistic_check_and_set_ready()
+
+        # TODO self.logistic_check_and_set_ready()
         return True
 
     @api.multi

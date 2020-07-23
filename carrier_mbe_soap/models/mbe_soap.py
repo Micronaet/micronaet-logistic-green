@@ -169,12 +169,15 @@ class SaleOrder(models.Model):
         self.ensure_one()
         # Status token (OK, ERROR)
 
-        error = ''
+        error_text = ''
+        pdb.set_trace()
         if reply['Status'] == 'ERROR':
             # Error[{'id', 'Description'}]
-            error = '%s' % (reply['Errors'], )  # TODO better!
-            _logger.error(error)
-        return error
+            # error_text = '%s' % (reply['Errors'], )  # TODO better!
+            for error in reply['Errors']:
+                error_text += error['Error']['Description']
+            _logger.error(error_text)
+        return error_text
 
     # Format Utility:
     def check_size(self, text, size, dotted=False):
@@ -230,19 +233,20 @@ class SaleOrder(models.Model):
         """
         order = self
         partner = order.partner_shipping_id or order.partner_id
+        demo = 'TEST' if order.connector_id.demo_partner else ''
         return {
-            'Name': 'TEST' or partner.name,  # 35
-            'CompanyName': 'TEST',  # 35
-            'Nickname': 'TEST',  # 100
-            'Address': partner.street or '',  # 100
-            'Address2': (partner.street2 or '')[:35],  # 35
-            'Address3': '',  # 35
-            'Phone': partner.phone or '',  # 50
-            'ZipCode': partner.zip or '',  # 12
-            'City': partner.city or '',  # 50
-            'State': partner.state_id.code or '',  # 2
-            'Country': partner.country_id.code or '',  # 2
-            'Email': partner.email or '',  # 75
+            'Name': (demo or partner.name)[:35],
+            'CompanyName': (demo or '')[:35],
+            'Nickname': (demo or '')[:100],
+            'Address': (partner.street or '')[:100],
+            'Address2': (partner.street2 or '')[:35],
+            'Address3': ''[:35],
+            'Phone': (partner.phone or '')[:50],
+            'ZipCode': (partner.zip or '')[:12],
+            'City': (partner.city or '')[:50],
+            'State': (partner.state_id.code or '')[:2],
+            'Country': (partner.country_id.code or '')[:2],
+            'Email': (partner.email or '')[:75],
             'SubzoneId': '',  # integer
             'SubzoneDesc': '',
         }
@@ -498,6 +502,12 @@ class SaleOrder(models.Model):
             return 'Error updating data on order (clean quotation)'
         return ''
 
+    @api.multi
+    def soap_comment_last_error(self):
+        """ Last error comment pop up
+        """
+        return True
+
     # -------------------------------------------------------------------------
     # Override methods
     # -------------------------------------------------------------------------
@@ -519,18 +529,21 @@ class SaleOrder(models.Model):
         order = self
         _logger.error('Order: %s [%s]' % (order.name, error))
         order.write_log_chatter_message(error)
-        return False
+        return order.write({
+            'soap_last_error': error,
+        })
 
     @api.multi
     def set_carrier_ok_yes(self):
         """ Override method for send carrier request
         """
         order = self
+        pdb.set_trace()
 
         # ---------------------------------------------------------------------
         # Check options:
         # ---------------------------------------------------------------------
-        # Get options if not present:
+        # Get options if not present (XXX Moved here):
         if not order.manage_delivery:
             return order.log_error(
                 _('Order not delivery managed from ODOO'))
@@ -543,18 +556,18 @@ class SaleOrder(models.Model):
             return order.log_error(
                 _('Need carrier name and parcel data for get quotation'))
 
-        # Get options if not present:
+        # 1. Get options if not present courier:
         if not order.courier_supplier_id:
             error = order.shipment_options_request()
             if error:
                 return order.log_error(error)
 
-        # Create request:
+        # 2. Create request:
         error = order.shipment_request()
         if error:
             return order.log_error(error)
 
-        # Print also labels?
+        # 3. Print also labels:
         if order.soap_connection_id.auto_print_label:
             _logger.warning(_('Auto print label on request!'))
             order.carrier_print_label()

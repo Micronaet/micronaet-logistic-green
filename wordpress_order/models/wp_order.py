@@ -16,9 +16,15 @@ class WPConnector(models.Model):
     _inherit = 'wp.connector'
 
     # Columns:
+    demo_partner = fields.Boolean(
+        'Demo customer',
+        help='Create demo customer in carriage operations')
     manage_delivery = fields.Boolean(
         'Manage delivery',
         help='The new order will be marked for manage delivery in ODOO')
+    manage_web_status = fields.Boolean(
+        'Manage web status',
+        help='Will update wordpress order status during order operation')
     order_start_page = fields.Integer(
         'Order start page', default=1,
         help='Start reading orders from page',
@@ -234,13 +240,14 @@ class WPConnector(models.Model):
                 _logger.error('Error calling WP: \n%s' % (sys.exc_info(), ))
                 continue
             params['page'] += 1
-            if not reply.ok:  # status_code >= 300:
+            if not reply.ok:
                 _logger.error('Error: %s' % reply.text)
                 break
 
             records = reply.json()
             if not records:
                 break
+
             for record in records:
                 wp_id = record['id']
                 number = record['number']
@@ -268,38 +275,33 @@ class WPConnector(models.Model):
                     self.extract_partner(record)
 
                 """
-                {'date_completed_gmt': None,
-                 'date_modified': '2020-01-27T15:16:01',
+                {                 
                  'shipping_lines': [
                      {'id': 242519, 'method_id': 'table_rate_shipping',
                       'taxes': [], 'total': '11.50',
                       'method_title': 'Corriere espresso', 'meta_data': [],
                       'total_tax': '0.00', 'instance_id': '0'}],
                  'created_via': 'checkout',
-                 'currency': 'EUR', 
-                 'order_key': 'wc_order_J7VSecMlSkF3Z',
+                 'currency': 'EUR', 'order_key': 'wc_order_J7VSecMlSkF3Z',
                  'shipping_total': '11.50', 'date_completed': None,
                  'cart_tax': '0.00',
                  'customer_user_agent': 'Mozilla/5.0 (Windows NT 10.0; ...
                  'discount_tax': '0.00', 'date_paid': None,
                  'shipping_tax': '0.00',
-                 'prices_include_tax': True, 'date_paid_gmt': None,
+                 'prices_include_tax': True,
                  'customer_ip_address': '5.89.6.17',
-                 'date_created_gmt': '2020-01-27T14:16:01', 'id': 121605,
-                 'customer_id': 0, 'date_modified_gmt': '2020-01-27T14:16:01',
+                 'id': 121605, 'customer_id': 0,
                  'payment_method_title': 'Paga con il tuo account Amazon',
                  'transaction_id': 'P02-5649172-2284784',
-                 'discount_total': '0.00', 
-                 'total_tax': '0.00', 
-                 'number': '121605', 
-                 'coupon_lines': [],
+                 'discount_total': '0.00', 'total_tax': '0.00', 
+                 'number': '121605', 'coupon_lines': [],
                  'cart_hash': 'e5c2a0e6b0e51b7edfd439faff26307c',
-                 'date_created': '2020-01-27T15:16:01', 
                  'total': '40.50',
                  'refunds': [], 'tax_lines': [], 'fee_lines': [],
                  'payment_method': 'amazon_payments_advanced', 
                  }
                 """
+
                 order_data = {  # Update mode:
                     'wp_status': status,
                     'wp_date_created': date_created,
@@ -451,6 +453,7 @@ class WPConnector(models.Model):
                                 'price_unit': shipping_total,
                                 })
                     _logger.info('Create  order: %s' % number)
+
                     # After updating the web site:
                     if status == 'processing':
                         update_order_reached.append(order)
@@ -464,9 +467,15 @@ class WPConnector(models.Model):
             _logger.warning('Order are managed from Wordpress')
             return True
 
-        _logger.warning('Order are managed from ODOO')
-        for order in update_order_reached:
-            order.wp_wf_set_to_state('sent-to-gsped')
+        # ---------------------------------------------------------------------
+        #                      Check if need update status:
+        # ---------------------------------------------------------------------
+        _logger.warning('Orders are managed from ODOO')
+        if self.manage_web_status:  # Connector manage status:
+            for order in update_order_reached:
+                order.wp_wf_set_to_state('sent-to-gsped')
+            _logger.warning(
+                'Updated Wordpress status # %s' % len(update_order_reached))
         return True
 
 
@@ -571,7 +580,7 @@ class SaleOrder(models.Model):
     def wp_wf_processing(self):
         """ Update status to processing
         """
-        # return self.wp_wf_set_to_state('processing')
+        # OLD return self.wp_wf_set_to_state('processing')
         return self.wp_wf_set_to_state('sent-to-gsped')
 
     @api.multi
@@ -614,6 +623,7 @@ class SaleOrder(models.Model):
     manage_delivery = fields.Boolean(
         'Manage delivery', help='This order manage delivery in ODOO')
     connector_id = fields.Many2one('wp.connector', 'Connector')
+    soap_last_error = fields.Char('SOAP Last Error', size=100)
     wp_date_created = fields.Datetime('Wp date created')
     wp_date_modified = fields.Datetime('Wp date modified')
     wp_date_completed = fields.Datetime('Wp date completed')

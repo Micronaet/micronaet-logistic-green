@@ -21,6 +21,9 @@
                     <field name="carrier_mode_id" />
                     <field name="courier_supplier_id" />
                     <field name="courier_mode_id" />
+
+                    <filter name="carrier_track_id_assigned" string="LDV generated" domain="[('carrier_track_id','!=',False)]"/>
+
                 </field>
                 <xpath expr="/search/group/filter[2]" position="after">
                     <filter string="Carrier supplier" domain="[]" context="{'group_by': 'carrier_supplier_id'}"/>
