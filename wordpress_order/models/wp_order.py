@@ -586,6 +586,7 @@ class SaleOrder(models.Model):
     def wp_wf_set_to_state(self, state):
         """ Update status to state passed (utility called from WF button)
         """
+        user = self.env['res.users'].browse(self.env.uid)
         data = {
             'status': state,
         }
@@ -600,11 +601,20 @@ class SaleOrder(models.Model):
                 reply = wcapi.put('orders/%s' % order.wp_id, data)
                 if reply.ok:
                     order.write({'wp_status': state})
+                    self.message_post(
+                        body=_('Change Wordpress status %s [User: %s]') % (
+                            state,
+                            user.name,
+                        ))
                 else:
-                    _logger.error('Order: %s error in update call' % reply)
+                    message = 'Order: %s error in update call' % reply
+                    self.message_post(body=message)
+                    _logger.error(message)
             except:
                 error.append(order)
-                _logger.error('Order: %s not updated' % order.name)
+                message = 'Order: %s not updated' % order.name
+                _logger.error(message)
+                self.message_post(body=message)
 
     @api.multi
     def wp_wf_processing(self):
