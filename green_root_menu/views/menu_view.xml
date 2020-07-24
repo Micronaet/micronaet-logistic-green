@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+         <menuitem
+             id="menu_green_header_root"
+             name="Green"
+             sequence="0"
+             groups="green_logistic_management.group_green_manager,green_logistic_management.group_green_sale_manager,green_logistic_management.group_green_account_manager,green_logistic_management.group_green_package_manager"
+             />
+             <menuitem
+                 id="menu_green_left_order_root"
+                 parent="menu_green_header_root"
+                 name="Selling"
+                 sequence="10"
+                 groups="green_logistic_management.group_green_manager,green_logistic_management.group_green_sale_manager"
+                 />
+             <menuitem
+                 id="menu_green_left_packaging_root"
+                 parent="menu_green_header_root"
+                 name="Packaging"
+                 sequence="20"
+                 groups="green_logistic_management.group_green_manager,green_logistic_management.group_green_package_manager"
+                 />
+                 <menuitem id="carrier_root_menu" parent="menu_green_left_packaging_root" name="Carrier" sequence="10"/>
+                     <menuitem id="carrier_sale_order_action_menu" parent="carrier_root_menu" action="carrier_mbe_soap.carrier_sale_order_action" sequence="10"/>
+                     <menuitem id="carrier_sale_order_action_sent_menu" parent="carrier_root_menu" action="carrier_mbe_soap.carrier_sale_order_action_sent" sequence="20"/>
+                     <menuitem id="carrier_sale_order_action_delivered_menu" parent="carrier_root_menu" action="carrier_mbe_soap.carrier_sale_order_action_delivered" sequence="30"/>
+        <menuitem
+                 id="menu_green_left_accounting_root"
+                 parent="menu_green_header_root"
+                 name="Accounting"
+                 sequence="30"
+                 groups="green_logistic_management.group_green_manager,green_logistic_management.group_green_account_manager"
+                 />
+             <menuitem
+                 id="menu_green_left_administering_root"
+                 parent="menu_green_header_root"
+                 name="Administering"
+                 sequence="40"
+                 groups="green_logistic_management.group_green_manager"
+                 />
+
+        <!--<menuitem name="Carrier SOAP" id="carrier_connection_soap_root_menu" parent="sale.menu_sale_config" sequence="20"/>
+            <menuitem id="carrier_connection_soap_menu" parent="carrier_connection_soap_root_menu" action="carrier_connection_soap_action" sequence="10"/>-->
+
+
+
+    </data>
+</openerp>
+
