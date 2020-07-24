@@ -113,7 +113,10 @@ class WPConnector(models.Model):
                 return False
 
             province_code = cities[0].province_id.code
-            states = state_pool.search([('code', '=', province_code)])
+            states = state_pool.search([
+                ('code', '=', province_code),
+                ('country_id.code', '=', 'IT'),  # TODO Parameter for country
+            ])
 
             if not states:
                 return False
