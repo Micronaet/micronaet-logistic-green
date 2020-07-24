@@ -24,6 +24,7 @@
         # 'l18n_it_fatturapa',  # Fattura PA Management
         ],
     'data': [
+        'security/logistic_group.xml',
         # Views:
         'views/logistic_management_view.xml',
 

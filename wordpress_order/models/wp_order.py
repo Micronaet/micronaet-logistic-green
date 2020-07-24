@@ -618,9 +618,8 @@ class SaleOrder(models.Model):
 
     @api.multi
     def wp_wf_processing(self):
-        """ Update status to processing
+        """ Update status to processing, real state is sent to sped
         """
-        # OLD return self.wp_wf_set_to_state('processing')
         return self.wp_wf_set_to_state('sent-to-gsped')
 
     @api.multi

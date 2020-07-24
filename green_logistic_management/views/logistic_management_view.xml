@@ -825,6 +825,37 @@
 
          <!--MASTER MENU:-->
          <menuitem
+             id="menu_green_header_root"
+             name="Green"
+             sequence="0"
+             />
+             <menuitem
+                 id="menu_green_left_order_root"
+                 parent="menu_green_header_root"
+                 name="Selling"
+                 sequence="10"
+                 />
+             <menuitem
+                 id="menu_green_left_packaging_root"
+                 parent="menu_green_header_root"
+                 name="Packaging"
+                 sequence="20"
+                 />
+             <menuitem
+                 id="menu_green_left_accounting_root"
+                 parent="menu_green_header_root"
+                 name="Accounting"
+                 sequence="30"
+                 />
+             <menuitem
+                 id="menu_green_left_administering_root"
+                 parent="menu_green_header_root"
+                 name="Administering"
+                 sequence="40"
+                 />
+
+
+         <menuitem
              id="menu_logistic_header_root"
              name="Logistic"
              sequence="0"
