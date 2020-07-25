@@ -449,43 +449,43 @@ msgstr "Prodotto semplice"
 #: model:ir.model.fields,field_description:wordpress_connector.field_product_template_wp_slave_ids
 #: model:ir.ui.view,arch_db:wordpress_connector.product_product_view_form
 msgid "Slave"
-msgstr "Slave"
+msgstr "Variante"
 
 #. module: wordpress_connector
 #: model:ir.actions.act_window,name:wordpress_connector.wp_product_template_slave_product_action
 #: model:ir.ui.menu,name:wordpress_connector.wp_product_template_slave_menu
 msgid "Slave product"
-msgstr "Slave product"
+msgstr "Prodotto variante"
 
 #. module: wordpress_connector
 #: model:ir.model.fields,field_description:wordpress_connector.field_wp_connector_publish_stock
 msgid "Stock status"
-msgstr "Stock status"
+msgstr "Stato magazzino"
 
 #. module: wordpress_connector
 #: model:ir.ui.view,arch_db:wordpress_connector.wp_connector_view_form
 msgid "Syncro attributes"
-msgstr "Syncro attributes"
+msgstr "Sincronizza attributi"
 
 #. module: wordpress_connector
 #: model:ir.ui.view,arch_db:wordpress_connector.wp_connector_view_form
 msgid "Syncro category"
-msgstr "Syncro category"
+msgstr "Sincronizza categorie"
 
 #. module: wordpress_connector
 #: model:ir.ui.view,arch_db:wordpress_connector.wp_connector_view_form
 msgid "Syncro product"
-msgstr "Syncro product"
+msgstr "Sincronizza prodotto
 
 #. module: wordpress_connector
 #: model:ir.ui.view,arch_db:wordpress_connector.wp_connector_view_form
 msgid "Syncro tags"
-msgstr "Syncro tags"
+msgstr "Sincronizza tags"
 
 #. module: wordpress_connector
 #: model:ir.model.fields,field_description:wordpress_connector.field_wp_tag_name
 msgid "Tag name"
-msgstr "Tag name"
+msgstr "Nome tag"
 
 #. module: wordpress_connector
 #: model:ir.model.fields,field_description:wordpress_connector.field_product_product_wp_tag_ids
@@ -499,13 +499,13 @@ msgstr "Etichette"
 #. module: wordpress_connector
 #: model:ir.model.fields,help:wordpress_connector.field_wp_connector_mode
 msgid "Tags, Attributes, Terms, Category, Products direction for sync(Order always vs ODOO)"
-msgstr "Tags, Attributes, Terms, Category, Products direction for sync(Order always vs ODOO)"
+msgstr "Tags, Attributi, Termini, Categorie, Prodotti direzione per sincronia (Orgini sempre vs ODOO)"
 
 #. module: wordpress_connector
 #: model:ir.model.fields,help:wordpress_connector.field_product_product_wp_variation_term_id
 #: model:ir.model.fields,help:wordpress_connector.field_product_template_wp_variation_term_id
 msgid "Term used for this variation"
-msgstr "Term used for this variation"
+msgstr "Termini utilizzati per questa variazione"
 
 #. module: wordpress_connector
 #: model:ir.model.fields,field_description:wordpress_connector.field_wp_attribute_term_ids
@@ -515,17 +515,17 @@ msgstr "Termini"
 #. module: wordpress_connector
 #: model:ir.model.fields,field_description:wordpress_connector.field_wp_product_attribute_term_ids
 msgid "Terms available"
-msgstr "Terms available"
+msgstr "Termini disponibili"
 
 #. module: wordpress_connector
 #: model:ir.ui.view,arch_db:wordpress_connector.wp_attribute_view_form
 msgid "Terms:"
-msgstr "Terms:"
+msgstr "Termini:"
 
 #. module: wordpress_connector
 #: model:ir.model.fields,field_description:wordpress_connector.field_wp_connector_publish_text
 msgid "Text data"
-msgstr "Text data"
+msgstr "Dato di testo"
 
 #. module: wordpress_connector
 #: model:ir.model.fields,field_description:wordpress_connector.field_wp_connector_timeout
@@ -540,7 +540,7 @@ msgstr "Tipo"
 #. module: wordpress_connector
 #: model:ir.ui.view,arch_db:wordpress_connector.view_wp_tag_search
 msgid "Unused"
-msgstr "Unused"
+msgstr "Non utilizzato"
 
 #. module: wordpress_connector
 #: model:ir.ui.view,arch_db:wordpress_connector.product_product_view_form
@@ -552,47 +552,47 @@ msgstr "Up sell"
 #: model:ir.model.fields,field_description:wordpress_connector.field_product_template_wp_up_sell_ids
 #: model:ir.ui.view,arch_db:wordpress_connector.product_product_view_form
 msgid "Up sell product"
-msgstr "Up sell product"
+msgstr "Prodotto Up sell"
 
 #. module: wordpress_connector
 #: model:ir.model.fields,field_description:wordpress_connector.field_wp_connector_update_attribute
 msgid "Update attribute and terms"
-msgstr "Update attribute and terms"
+msgstr "Aggiorna termini e prodotti"
 
 #. module: wordpress_connector
 #: model:ir.model.fields,field_description:wordpress_connector.field_wp_connector_update_category
 msgid "Update category"
-msgstr "Update category"
+msgstr "Aggiorna categorie"
 
 #. module: wordpress_connector
 #: model:ir.model.fields,field_description:wordpress_connector.field_wp_connector_update_tag
 msgid "Update tag"
-msgstr "Update tag"
+msgstr "Aggiorna tag"
 
 #. module: wordpress_connector
 #: model:ir.ui.view,arch_db:wordpress_connector.view_wp_tag_search
 msgid "Used"
-msgstr "Used"
+msgstr "Utilizzato"
 
 #. module: wordpress_connector
 #: model:ir.model.fields,help:wordpress_connector.field_wp_product_attribute_used_in_variant
 msgid "Used in product variant setup"
-msgstr "Used in product variant setup"
+msgstr "Utilizzato nell'impostazione di varianti"
 
 #. module: wordpress_connector
 #: model:ir.ui.view,arch_db:wordpress_connector.view_wp_tag_search
 msgid "Used mode"
-msgstr "Used mode"
+msgstr "Modo d'uso"
 
 #. module: wordpress_connector
 #: selection:product.template,wp_type:0
 msgid "Variable product"
-msgstr "Variable product"
+msgstr "Prodotto variante"
 
 #. module: wordpress_connector
 #: model:ir.model.fields,field_description:wordpress_connector.field_wp_product_attribute_used_in_variant
 msgid "Variant"
-msgstr "Variant"
+msgstr "Variante"
 
 #. module: wordpress_connector
 #: model:ir.ui.view,arch_db:wordpress_connector.product_product_view_form
@@ -603,7 +603,7 @@ msgstr "Varianti"
 #: model:ir.model.fields,field_description:wordpress_connector.field_product_product_wp_variation_term_id
 #: model:ir.model.fields,field_description:wordpress_connector.field_product_template_wp_variation_term_id
 msgid "Variation terms"
-msgstr "Variation terms"
+msgstr "Termini variante"
 
 #. module: wordpress_connector
 #: selection:wp.connector,mode:0
@@ -618,18 +618,18 @@ msgstr "WP API"
 #. module: wordpress_connector
 #: model:ir.model.fields,field_description:wordpress_connector.field_product_category_wp_child_ids
 msgid "WP Child"
-msgstr "WP Child"
+msgstr "WP Figlio"
 
 #. module: wordpress_connector
 #: model:ir.model.fields,field_description:wordpress_connector.field_product_category_wp_description
 msgid "WP Description"
-msgstr "WP Description"
+msgstr "WP Descrizione"
 
 #. module: wordpress_connector
 #: model:ir.model.fields,field_description:wordpress_connector.field_product_product_wp_image
 #: model:ir.model.fields,field_description:wordpress_connector.field_product_template_wp_image
 msgid "WP Image"
-msgstr "WP Image"
+msgstr "WP Immagine"
 
 #. module: wordpress_connector
 #: model:ir.model.fields,field_description:wordpress_connector.field_wp_connector_url
@@ -639,23 +639,23 @@ msgstr "WP URL"
 #. module: wordpress_connector
 #: model:ir.model.fields,field_description:wordpress_connector.field_wp_connector_version
 msgid "WP Version"
-msgstr "WP Version"
+msgstr "WP Versione"
 
 #. module: wordpress_connector
 #: model:ir.model.fields,field_description:wordpress_connector.field_wp_connector_key
 msgid "WP consumer key"
-msgstr "WP consumer key"
+msgstr "WP chiave utente"
 
 #. module: wordpress_connector
 #: model:ir.model.fields,field_description:wordpress_connector.field_wp_connector_secret
 msgid "WP consumer secret"
-msgstr "WP consumer secret"
+msgstr "WP segreto utente"
 
 #. module: wordpress_connector
 #: model:ir.model.fields,field_description:wordpress_connector.field_product_product_wp_published
 #: model:ir.model.fields,field_description:wordpress_connector.field_product_template_wp_published
 msgid "WP published"
-msgstr "WP published"
+msgstr "WP pubblicati"
 
 #. module: wordpress_connector
 #: model:ir.ui.menu,name:wordpress_connector.wordpress_root
@@ -669,32 +669,32 @@ msgstr "Wordpress"
 #: model:ir.ui.view,arch_db:wordpress_connector.wp_attribute_view_tree
 #: model:ir.ui.view,arch_db:wordpress_connector.wp_connector_view_form
 msgid "Wordpress Attribute"
-msgstr "Wordpress Attribute"
+msgstr "Wordpress attributo"
 
 #. module: wordpress_connector
 #: model:ir.ui.view,arch_db:wordpress_connector.wp_attribute_term_view_form
 #: model:ir.ui.view,arch_db:wordpress_connector.wp_attribute_term_view_tree
 msgid "Wordpress Attribute Term"
-msgstr "Wordpress Attribute Term"
+msgstr "Wordpress termine attributo"
 
 #. module: wordpress_connector
 #: model:ir.model,name:wordpress_connector.model_wp_category
 #: model:ir.ui.view,arch_db:wordpress_connector.view_wordpress_category_form
 #: model:ir.ui.view,arch_db:wordpress_connector.view_wordpress_category_tree
 msgid "Wordpress Category"
-msgstr "Wordpress Category"
+msgstr "Wordpress Categoria"
 
 #. module: wordpress_connector
 #: model:ir.actions.act_window,name:wordpress_connector.wp_connector_action
 #: model:ir.model,name:wordpress_connector.model_wp_connector
 msgid "Wordpress Connector"
-msgstr "Wordpress Connector"
+msgstr "Wordpress Connettore"
 
 #. module: wordpress_connector
 #: model:ir.model.fields,field_description:wordpress_connector.field_product_product_wp_status
 #: model:ir.model.fields,field_description:wordpress_connector.field_product_template_wp_status
 msgid "Wordpress Status"
-msgstr "Wordpress Status"
+msgstr "Wordpress Stato"
 
 #. module: wordpress_connector
 #: model:ir.actions.act_window,name:wordpress_connector.wp_tag_action
@@ -710,23 +710,23 @@ msgstr "Wordpress Tags"
 #. module: wordpress_connector
 #: model:ir.model,name:wordpress_connector.model_wp_attribute_term
 msgid "Wordpress attribute term"
-msgstr "Wordpress attribute term"
+msgstr "Wordpress termini attributo"
 
 #. module: wordpress_connector
 #: model:ir.ui.view,arch_db:wordpress_connector.wp_connector_view_tree
 msgid "Wordpress connector"
-msgstr "Wordpress connector"
+msgstr "Wordpress connettore"
 
 #. module: wordpress_connector
 #: model:ir.model.fields,help:wordpress_connector.field_product_product_wp_master
 #: model:ir.model.fields,help:wordpress_connector.field_product_template_wp_master
 msgid "Wordpress master product"
-msgstr "Wordpress master product"
+msgstr "Wordpress prodotto master"
 
 #. module: wordpress_connector
 #: model:ir.actions.act_window,name:wordpress_connector.wp_product_category_parent_action
 msgid "Wordpress product category"
-msgstr "Wordpress product category"
+msgstr "Wordpress categoria prodotto"
 
 #. module: wordpress_connector
 #: model:ir.ui.view,arch_db:wordpress_connector.wp_tag_view_tree
@@ -737,7 +737,7 @@ msgstr "Wordpress tags"
 #: model:ir.model.fields,field_description:wordpress_connector.field_product_product_wp_type
 #: model:ir.model.fields,field_description:wordpress_connector.field_product_template_wp_type
 msgid "Wordpress type"
-msgstr "Wordpress type"
+msgstr "Wordpress tipo"
 
 #. module: wordpress_connector
 #: model:ir.model.fields,field_description:wordpress_connector.field_product_category_wp_id
@@ -762,25 +762,25 @@ msgstr "Wp ID out"
 #. module: wordpress_connector
 #: model:ir.model.fields,field_description:wordpress_connector.field_product_category_wp_sequence
 msgid "Wp Sequence"
-msgstr "Wp Sequence"
+msgstr "Wp sequenza"
 
 #. module: wordpress_connector
 #: selection:product.template,wp_status:0
 msgid "draft"
-msgstr "draft"
+msgstr "bozza"
 
 #. module: wordpress_connector
 #: selection:product.template,wp_status:0
 msgid "pending"
-msgstr "pending"
+msgstr "pendente"
 
 #. module: wordpress_connector
 #: selection:product.template,wp_status:0
 msgid "private"
-msgstr "private"
+msgstr "privato"
 
 #. module: wordpress_connector
 #: selection:product.template,wp_status:0
 msgid "publish"
-msgstr "publish"
+msgstr "pubblico"
 
