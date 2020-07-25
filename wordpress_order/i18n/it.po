@@ -112,62 +112,62 @@ msgstr "Manage web status"
 #: model:ir.ui.view,arch_db:wordpress_order.view_sale_order_wordpress_form
 #: model:ir.ui.view,arch_db:wordpress_order.view_sale_order_wordpress_payment_tree
 msgid "Number"
-msgstr "Number"
+msgstr "Numero"
 
 #. module: wordpress_order
 #: selection:sale.order,wp_status:0
 msgid "On hold"
-msgstr "On hold"
+msgstr "In attesa"
 
 #. module: wordpress_order
 #: model:ir.ui.menu,name:wordpress_order.wordpress_order_root
 msgid "Order"
-msgstr "Order"
+msgstr "Ordine"
 
 #. module: wordpress_order
 #: model:ir.ui.view,arch_db:wordpress_order.wp_connector_view_form
 msgid "Order block:"
-msgstr "Order block:"
+msgstr "Blocco ordine:"
 
 #. module: wordpress_order
 #: model:ir.ui.view,arch_db:wordpress_order.wp_connector_view_form
 msgid "Order input"
-msgstr "Order input"
+msgstr "Input ordine"
 
 #. module: wordpress_order
 #: model:ir.model.fields,field_description:wordpress_order.field_wp_connector_order_limit
 msgid "Order limit"
-msgstr "Order limit"
+msgstr "Limite ordine"
 
 #. module: wordpress_order
 #: model:ir.model.fields,field_description:wordpress_order.field_wp_connector_order_start_page
 msgid "Order start page"
-msgstr "Order start page"
+msgstr "Pagina inizio ordini"
 
 #. module: wordpress_order
 #: model:ir.model.fields,field_description:wordpress_order.field_sale_order_wp_status
 msgid "Order status"
-msgstr "Order status"
+msgstr "Stato ordine"
 
 #. module: wordpress_order
 #: model:ir.model.fields,field_description:wordpress_order.field_wp_connector_order_stop_page
 msgid "Order stop page"
-msgstr "Order stop page"
+msgstr "Pagina fine ordini"
 
 #. module: wordpress_order
 #: model:ir.ui.view,arch_db:wordpress_order.view_sale_order_line_form
 msgid "Order wil be marked as cancelled, confirm?"
-msgstr "Order wil be marked as cancelled, confirm?"
+msgstr "L'ordine verrà marcato come annullato, confermi?"
 
 #. module: wordpress_order
 #: model:ir.ui.view,arch_db:wordpress_order.view_sale_order_line_form
 msgid "Order wil be marked as failed, confirm?"
-msgstr "Order wil be marked as failed, confirm?"
+msgstr "L'ordine verrà marcato come fallito, confermi?"
 
 #. module: wordpress_order
 #: model:ir.ui.view,arch_db:wordpress_order.view_sale_order_line_form
 msgid "Order will be marked as refunded, confirm?"
-msgstr "Order will be marked as refunded, confirm?"
+msgstr "L'ordine verrà marcato come rimborsato, confermi?"
 
 #. module: wordpress_order
 #: model:ir.ui.menu,name:wordpress_order.wordpress_order_payment
@@ -182,12 +182,12 @@ msgstr "Termini di pagamento"
 #. module: wordpress_order
 #: selection:sale.order,wp_status:0
 msgid "Pending"
-msgstr "Pending"
+msgstr "Pentente"
 
 #. module: wordpress_order
 #: selection:sale.order,wp_status:0
 msgid "Processing"
-msgstr "Processing"
+msgstr "In elaborazione"
 
 #. module: wordpress_order
 #: model:ir.model,name:wordpress_order.model_sale_order
@@ -199,28 +199,28 @@ msgstr "Preventivo"
 #: model:ir.ui.view,arch_db:wordpress_order.view_sale_order_wordpress_form
 #: model:ir.ui.view,arch_db:wordpress_order.view_sale_order_wordpress_payment_tree
 msgid "Refresh"
-msgstr "Refresh"
+msgstr "Aggiorna"
 
 #. module: wordpress_order
 #: model:ir.ui.view,arch_db:wordpress_order.view_sale_order_line_form
 #: selection:sale.order,wp_status:0
 msgid "Refunded"
-msgstr "Refunded"
+msgstr "Rimborsato"
 
 #. module: wordpress_order
 #: model:ir.model.fields,field_description:wordpress_order.field_sale_order_soap_last_error
 msgid "SOAP Last Error"
-msgstr "SOAP Last Error"
+msgstr "Ultimo errore"
 
 #. module: wordpress_order
 #: model:ir.ui.view,arch_db:wordpress_order.view_sale_order_wordpress_form
 msgid "Sale order"
-msgstr "Sale order"
+msgstr "Ordine di vendita"
 
 #. module: wordpress_order
 #: model:ir.ui.view,arch_db:wordpress_order.view_sale_order_wordpress_payment_tree
 msgid "Sale order payment"
-msgstr "Sale order payment"
+msgstr "Pagamento ordine"
 
 #. module: wordpress_order
 #: model:ir.model,name:wordpress_order.model_sale_order_line
@@ -230,54 +230,54 @@ msgstr "Riga ordine di vendita"
 #. module: wordpress_order
 #: selection:sale.order,wp_status:0
 msgid "Sent to GSped"
-msgstr "Sent to GSped"
+msgstr "In preparazione"
 
 #. module: wordpress_order
 #: code:addons/wordpress_order/models/wp_order.py:482
 #, python-format
 msgid "Shipping cost"
-msgstr "Shipping cost"
+msgstr "Costo consegna"
 
 #. module: wordpress_order
 #: model:ir.model.fields,help:wordpress_order.field_wp_connector_order_start_page
 msgid "Start reading orders from page"
-msgstr "Start reading orders from page"
+msgstr "Inizia a leggere gli ordini dalla pagina
 
 #. module: wordpress_order
 #: model:ir.model.fields,help:wordpress_order.field_wp_connector_order_stop_page
 msgid "Stop reading orders from page (0 means unlimited)"
-msgstr "Stop reading orders from page (0 means unlimited)"
+msgstr "Fermati a leggere gli ordini dalla pagina (0 significa illimitato)"
 
 #. module: wordpress_order
 #: model:ir.model.fields,help:wordpress_order.field_wp_connector_manage_delivery
 msgid "The new order will be marked for manage delivery in ODOO"
-msgstr "The new order will be marked for manage delivery in ODOO"
+msgstr "Il nuovo ordine verrà marcato come gestito in ODOO"
 
 #. module: wordpress_order
 #: model:ir.ui.view,arch_db:wordpress_order.view_sale_order_line_form
 msgid "This operation will end the order process, confirm?"
-msgstr "This operation will end the order process, confirm?"
+msgstr "Questa operazione terminerà il processo degli ordini, confermi?"
 
 #. module: wordpress_order
 #: model:ir.model.fields,help:wordpress_order.field_sale_order_manage_delivery
 msgid "This order manage delivery in ODOO"
-msgstr "This order manage delivery in ODOO"
+msgstr "Questo ordine gestisce la consegna in ODOO"
 
 #. module: wordpress_order
 #: model:ir.ui.view,arch_db:wordpress_order.view_sale_order_wordpress_form
 #: model:ir.ui.view,arch_db:wordpress_order.view_sale_order_wordpress_payment_tree
 msgid "Total (VAT included)"
-msgstr "Total (VAT included)"
+msgstr "Totale (IVA inclusa)"
 
 #. module: wordpress_order
 #: model:ir.model.fields,field_description:wordpress_order.field_sale_order_wp_customer_note
 msgid "WP customer note"
-msgstr "WP customer note"
+msgstr "WP note cliente"
 
 #. module: wordpress_order
 #: model:ir.model.fields,help:wordpress_order.field_wp_connector_manage_web_status
 msgid "Will update wordpress order status during order operation"
-msgstr "Will update wordpress order status during order operation"
+msgstr Aggiornerà lo stato ordine di Wordpress durante le operazioni in ODOO"
 
 #. module: wordpress_order
 #: model:ir.ui.view,arch_db:wordpress_order.view_sale_order_line_form
@@ -292,17 +292,17 @@ msgstr "Wordpress Connettore"
 #. module: wordpress_order
 #: model:ir.actions.act_window,name:wordpress_order.view_sale_order_action
 msgid "Wordpress order"
-msgstr "Wordpress order"
+msgstr "Wordpress ordine"
 
 #. module: wordpress_order
 #: model:ir.actions.act_window,name:wordpress_order.view_sale_order_payment_action
 msgid "Wordpress order payment"
-msgstr "Wordpress order payment"
+msgstr "Wordpress pagamento ordine"
 
 #. module: wordpress_order
 #: model:ir.model.fields,field_description:wordpress_order.field_account_payment_term_wp_payment_code
 msgid "Wordpress payment code"
-msgstr "Wordpress payment code"
+msgstr "Wordpress codice pagamento"
 
 #. module: wordpress_order
 #: model:ir.model.fields,field_description:wordpress_order.field_sale_order_line_wp_id
@@ -313,15 +313,15 @@ msgstr "Wp ID"
 #. module: wordpress_order
 #: model:ir.model.fields,field_description:wordpress_order.field_sale_order_wp_date_completed
 msgid "Wp date completed"
-msgstr "Wp date completed"
+msgstr "Wp data completamento"
 
 #. module: wordpress_order
 #: model:ir.model.fields,field_description:wordpress_order.field_sale_order_wp_date_created
 msgid "Wp date created"
-msgstr "Wp date created"
+msgstr "Wp data creazione"
 
 #. module: wordpress_order
 #: model:ir.model.fields,field_description:wordpress_order.field_sale_order_wp_date_modified
 msgid "Wp date modified"
-msgstr "Wp date modified"
+msgstr "Wp data modifica"
 
