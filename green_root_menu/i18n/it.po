@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 11.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-25 14:27+0000\n"
-"PO-Revision-Date: 2020-07-25 14:27+0000\n"
+"POT-Creation-Date: 2020-07-25 15:51+0000\n"
+"PO-Revision-Date: 2020-07-25 15:51+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -32,15 +32,23 @@ msgstr "Tutti"
 
 #. module: green_root_menu
 #: model:ir.ui.menu,name:green_root_menu.carrier_root_menu
-msgid "Carrier"
-msgstr "Corriere"
+msgid "Carrier management"
+msgstr "Carrier management"
+
+#. module: green_root_menu
+#: model:ir.ui.menu,name:green_root_menu.carrier_sale_order_action_sent_menu
+msgid "Completed"
+msgstr "Completato"
 
 #. module: green_root_menu
 #: model:ir.ui.menu,name:green_root_menu.carrier_sale_order_action_delivered_menu
+msgid "Delivered"
+msgstr "Consegnato"
+
+#. module: green_root_menu
 #: model:ir.ui.menu,name:green_root_menu.carrier_sale_order_action_menu
-#: model:ir.ui.menu,name:green_root_menu.carrier_sale_order_action_sent_menu
-msgid "Carrier sale order"
-msgstr "Ordine con corriere"
+msgid "Draft"
+msgstr "Bozza"
 
 #. module: green_root_menu
 #: model:ir.ui.menu,name:green_root_menu.menu_green_header_root
