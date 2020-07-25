@@ -168,6 +168,7 @@ class WPConnector(models.Model):
         # Email is the key:
         name = odoo_data['billing']['name']
         email = odoo_data['billing']['email']
+        pdb.set_trace()
         partners = partner_pool.search([
             ('email', '=', email),
             ('name', '=ilike', name),
