@@ -170,7 +170,7 @@ class WPConnector(models.Model):
         email = odoo_data['billing']['email']
         partners = partner_pool.search([
             ('email', '=', email),
-            ('name', 'ilike', name),
+            ('name', '=ilike', name),
             ])
 
         if partners:
