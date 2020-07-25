@@ -475,7 +475,7 @@ msgstr "Sincronizza categorie"
 #. module: wordpress_connector
 #: model:ir.ui.view,arch_db:wordpress_connector.wp_connector_view_form
 msgid "Syncro product"
-msgstr "Sincronizza prodotto
+msgstr "Sincronizza prodotto"
 
 #. module: wordpress_connector
 #: model:ir.ui.view,arch_db:wordpress_connector.wp_connector_view_form
