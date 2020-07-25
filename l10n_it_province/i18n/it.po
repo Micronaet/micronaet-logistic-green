@@ -1,0 +1,166 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* l10n_it_province
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 11.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-07-25 15:20+0000\n"
+"PO-Revision-Date: 2020-07-25 15:20+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: l10n_it_province
+#: model:ir.model.fields,field_description:l10n_it_province.field_res_city_cadaster_code
+msgid "Cadaster Code"
+msgstr "Codice Cadaster"
+
+#. module: l10n_it_province
+#: model:ir.actions.act_window,name:l10n_it_province.action_city
+#: model:ir.ui.menu,name:l10n_it_province.menu_city_partner
+msgid "Cities"
+msgstr "Città"
+
+#. module: l10n_it_province
+#: model:ir.model,name:l10n_it_province.model_res_city
+#: model:ir.model.fields,field_description:l10n_it_province.field_res_city_name
+#: model:ir.ui.view,arch_db:l10n_it_province.view_res_city_form
+#: model:ir.ui.view,arch_db:l10n_it_province.view_res_city_tree
+msgid "City"
+msgstr "Città"
+
+#. module: l10n_it_province
+#: model:ir.model.fields,field_description:l10n_it_province.field_res_region_country_id
+msgid "Country"
+msgstr "Nazione"
+
+#. module: l10n_it_province
+#: model:ir.model.fields,field_description:l10n_it_province.field_res_city_create_uid
+#: model:ir.model.fields,field_description:l10n_it_province.field_res_province_create_uid
+#: model:ir.model.fields,field_description:l10n_it_province.field_res_region_create_uid
+msgid "Created by"
+msgstr "Creato da"
+
+#. module: l10n_it_province
+#: model:ir.model.fields,field_description:l10n_it_province.field_res_city_create_date
+#: model:ir.model.fields,field_description:l10n_it_province.field_res_province_create_date
+#: model:ir.model.fields,field_description:l10n_it_province.field_res_region_create_date
+msgid "Created on"
+msgstr "Creato il"
+
+#. module: l10n_it_province
+#: model:ir.model.fields,field_description:l10n_it_province.field_res_city_display_name
+#: model:ir.model.fields,field_description:l10n_it_province.field_res_province_display_name
+#: model:ir.model.fields,field_description:l10n_it_province.field_res_region_display_name
+msgid "Display Name"
+msgstr "Nome Completo"
+
+#. module: l10n_it_province
+#: model:ir.model.fields,field_description:l10n_it_province.field_res_city_id
+#: model:ir.model.fields,field_description:l10n_it_province.field_res_province_id
+#: model:ir.model.fields,field_description:l10n_it_province.field_res_region_id
+msgid "ID"
+msgstr "ID"
+
+#. module: l10n_it_province
+#: model:ir.model.fields,field_description:l10n_it_province.field_res_city_istat_code
+msgid "ISTAT code"
+msgstr "Codice ISTAT"
+
+#. module: l10n_it_province
+#: model:ir.model.fields,field_description:l10n_it_province.field_res_city___last_update
+#: model:ir.model.fields,field_description:l10n_it_province.field_res_province___last_update
+#: model:ir.model.fields,field_description:l10n_it_province.field_res_region___last_update
+msgid "Last Modified on"
+msgstr "Data di ultima modifica"
+
+#. module: l10n_it_province
+#: model:ir.model.fields,field_description:l10n_it_province.field_res_city_write_uid
+#: model:ir.model.fields,field_description:l10n_it_province.field_res_province_write_uid
+#: model:ir.model.fields,field_description:l10n_it_province.field_res_region_write_uid
+msgid "Last Updated by"
+msgstr "Ultima modifica di"
+
+#. module: l10n_it_province
+#: model:ir.model.fields,field_description:l10n_it_province.field_res_city_write_date
+#: model:ir.model.fields,field_description:l10n_it_province.field_res_province_write_date
+#: model:ir.model.fields,field_description:l10n_it_province.field_res_region_write_date
+msgid "Last Updated on"
+msgstr "Ultima modifica il"
+
+#. module: l10n_it_province
+#: model:ir.ui.menu,name:l10n_it_province.menu_partner_city_root
+msgid "Partner localization"
+msgstr "Localizzazione partner"
+
+#. module: l10n_it_province
+#: model:ir.model,name:l10n_it_province.model_res_province
+#: model:ir.model.fields,field_description:l10n_it_province.field_res_city_province_id
+#: model:ir.ui.view,arch_db:l10n_it_province.view_res_province_form
+#: model:ir.ui.view,arch_db:l10n_it_province.view_res_province_tree
+msgid "Province"
+msgstr "Provincia"
+
+#. module: l10n_it_province
+#: model:ir.model.fields,field_description:l10n_it_province.field_res_province_code
+msgid "Province Code"
+msgstr "Codice provincia"
+
+#. module: l10n_it_province
+#: model:ir.model.fields,field_description:l10n_it_province.field_res_province_name
+msgid "Province Name"
+msgstr "Nome provincia"
+
+#. module: l10n_it_province
+#: model:ir.actions.act_window,name:l10n_it_province.action_province
+#: model:ir.ui.menu,name:l10n_it_province.menu_province_partner
+msgid "Provinces"
+msgstr "Province"
+
+#. module: l10n_it_province
+#: model:ir.model,name:l10n_it_province.model_res_region
+#: model:ir.model.fields,field_description:l10n_it_province.field_res_city_region
+#: model:ir.model.fields,field_description:l10n_it_province.field_res_province_region
+msgid "Region"
+msgstr "Regione"
+
+#. module: l10n_it_province
+#: model:ir.model.fields,field_description:l10n_it_province.field_res_region_name
+msgid "Region Name"
+msgstr "Nome regione"
+
+#. module: l10n_it_province
+#: model:ir.model.fields,field_description:l10n_it_province.field_res_city_phone_prefix
+msgid "Telephone Prefix"
+msgstr "Prefisso telefonico"
+
+#. module: l10n_it_province
+#: model:ir.model.fields,help:l10n_it_province.field_res_province_name
+msgid "The full name of the province."
+msgstr "Nome completo della provincia."
+
+#. module: l10n_it_province
+#: model:ir.model.fields,help:l10n_it_province.field_res_region_name
+msgid "The full name of the region."
+msgstr "Nome completo della regione."
+
+#. module: l10n_it_province
+#: model:ir.model.fields,help:l10n_it_province.field_res_province_code
+msgid "The province code in two chars."
+msgstr "Il codice provincia a due caratteri."
+
+#. module: l10n_it_province
+#: model:ir.model.fields,field_description:l10n_it_province.field_res_city_web_site
+msgid "Web Site"
+msgstr "Sito web"
+
+#. module: l10n_it_province
+#: model:ir.model.fields,field_description:l10n_it_province.field_res_city_zip
+msgid "ZIP"
+msgstr "CAP"
+

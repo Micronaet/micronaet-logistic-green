@@ -84,7 +84,7 @@ msgstr "I dati corriere non sono OK (annullare operazione)"
 #. module: green_logistic_carrier
 #: model:ir.ui.view,arch_db:green_logistic_carrier.view_sale_order_logistic_search
 msgid "Carrier delivered date"
-msgstr "Carrier delivered date"
+msgstr "Data consegna corriere"
 
 #. module: green_logistic_carrier
 #: model:ir.model.fields,field_description:green_logistic_carrier.field_sale_order_carrier_description
@@ -117,7 +117,7 @@ msgstr "Risposta corriere:"
 #. module: green_logistic_carrier
 #: model:ir.model.fields,field_description:green_logistic_carrier.field_sale_order_carrier_mode_id
 msgid "Carrier service"
-msgstr "Carrier service"
+msgstr "Servizio corriere"
 
 #. module: green_logistic_carrier
 #: model:ir.ui.view,arch_db:green_logistic_carrier.view_sale_order_logistic_search
