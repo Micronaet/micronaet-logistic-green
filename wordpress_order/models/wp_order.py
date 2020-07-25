@@ -73,13 +73,18 @@ class WPConnector(models.Model):
             """ Extract name from record
                 partner_block: wordpress partner block
             """
-            if partner_block['company']:
-                return partner_block['company']
-            else:
-                return '%s %s' % (
+            customer = '%s %s' % (
                     partner_block['first_name'],
                     partner_block['last_name'],
                     )
+            if partner_block['company']:
+                return '%s%s%s' % (
+                    partner_block['company'],
+                    ' - ' if customer,
+                    customer,
+                )
+            else:
+                return customer
 
         def get_country_id(partner_block):
             """ Extract name from record
