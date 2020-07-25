@@ -1,0 +1,64 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* green_root_menu
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 11.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-07-25 14:27+0000\n"
+"PO-Revision-Date: 2020-07-25 14:27+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: green_root_menu
+#: model:ir.ui.menu,name:green_root_menu.menu_green_left_accounting_root
+msgid "Accounting"
+msgstr "Contabilità"
+
+#. module: green_root_menu
+#: model:ir.ui.menu,name:green_root_menu.menu_green_left_administering_root
+msgid "Administering"
+msgstr "Amministrazione"
+
+#. module: green_root_menu
+#: model:ir.ui.menu,name:green_root_menu.wordpress_order_all
+msgid "All"
+msgstr "Tutti"
+
+#. module: green_root_menu
+#: model:ir.ui.menu,name:green_root_menu.carrier_root_menu
+msgid "Carrier"
+msgstr "Corriere"
+
+#. module: green_root_menu
+#: model:ir.ui.menu,name:green_root_menu.carrier_sale_order_action_delivered_menu
+#: model:ir.ui.menu,name:green_root_menu.carrier_sale_order_action_menu
+#: model:ir.ui.menu,name:green_root_menu.carrier_sale_order_action_sent_menu
+msgid "Carrier sale order"
+msgstr "Ordine con corriere"
+
+#. module: green_root_menu
+#: model:ir.ui.menu,name:green_root_menu.menu_green_header_root
+msgid "Green"
+msgstr "GREEN"
+
+#. module: green_root_menu
+#: model:ir.ui.menu,name:green_root_menu.menu_green_left_packaging_root
+msgid "Packaging"
+msgstr "Imballaggio"
+
+#. module: green_root_menu
+#: model:ir.ui.menu,name:green_root_menu.wordpress_order_payment
+msgid "Payment"
+msgstr "Pagamenti"
+
+#. module: green_root_menu
+#: model:ir.ui.menu,name:green_root_menu.menu_green_left_order_root
+msgid "Selling"
+msgstr "Vendite"
+
