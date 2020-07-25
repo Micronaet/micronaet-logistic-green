@@ -241,7 +241,7 @@ msgstr "Costo consegna"
 #. module: wordpress_order
 #: model:ir.model.fields,help:wordpress_order.field_wp_connector_order_start_page
 msgid "Start reading orders from page"
-msgstr "Inizia a leggere gli ordini dalla pagina
+msgstr "Inizia a leggere gli ordini dalla pagina"
 
 #. module: wordpress_order
 #: model:ir.model.fields,help:wordpress_order.field_wp_connector_order_stop_page
