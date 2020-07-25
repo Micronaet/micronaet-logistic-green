@@ -81,8 +81,6 @@
             <field name="domain">[('carrier_soap_state', '=', 'delivered'), ('manage_delivery', '=', True)]</field>
             <field name="view_id" ref="carrier_mbe_soap.carrier_sale_order_tree"/>
         </record>
-
-
     </data>
 </openerp>
 
