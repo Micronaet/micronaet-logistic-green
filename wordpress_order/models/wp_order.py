@@ -166,7 +166,6 @@ class WPConnector(models.Model):
         is_same = same_partner_check(odoo_data)
 
         # Email is the key:
-        pdb.set_trace()
         name = odoo_data['billing']['name']
         email = odoo_data['billing']['email']
         partners = partner_pool.search([
