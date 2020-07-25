@@ -80,7 +80,7 @@ class WPConnector(models.Model):
             if partner_block['company']:
                 return '%s%s%s' % (
                     partner_block['company'],
-                    ' - ' if customer,
+                    ' - ' if customer else '',
                     customer,
                 )
             else:
