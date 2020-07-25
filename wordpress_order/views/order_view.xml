@@ -109,8 +109,9 @@
                 <field name="currency_id" invisible="1" />
                 <field name="state" invisible="1"/>
                 <field name="wp_status" />
+                <button name="wp_wf_refresh_status" type="object" string="Refresh" icon="fa-refresh" />
                 <!--<button name="wp_wf_refresh_status" type="object" string="Refresh" icon="fa-refresh"/>-->
-                <button name="wp_wf_processing" type="object" string="Confirmed payment" icon="fa-money" colspan="1" />
+                <button name="wp_wf_processing" type="object" string="Confirmed payment" icon="fa-money" />
             </tree>
         </field>
     </record>
