@@ -223,6 +223,7 @@ class WPConnector(models.Model):
     def button_load_order(self):
         """ Load order from Wordpress
         """
+        pdb.set_trace()
         # Pool used:
         product_pool = self.env['product.product']
         sale_pool = self.env['sale.order']
