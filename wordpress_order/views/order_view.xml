@@ -57,7 +57,7 @@
 
                         <field name="wp_id"/>
                         <field name="wp_status"/>
-                        <button name="wp_wf_processing" type="object" string="Confirmed payment" icon="fa-money" colspan="1" attrs="{'invisible': [('wp_status', '!=', 'on-hold')]}"/>
+                        <button name="wp_wf_processing" type="object" string="Confirmed payment" icon="fa-money" colspan="1" attrs="{'invisible': [('wp_status', 'not in', ('pending', 'on-hold'))]}"/>
 
                         <field name="wp_date_created"/>
                         <field name="wp_date_modified"/>
