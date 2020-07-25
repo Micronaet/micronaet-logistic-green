@@ -93,6 +93,27 @@
             </tree>
         </field>
     </record>
+    <record id="view_sale_order_wordpress_payment_tree" model="ir.ui.view">
+        <field name="name">sale.order.wordpress.payment</field>
+        <field name="model">sale.order</field>
+        <field name="priority" eval="20"/>
+        <field name="arch" type="xml">
+            <tree string="Sale order payment" class="o_sale_order" >
+                <field name="name" string="Number" />
+                <field name="connector_id" />
+                <field name="date_order" string="Date" />
+                <field name="partner_id" />
+                <field name="partner_shipping_id" />
+                <field name="user_id" invisible="1" />
+                <field name="amount_total" sum="Total (VAT included)" widget="monetary" />
+                <field name="currency_id" invisible="1" />
+                <field name="state" invisible="1"/>
+                <field name="wp_status" />
+                <!--<button name="wp_wf_refresh_status" type="object" string="Refresh" icon="fa-refresh"/>-->
+                <button name="wp_wf_processing" type="object" string="Confirmed payment" icon="fa-money" colspan="1" />
+            </tree>
+        </field>
+    </record>
     <record id="view_sale_order_action" model="ir.actions.act_window">
         <field name="name">Wordpress order</field>
         <field name="type">ir.actions.act_window</field>
@@ -100,6 +121,16 @@
         <field name="view_mode">tree,form</field>
         <field name="view_id" ref="view_sale_order_wordpress_form" />
     </record>
+
+    <record id="view_sale_order_payment_action" model="ir.actions.act_window">
+        <field name="name">Wordpress order payment</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('wp_status', 'in', ('pending', 'on-hold'))]</field>
+        <field name="view_id" ref="view_sale_order_wordpress_payment_tree" />
+    </record>
     <menuitem id="wordpress_order_root" name="Order" parent="wordpress_connector.wordpress_root" sequence="20"/>
         <menuitem id="wordpress_order_all" name="All" parent="wordpress_order_root" sequence="10" action="view_sale_order_action"/>
+        <menuitem id="wordpress_order_payment" name="Payment" parent="wordpress_order_root" sequence="20" action="view_sale_order_payment_action"/>
 </odoo>
