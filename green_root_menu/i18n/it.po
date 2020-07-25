@@ -33,7 +33,7 @@ msgstr "Tutti"
 #. module: green_root_menu
 #: model:ir.ui.menu,name:green_root_menu.carrier_root_menu
 msgid "Carrier management"
-msgstr "Carrier management"
+msgstr "Gestione corriere"
 
 #. module: green_root_menu
 #: model:ir.ui.menu,name:green_root_menu.carrier_sale_order_action_sent_menu
