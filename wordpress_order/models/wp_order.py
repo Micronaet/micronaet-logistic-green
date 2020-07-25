@@ -166,9 +166,12 @@ class WPConnector(models.Model):
         is_same = same_partner_check(odoo_data)
 
         # Email is the key:
+        pdb.set_trace()
+        name = odoo_data['billing']['name']
         email = odoo_data['billing']['email']
         partners = partner_pool.search([
             ('email', '=', email),
+            ('name', 'ilike', name),
             ])
 
         if partners:
@@ -256,7 +259,6 @@ class WPConnector(models.Model):
         end_page = self.env.context.get('end_page', self.order_stop_page)
 
         update_order_reached = []
-        pdb.set_trace()
         while True:
             # Log:
             _logger.info('Reading orders from %s [Record %s-%s]' % (
