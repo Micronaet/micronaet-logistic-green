@@ -141,10 +141,11 @@ class WPConnector(models.Model):
             state_pool = self.env['res.country.state']
             province_code = partner_block['state']
             country_code = partner_block['country']
-            print(partner_block)
-            pdb.set_trace()
+            # print(partner_block)
+            # pdb.set_trace()
 
             states = state_pool.search([
+                '&'
                 ('country_id.code', '=', country_code),
                 '|',
                 ('code', '=', province_code),
