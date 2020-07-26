@@ -146,9 +146,9 @@ class WPConnector(models.Model):
 
             states = state_pool.search([
                 '&',
-                ('country_id.code', '=', country_code),
+                ('country_id.code', '=ilike', country_code),
                 '|',
-                ('code', '=', province_code),
+                ('code', '=ilike', province_code),
                 ('name', '=ilike', province_code),
             ])
             if not states:
