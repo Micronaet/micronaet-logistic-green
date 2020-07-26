@@ -185,7 +185,7 @@ class WPConnector(models.Model):
         odoo_data = {}
         for mode in ('billing', 'shipping'):
             partner_block = record[mode]
-            pdb.set_trace()
+            state = partner_block['state']  # Province code
 
             # This records are generated with all fields to check same:
             odoo_data[mode] = {
