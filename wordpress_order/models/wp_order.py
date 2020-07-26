@@ -134,6 +134,7 @@ class WPConnector(models.Model):
             else:
                 return False
 
+        '''
         def get_state_id(partner_block):
             """ Extract name from record
                 record: wordpress partner block
@@ -161,6 +162,7 @@ class WPConnector(models.Model):
                 return False
 
             return states[0].id
+        '''
 
         def same_partner_check(odoo_data):
             """ Check if same partner
