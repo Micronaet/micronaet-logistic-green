@@ -203,12 +203,13 @@ class WPConnector(models.Model):
         name = odoo_data['billing']['name']
         email = odoo_data['billing']['email']
         partners = partner_pool.search([
-            ('email', '=', email),
+            ('email', '=ilike', email),
             ('name', '=ilike', name),
             ])
 
         if partners:
             partner_invoice = partners[0]
+            # TODO update if not state
         else:
             partner_invoice = partner_pool.create(odoo_data['billing'])
         if not partner_invoice.state_id:
@@ -247,6 +248,7 @@ class WPConnector(models.Model):
             if destinations:
                 # Not updated for now:
                 # destinations.write(odoo_data['shipping'])
+                # TODO update if not state
                 partner_shipping = destinations[0]
             else:
                 partner_shipping = partner_pool.create(
