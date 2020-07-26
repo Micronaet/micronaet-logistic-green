@@ -145,7 +145,7 @@ class WPConnector(models.Model):
             # pdb.set_trace()
 
             states = state_pool.search([
-                '&'
+                '&',
                 ('country_id.code', '=', country_code),
                 '|',
                 ('code', '=', province_code),
