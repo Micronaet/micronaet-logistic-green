@@ -10,6 +10,40 @@ from odoo.tools.translate import _
 _logger = logging.getLogger(__name__)
 
 
+class ResPartner(models.Model):
+    """ Model name: Extend res partner
+    """
+    _inherit = 'res.partner'
+
+    @api.model
+    def update_partner_province(self):
+        """ Setup partner province
+        """
+        city_pool = self.env['res.city']
+        state_pool = self.env['res.country.state']
+
+        city_name = self.city
+        cities = city_pool.search([
+            ('name', '=ilike', city_name),
+        ])
+        if not cities:
+            return False
+        if len(cities) > 1:
+            _logger.error('More than one city!')
+            return False
+
+        province_code = cities[0].province_id.code
+        states = state_pool.search([
+            ('code', '=', province_code),
+            ('country_id.code', '=', 'IT'),  # TODO Parameter for country
+        ])
+        if not states:
+            return False
+        self.write({
+            'state_id': states[0].id,
+        })
+
+
 class AccountPaymentTerm(models.Model):
     """ Model name: Extend payment term
     """
@@ -156,7 +190,7 @@ class WPConnector(models.Model):
                 'customer': True,
                 'name': get_name(partner_block),
                 'country_id': get_country_id(partner_block),
-                'state_id': get_state_id(partner_block),
+                # 'state_id': get_state_id(partner_block),
                 'street': partner_block['address_1'],
                 'street2': partner_block['address_2'],
                 'city': partner_block['city'],
@@ -179,9 +213,12 @@ class WPConnector(models.Model):
             ])
 
         if partners:
-            partner_invoice_id = partners[0].id
+            partner_invoice = partners[0]
         else:
-            partner_invoice_id = partner_pool.create(odoo_data['billing']).id
+            partner_invoice = partner_pool.create(odoo_data['billing'])
+        if not partner_invoice.state_id:
+            partner_invoice.update_partner_province()
+        partner_invoice_id = partner_invoice.id
 
         # ---------------------------------------------------------------------
         # B. Shipping partner:
@@ -215,10 +252,14 @@ class WPConnector(models.Model):
             if destinations:
                 # Not updated for now:
                 # destinations.write(odoo_data['shipping'])
-                partner_shipping_id = destinations[0].id
+                partner_shipping = destinations[0]
             else:
-                partner_shipping_id = partner_pool.create(
-                    odoo_data['shipping']).id
+                partner_shipping = partner_pool.create(
+                    odoo_data['shipping'])
+
+            if not partner_shipping.state_id:
+                partner_shipping.update_partner_province()
+            partner_shipping_id = partner_shipping.id
 
         # For now no alternative invoice partner:
         return partner_id, partner_invoice_id, partner_shipping_id
