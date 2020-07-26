@@ -134,35 +134,21 @@ class WPConnector(models.Model):
             else:
                 return False
 
-        '''
         def get_state_id(partner_block):
             """ Extract name from record
                 record: wordpress partner block
             """
-            city_pool = self.env['res.city']
             state_pool = self.env['res.country.state']
+            province_code = partner_block['state']
+            country_code = partner_block['country']
 
-            city_name = partner_block['city']
-            cities = city_pool.search([
-                ('name', '=ilike', city_name),
-                ])
-            if not cities:
-                return False
-            if len(cities) > 1:
-                _logger.error('More than one city!')
-                return False
-
-            province_code = cities[0].province_id.code
             states = state_pool.search([
                 ('code', '=', province_code),
-                ('country_id.code', '=', 'IT'),  # TODO Parameter for country
+                ('country_id.code', '=', country_code),
             ])
-
             if not states:
                 return False
-
             return states[0].id
-        '''
 
         def same_partner_check(odoo_data):
             """ Check if same partner
@@ -185,7 +171,6 @@ class WPConnector(models.Model):
         odoo_data = {}
         for mode in ('billing', 'shipping'):
             partner_block = record[mode]
-            state = partner_block['state']  # Province code
 
             # This records are generated with all fields to check same:
             odoo_data[mode] = {
@@ -193,18 +178,20 @@ class WPConnector(models.Model):
                 'customer': True,
                 'name': get_name(partner_block),
                 'country_id': get_country_id(partner_block),
-                # 'state_id': get_state_id(partner_block),
                 'street': partner_block['address_1'],
                 'street2': partner_block['address_2'],
                 'city': partner_block['city'],
                 'zip': partner_block['postcode'],
                 # TODO 'property_account_position_id': 1,
-                # TODO state_id
 
                 # Billing only (keep also in shipping):
                 'email': record['billing']['email'].lower(),
                 'phone': record['billing']['phone'],
                 }
+            state_id = get_state_id(partner_block)
+            if state_id:
+                odoo_data[mode]['state_id'] = state_id
+
         is_same = same_partner_check(odoo_data)
         # Email is the key:
         name = odoo_data['billing']['name']
