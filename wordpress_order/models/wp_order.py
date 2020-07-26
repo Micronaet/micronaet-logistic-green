@@ -145,11 +145,13 @@ class WPConnector(models.Model):
             pdb.set_trace()
 
             states = state_pool.search([
-                ('code', '=', province_code),
                 ('country_id.code', '=', country_code),
+                ('code', '=', province_code),
+                ('name', '=ilike', province_code),
             ])
             if not states:
                 return False
+
             return states[0].id
 
         def same_partner_check(odoo_data):
