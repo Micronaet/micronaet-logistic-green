@@ -53,6 +53,7 @@
 
                         <button name="wp_wf_cancelled" type="object" string="Cancelled" icon="fa-mail-reply" colspan="1"  attrs="{'invisible': [('wp_status', '=', 'cancelled')]}"  confirm="Order wil be marked as cancelled, confirm?"/>
                         <button name="wp_wf_failed" type="object" string="Failed" icon="fa-ban" colspan="1"  attrs="{'invisible': [('wp_status', '=', 'failed')]}"  confirm="Order wil be marked as failed, confirm?"/>
+                        <button name="wp_wf_processing" type="object" string="Working" icon="fa-gear" colspan="1" attrs="{'invisible': [('wp_status', '!=', 'sent-to-gsped')]}"/>
                         <newline/>
 
                         <field name="wp_id"/>
