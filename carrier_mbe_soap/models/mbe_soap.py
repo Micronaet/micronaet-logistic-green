@@ -373,7 +373,7 @@ class SaleOrder(models.Model):
         data = {'Item': []}
         for parcel in order.parcel_ids:
             data['Item'].append({
-                'Weight': parcel.real_weight,
+                'Weight': parcel.used_weight,
                 'Dimensions': {
                     'Lenght': parcel.length,  # TODO typo but written wrong
                     'Height': parcel.height,

@@ -97,16 +97,16 @@ class SaleOrderParcel(models.Model):
     def _get_volumetric_weight(self):
         """ Compute volumetric weight, return value
         """
-        for template in self:
+        for line in self:
             weight = (  # Volumetric:
-                template.length * template.width * template.height / 5000.0)
-            real_weight = template.real_weight
+                line.length * line.width * line.height / 5000.0)
+            real_weight = line.real_weight
             if weight > real_weight:
                 used_weight = weight
             else:
                 used_weight = real_weight
-            template.weight = weight
-            template.used_weight = used_weight
+            line.weight = weight  # volumetric
+            line.used_weight = used_weight
 
     # -------------------------------------------------------------------------
     #                                   COLUMNS:
