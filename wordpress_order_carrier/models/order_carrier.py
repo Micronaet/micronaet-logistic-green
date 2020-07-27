@@ -58,7 +58,6 @@ class SaleOrder(models.Model):
                 order.name, order.carrier_soap_id)
 
         service = soap_connection.get_connection()
-        pdb.set_trace()
         data = order.get_request_container(
             system=True, internal=True, customer=False, store=False)
 
@@ -67,8 +66,9 @@ class SaleOrder(models.Model):
         error = order.check_reply_status(reply)
         if not error:
             # Update SOAP data for real call
-            tracking_status = reply.get('TrackingStatus')
+            tracking_status = reply['TrackingStatus']
             if tracking_status != order.delivery_soap_state:
+                pdb.set_trace()
                 # -------------------------------------------------------------
                 #                            Changed
                 # -------------------------------------------------------------
