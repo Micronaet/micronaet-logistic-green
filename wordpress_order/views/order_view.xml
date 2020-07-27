@@ -90,6 +90,7 @@
                 <field name="currency_id" invisible="1" />
                 <field name="state" invisible="1"/>
                 <field name="wp_status" />
+                <field name="manage_delivery" invisible="1"/>
                 <button name="wp_wf_refresh_status" type="object" string="Refresh" icon="fa-refresh"/>
             </tree>
         </field>
@@ -110,10 +111,21 @@
                 <field name="currency_id" invisible="1" />
                 <field name="state" invisible="1"/>
                 <field name="wp_status" />
+                <field name="manage_delivery" invisible="1"/>
                 <button name="wp_wf_refresh_status" type="object" string="Refresh" icon="fa-refresh" />
                 <!--<button name="wp_wf_refresh_status" type="object" string="Refresh" icon="fa-refresh"/>-->
                 <button name="wp_wf_processing" type="object" string="Confirmed payment" icon="fa-money" />
             </tree>
+        </field>
+    </record>
+    <record model="ir.ui.view" id="view_sale_order_logistic_manage_delivery_search">
+        <field name="name">sale.order.logistic.manage.delivery.search</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_sales_order_filter"/>
+        <field name="arch" type="xml">
+            <field name="user_id" position="after">
+                <filter name="manage_delivery_yes" string="Manage delivery ODOO" domain="[('manage_delivery','=',True)]"/>
+            </field>
         </field>
     </record>
     <record id="view_sale_order_action" model="ir.actions.act_window">
@@ -130,6 +142,7 @@
         <field name="res_model">sale.order</field>
         <field name="view_mode">tree,form</field>
         <field name="domain">[('wp_status', 'in', ('pending', 'on-hold'))]</field>
+        <field name="context">{'search_default_manage_delivery_yes': True}</field>
         <field name="view_id" ref="view_sale_order_wordpress_payment_tree" />
     </record>
     <menuitem id="wordpress_order_root" name="Order" parent="wordpress_connector.wordpress_root" sequence="20"/>

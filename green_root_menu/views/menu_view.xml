@@ -14,8 +14,8 @@
                  sequence="10"
                  groups="green_logistic_management.group_green_manager,green_logistic_management.group_green_sale_manager"
                  />
-                <menuitem id="wordpress_order_all" name="All" parent="menu_green_left_order_root" sequence="10" action="wordpress_order.view_sale_order_action"/>
-                <menuitem id="wordpress_order_payment" name="Payment" parent="menu_green_left_order_root" sequence="20" action="wordpress_order.view_sale_order_payment_action"/>
+                 <menuitem id="wordpress_order_all" name="All" parent="menu_green_left_order_root" sequence="10" action="wordpress_order.view_sale_order_action"/>
+                 <menuitem id="wordpress_order_payment" name="Payment" parent="menu_green_left_order_root" sequence="20" action="wordpress_order.view_sale_order_payment_action"/>
              <menuitem
                  id="menu_green_left_packaging_root"
                  parent="menu_green_header_root"
