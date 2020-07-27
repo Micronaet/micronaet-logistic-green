@@ -439,6 +439,7 @@ class SaleOrder(models.Model):
                     sys.exc_info(), ))
 
         # Update order with better quotation:
+        data = False
         if better:
             connection, data = better
             try:

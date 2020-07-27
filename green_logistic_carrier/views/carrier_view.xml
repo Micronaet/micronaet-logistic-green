@@ -70,7 +70,7 @@
                                     <field name="height" />
 
                                     <field name="real_weight" sum="total_real"/>
-                                    <field name="use_real_weight"/>
+                                    <field name="use_real_weight" />
                                     <field name="weight" sum="total_volumetric"/>
                                     <!--<field name="used_weight" sum="total_weight"/>-->
                                     <field name="no_label" />
