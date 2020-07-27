@@ -37,9 +37,13 @@ pdb.set_trace()
 if not order_ids:
     print('No order in sent state for now')
     sys.exit()
-print('Found sent order # %s' % len(order_ids))
+total = len(order_ids)
+print('Found sent order # %s' % total)
 
+i = 0
 for order_id in order_ids:
+    i += 1
     result = order_pool.shipments_get_tracking_result(order_id)
-    print(result or ('Order %s updated!' % order_id))
+    print(result or ('Order %s updated [%s / %s]!' % (
+        order_id, i, total)))
 print('Check order delivery done!')
