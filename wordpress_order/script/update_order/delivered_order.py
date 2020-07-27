@@ -1,5 +1,6 @@
 import os
 import sys
+import pdb
 from datetime import datetime, timedelta
 import erppeek
 import ConfigParser
@@ -32,7 +33,7 @@ order_pool = odoo.model('sale.order')
 order_ids = order_pool.search([
     ('carrier_soap_state', '=', 'sent'),
 ])
-
+pdb.set_trace()
 if not order_ids:
     print('No order in sent state for now')
     sys.exit()
