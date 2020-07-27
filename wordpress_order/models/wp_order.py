@@ -207,7 +207,10 @@ class WPConnector(models.Model):
 
         if partners:
             partner_invoice = partners[0]
-            # TODO update if not state
+            # Update state if present:
+            if not partner_invoice.state_id and \
+                    'state_id' in odoo_data['billing']:
+                partner_invoice.write(odoo_data['billing'])
         else:
             partner_invoice = partner_pool.create(odoo_data['billing'])
         if not partner_invoice.state_id:
@@ -219,7 +222,7 @@ class WPConnector(models.Model):
         # ---------------------------------------------------------------------
         partner_id = partner_invoice_id  # TODO for now is same!
 
-        # Add Extra data for link partner:
+        # Add Extra data for link partner/parent:
         odoo_data['shipping'].update({
             'parent_id': partner_id,
             'type': 'delivery',
@@ -240,6 +243,7 @@ class WPConnector(models.Model):
                 ('zip', '=', odoo_data['shipping']['zip']),
                 ('country_id', '=', odoo_data['shipping']['country_id']),
                 # TODO add other check:
+                # State not used, first is not present so double all partner!
                 # ('state_id.name', '=', odoo_data['shipping']['state']),
                 ])
 
@@ -248,6 +252,10 @@ class WPConnector(models.Model):
                 # destinations.write(odoo_data['shipping'])
                 # TODO update if not state
                 partner_shipping = destinations[0]
+                # Update state if present:
+                if not partner_shipping.state_id and \
+                        'state_id' in odoo_data['shipping']:
+                    destinations[0].write(odoo_data['shipping'])
             else:
                 partner_shipping = partner_pool.create(
                     odoo_data['shipping'])
