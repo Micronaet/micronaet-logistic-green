@@ -860,6 +860,7 @@ class SaleOrder(models.Model):
                 'carrier_mode_id': False,
                 'courier_supplier_id': False,
                 'courier_mode_id': False,
+                'carrier_cost': False,
             })
         return error
 
