@@ -101,10 +101,13 @@ class SaleOrderParcel(models.Model):
             weight = (  # Volumetric:
                 line.length * line.width * line.height / 5000.0)
             real_weight = line.real_weight
-            if weight > real_weight:
-                used_weight = weight
-            else:
-                used_weight = real_weight
+            if line.use_real_weight:
+                used_weight = line.real_weight  # Real
+            else:  # Greater evaluation:
+                if weight > real_weight:
+                    used_weight = weight
+                else:
+                    used_weight = real_weight
             line.weight = weight  # volumetric
             line.used_weight = used_weight
 
@@ -118,6 +121,8 @@ class SaleOrderParcel(models.Model):
     width = fields.Float('Width', digits=(16, 2), required=True)
     height = fields.Float('Height', digits=(16, 2), required=True)
     dimension_uom_id = fields.Many2one('product.uom', 'Product UOM')
+    use_real_weight = fields.Boolean(
+        string='Use real', help='Pass real weight instead of greater')
 
     # Weight:
     real_weight = fields.Float(
