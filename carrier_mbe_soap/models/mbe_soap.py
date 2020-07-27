@@ -294,7 +294,7 @@ class SaleOrder(models.Model):
             'CourierService': order.courier_mode_id.account_ref or '',
             'PackageType': order.package_type,
             'Referring': order.name,  # * 30
-            'InternalNotes': 'ORDINE DA CANCELLARE',  # TODO * string
+            'InternalNotes': '',  # TODO * string
             'Notes': note,
             'LabelFormat': 'NEW',  # * token (OLD, NEW)
             'Items': order.get_items_parcel_block(),
