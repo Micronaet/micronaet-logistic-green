@@ -201,7 +201,7 @@ class SaleOrder(models.Model):
             for error_block in reply['Errors']['Error']:
                 error_text += error_block['Description'].replace('\n', ' ')
                 error_text += '\n'
-        if console_log:
+        if console_log and error_text:
             _logger.error(error_text)
         return error_text
 
