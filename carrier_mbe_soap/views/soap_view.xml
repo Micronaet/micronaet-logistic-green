@@ -110,7 +110,8 @@
                 <field name="parcel_weight_tree" />
                 <button name="load_template_parcel" string="Add parcel" icon="fa-plus fa-2x" type="object" attrs="{'invisible': [('carrier_parcel_template_id','=',False)]}" class="oe_highlight"/>
 
-                <field name="parcel_ids" readonly="1"/>
+                <field name="parcel_detail" readonly="1"/>
+                <field name="parcel_ids" invisible="1"/>
                 <field name="ship_type" invisible="1"/>
                 <field name="package_type" invisible="1"/>
 

@@ -355,6 +355,20 @@ class SaleOrder(models.Model):
             order.carrier_check_error = error1 or error2 or error3
 
     @api.multi
+    def _get_parcel_detail(self):
+        """ Parcel detail
+        """
+        for order in self:
+            detail = ''
+            for parcel in order.parcel_ids:
+                detail += '%sx%sx%s\n' % (
+                    int(parcel.height),
+                    int(parcel.width),
+                    int(parcel.length),
+                )
+            order.parcel_detail = detail
+
+    @api.multi
     def _get_carrier_parcel_total(self):
         """ Return total depend on type of delivery: manual or shippy
         """
@@ -404,6 +418,7 @@ class SaleOrder(models.Model):
         ('CHECK', 'Check'),
         ], 'Pay mode', default='CASH')
     parcel_ids = fields.One2many('sale.order.parcel', 'order_id', 'Parcels')
+    parcel_detail = fields.Text('Parcel detail', compute='_get_parcel_detail')
     real_parcel_total = fields.Integer(
         string='Colli', compute='_get_carrier_parcel_total')
     destination_country_id = fields.Many2one(
