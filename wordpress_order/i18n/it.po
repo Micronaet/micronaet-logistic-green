@@ -182,7 +182,7 @@ msgstr "Termini di pagamento"
 #. module: wordpress_order
 #: selection:sale.order,wp_status:0
 msgid "Pending"
-msgstr "Pentente"
+msgstr "Pendente"
 
 #. module: wordpress_order
 #: selection:sale.order,wp_status:0
