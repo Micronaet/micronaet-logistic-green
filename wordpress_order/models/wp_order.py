@@ -341,9 +341,9 @@ class WPConnector(models.Model):
                 customer_note = record['customer_note']
 
                 # Date:
-                date_created = record['date_created']
-                date_modified = record['date_modified']
-                date_completed = record['date_completed']
+                date_created = record['date_created_gmt']
+                date_modified = record['date_modified_gmt']
+                date_completed = record['date_completed_gmt']
 
                 payment_term_id = payment_pool.get_payment_id_from_wordpress(
                     payment_method)
