@@ -67,6 +67,7 @@ class SaleOrder(models.Model):
         if not error:
             # Update SOAP data for real call
             tracking_status = reply['TrackingStatus']
+            pdb.set_trace()
             if tracking_status != order.delivery_soap_state:
                 pdb.set_trace()  # TODO check for update wordpress status
                 # -------------------------------------------------------------
