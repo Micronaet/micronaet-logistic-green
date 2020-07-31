@@ -24,10 +24,10 @@
                  groups="green_logistic_management.group_green_manager,green_logistic_management.group_green_package_manager"
                  />
                  <menuitem id="carrier_root_menu" parent="menu_green_left_packaging_root" name="Carrier management" sequence="10"/>
-                     <menuitem id="carrier_sale_order_action_lossy_menu" parent="carrier_root_menu" action="carrier_mbe_soap.carrier_sale_order_action_lossy" sequence="5" name="Carrier lossy"/>
                      <menuitem id="carrier_sale_order_action_menu" parent="carrier_root_menu" action="carrier_mbe_soap.carrier_sale_order_action" sequence="10" name="Draft"/>
                      <menuitem id="carrier_sale_order_action_sent_menu" parent="carrier_root_menu" action="carrier_mbe_soap.carrier_sale_order_action_sent" sequence="20" name="Completed" />
                      <menuitem id="carrier_sale_order_action_delivered_menu" parent="carrier_root_menu" action="carrier_mbe_soap.carrier_sale_order_action_delivered" sequence="30" name="Delivered"/>
+                     <menuitem id="carrier_sale_order_action_lossy_menu" parent="carrier_root_menu" action="carrier_mbe_soap.carrier_sale_order_action_lossy" sequence="40" name="Carrier lossy"/>
              <menuitem
                      id="menu_green_left_accounting_root"
                      parent="menu_green_header_root"
