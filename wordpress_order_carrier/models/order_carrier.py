@@ -39,6 +39,7 @@ class SaleOrder(models.Model):
                 'form': {'action_buttons': False},
             },
         }
+
     @api.multi
     def shipments_get_tracking_result(self):
         """ 18. Get tracking information

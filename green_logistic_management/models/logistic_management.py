@@ -767,7 +767,7 @@ class SaleOrder(models.Model):
             origin = _('%s [%s]') % (order.name, order.create_date[:10])
 
             picking = picking_pool.create({
-                'sale_order_id': order.id, # Link to order
+                'sale_order_id': order.id,  # Link to order
                 'partner_id': partner.id,
                 'scheduled_date': now,
                 'origin': origin,
