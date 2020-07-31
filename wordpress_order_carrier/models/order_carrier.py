@@ -78,6 +78,10 @@ class SaleOrder(models.Model):
                         tracking_status == 'DELIVERED':
                     # order.update_with_courier_data('delivered')
                     order.wp_wf_set_to_state('delivered')
+                    # TODO extra status remove (there's 3 state!)
+                    order.write({
+                        'carrier_soap_state': 'delivered',
+                    })
 
                 # 2. Change only tracking status:
                 order.write({
