@@ -383,7 +383,8 @@ class SaleOrder(models.Model):
             else:
                 order.real_parcel_total = order.carrier_manual_parcel
 
-    @api.depends('carrier_cost_total', 'order_line.price_subtotal')
+    @api.depends(
+        'carrier_cost', 'carrier_cost_total', 'order_line.price_subtotal')
     def _check_carrier_cost_value(self):
         """ Check if total shipment is correct
         """
