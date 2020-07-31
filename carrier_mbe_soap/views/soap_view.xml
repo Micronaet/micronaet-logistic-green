@@ -114,6 +114,7 @@
                 <field name="parcel_ids" invisible="1"/>
                 <field name="ship_type" invisible="1"/>
                 <field name="package_type" invisible="1"/>
+                <field name="carrier_cost_lossy" invisible="1"/>
 
                 <field name="carrier_supplier_id"/>
                 <field name="carrier_mode_id" domain="[('supplier_id', '=', carrier_supplier_id)]"/>
@@ -162,6 +163,14 @@
         <field name="res_model">sale.order</field>
         <field name="view_mode">tree,form</field>
         <field name="domain">[('carrier_soap_state', '=', 'delivered'),]</field>
+        <field name="view_id" ref="carrier_sale_order_tree"/>
+    </record>
+    <record id="carrier_sale_order_action_lossy" model="ir.actions.act_window">
+        <field name="name">Carrier order lossy</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('carrier_cost_lossy', '=', True)]</field>
         <field name="view_id" ref="carrier_sale_order_tree"/>
     </record>
 

@@ -228,9 +228,9 @@ class SaleOrder(models.Model):
         """
         self.ensure_one()
         # Generic call, check order before after supplier
-        connection = force_connection or \
-                     self.soap_connection_id or \
-                     self.carrier_supplier_id.soap_connection_id
+        connection = (force_connection or
+                      self.soap_connection_id or
+                      self.carrier_supplier_id.soap_connection_id)
         _logger.warning('Used %s connection!' % connection.name)
         data = {}
         if credentials:
@@ -265,7 +265,8 @@ class SaleOrder(models.Model):
         if partner.street2:
             address2 = partner.street2
         else:  # Update partner address with note so always was written
-            partner.write({'street2': note})
+            if note:
+                partner.write({'street2': note})
             address2 = note
 
         return {
@@ -290,15 +291,12 @@ class SaleOrder(models.Model):
         """ Return dict for order shipment
         """
         order = self
-        partner = order
 
         # TODO crossed field (bad solution)
-        note = eval("order.carrier_note or order.wp_customer_note or ''")[:35]
-        if partner.street2:
-            address2 = partner.street2
-        else:  # Update partner address with note so always was written
-            partner.write({'street2': note})
-            address2 = note
+        note = eval(
+            "order.carrier_note or order.wp_customer_note or "
+            "order.partner_shipping_id.address2 or ''")[:35]  # truncated
+
         data = {
             'ShipperType': order.shipper_type,
             'Description': order.check_size(
@@ -310,7 +308,7 @@ class SaleOrder(models.Model):
             'PackageType': order.package_type,
             'Referring': order.name,  # * 30
             'InternalNotes': '',  # TODO * string
-            'Notes': note[:35],  # TODO trunc
+            'Notes': note,
             'LabelFormat': 'NEW',  # * token (OLD, NEW)
             'Items': order.get_items_parcel_block(),
 

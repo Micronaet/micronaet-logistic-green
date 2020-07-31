@@ -387,14 +387,15 @@ class SaleOrder(models.Model):
     def _check_carrier_cost_value(self):
         """ Check if total shipment is correct
         """
+        _logger.warning('Recalculate lossy data!')
         for order in self:
-            payed = self.carrier_cost_total
+            payed = order.carrier_cost_total
             if not payed:
                 order.carrier_cost_lossy = False
                 continue
 
             request = sum([item.price_subtotal for item in order.order_line
-                           if item.default_code == 'shipment'])
+                           if item.product_id.default_code == 'shipment'])
             order.carrier_cost_lossy = payed > request
 
     # -------------------------------------------------------------------------
@@ -453,6 +454,7 @@ class SaleOrder(models.Model):
     carrier_cost_lossy = fields.Boolean(
         'Under carrier cost', help='Carrier cost payed less that request!',
         compute='_check_carrier_cost_value',
+        store=True,
     )
     carrier_track_id = fields.Char('Track ID', size=64)
     # TODO extra data needed!
