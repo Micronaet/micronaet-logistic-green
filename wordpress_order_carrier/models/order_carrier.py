@@ -73,13 +73,15 @@ class SaleOrder(models.Model):
                 # -------------------------------------------------------------
                 #                            Changed
                 # -------------------------------------------------------------
-                # 1. Change only tracking status:
+                # 1. Update ODOO and Wordpress:
+                if order.connector_id.manage_web_status and \
+                        tracking_status == 'DELIVERED':
+                    # order.update_with_courier_data('delivered')
+                    order.wp_wf_set_to_state('delivered')
+
+                # 2. Change only tracking status:
                 order.write({
                     'delivery_soap_state': tracking_status,
                 })
 
-                # 2. Update ODOO and Wordpress:
-                if order.connector_id.manage_web_status and \
-                        tracking_status == 'DELIVERED':
-                    order.update_with_courier_data('delivered')
         return error
