@@ -260,12 +260,13 @@ class SaleOrder(models.Model):
         order = self
         partner = order.partner_shipping_id or order.partner_id
         demo = 'TEST' if order.connector_id.demo_partner else ''
+        address2 = (partner.street2 or '')[:35] or (order.note or '')[:35]
         return {
             'Name': (demo or partner.name)[:35],
             'CompanyName': (demo or '')[:35],
             'Nickname': (demo or '')[:100],
             'Address': (partner.street or '')[:100],
-            'Address2': (partner.street2 or '')[:35],
+            'Address2': address2,
             'Address3': ''[:35],
             'Phone': (partner.phone or '')[:50],
             'ZipCode': (partner.zip or '')[:12],
@@ -295,7 +296,7 @@ class SaleOrder(models.Model):
             'PackageType': order.package_type,
             'Referring': order.name,  # * 30
             'InternalNotes': '',  # TODO * string
-            'Notes': note,
+            'Notes': note[:35],  # TODO trunc
             'LabelFormat': 'NEW',  # * token (OLD, NEW)
             'Items': order.get_items_parcel_block(),
 
