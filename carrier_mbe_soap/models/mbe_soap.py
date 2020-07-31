@@ -260,7 +260,14 @@ class SaleOrder(models.Model):
         order = self
         partner = order.partner_shipping_id or order.partner_id
         demo = 'TEST' if order.connector_id.demo_partner else ''
-        address2 = (partner.street2 or '')[:35] or (order.note or '')[:35]
+
+        note = eval("order.carrier_note or order.wp_customer_note or ''")[:35]
+        if partner.street2:
+            address2 = partner.street2
+        else:  # Update partner address with note so always was written
+            partner.write({'street2': note})
+            address2 = note
+
         return {
             'Name': (demo or partner.name)[:35],
             'CompanyName': (demo or '')[:35],
@@ -283,8 +290,15 @@ class SaleOrder(models.Model):
         """ Return dict for order shipment
         """
         order = self
+        partner = order
+
         # TODO crossed field (bad solution)
-        note = eval('order.carrier_note or order.wp_customer_note')
+        note = eval("order.carrier_note or order.wp_customer_note or ''")[:35]
+        if partner.street2:
+            address2 = partner.street2
+        else:  # Update partner address with note so always was written
+            partner.write({'street2': note})
+            address2 = note
         data = {
             'ShipperType': order.shipper_type,
             'Description': order.check_size(
