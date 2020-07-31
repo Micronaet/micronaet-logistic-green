@@ -383,6 +383,20 @@ class SaleOrder(models.Model):
             else:
                 order.real_parcel_total = order.carrier_manual_parcel
 
+    @api.depends('carrier_cost_total', 'order_line.price_subtotal')
+    def _check_carrier_cost_value(self):
+        """ Check if total shipment is correct
+        """
+        for order in self:
+            payed = self.carrier_cost_total
+            if not payed:
+                order.carrier_cost_lossy = False
+                continue
+
+            request = sum([item.price_subtotal for item in order.order_line
+                           if item.default_code == 'shipment'])
+            order.carrier_cost_lossy = payed > request
+
     # -------------------------------------------------------------------------
     #                                   COLUMNS:
     # -------------------------------------------------------------------------
@@ -436,6 +450,10 @@ class SaleOrder(models.Model):
         'Cost', digits=(16, 2), help='Net shipment price')
     carrier_cost_total = fields.Float(
         'Cost', digits=(16, 2), help='Net shipment total price')
+    carrier_cost_lossy = fields.Boolean(
+        'Under carrier cost', help='Carrier cost payed less that request!',
+        compute='_check_carrier_cost_value',
+    )
     carrier_track_id = fields.Char('Track ID', size=64)
     # TODO extra data needed!
 
