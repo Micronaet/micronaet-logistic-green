@@ -295,7 +295,7 @@ class SaleOrder(models.Model):
         # TODO crossed field (bad solution)
         note = eval(
             "order.carrier_note or order.wp_customer_note or "
-            "order.partner_shipping_id.address2 or ''")[:35]  # truncated
+            "order.partner_shipping_id.street2 or ''")[:35]  # truncated
 
         data = {
             'ShipperType': order.shipper_type,
