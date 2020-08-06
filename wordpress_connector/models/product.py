@@ -4,6 +4,7 @@
 import os
 import logging
 import base64
+import pdb
 from urllib.request import urlretrieve
 from urllib.parse import quote
 from odoo import models, fields, api
@@ -512,6 +513,53 @@ class ProductTemplate(models.Model):
             template.wp_in_id = wp_in_id
             template.wp_out_id = wp_out_id
 
+    # Inverse function (generic for both):
+    def _save_wp_id_in_and_out(self, mode='in'):
+        """ Inverse function for create sub record (used for both fields
+        """
+        self.ensure_one()
+
+        rel_pool = self.env['wp.connector.product.rel']
+        template = self
+
+        if mode == 'in':
+            connector_id = template.wp_connector_in_id
+            wp_id = template.wp_in_id
+        else:
+            connector_id = template.wp_connector_out_id
+            wp_id = template.wp_out_id
+
+        if not connector_id:
+            return _logger.error(
+                'Cannot create wp ID, setup the connector in company before'
+                'mode [%s]'.format(mode))
+
+        for line in template.wp_connector_rel_ids:
+            if line.connector_id == connector_id:
+                line_found = line
+                break
+        else:
+            line_found = False
+
+        if line_found:  # Update:
+            line.found.write({
+                'wp_id': wp_id,
+            })
+        else:  # Create line:
+            # template.wp_out_id = wp_out_id
+            rel_pool.create({
+                'template_id': template.id,
+                'connector_id': connector_id.id,
+                'wp_id': wp_id,
+                # TODO manage sku?
+            })
+
+    def _save_wp_id_in(self):
+        return self._save_wp_id_in_and_out('in')
+
+    def _save_wp_id_out(self):
+        return self._save_wp_id_in_and_out('out')
+
     # -------------------------------------------------------------------------
     #                                   COLUMNS:
     # -------------------------------------------------------------------------
@@ -533,6 +581,7 @@ class ProductTemplate(models.Model):
         string='Wp ID in',
         # readonly=True,
         compute='_get_wp_id_in_and_out',
+        inverse='_save_wp_id_in',
         multi=True,
         store=True,
     )
@@ -540,6 +589,7 @@ class ProductTemplate(models.Model):
         string='Wp ID out',
         # readonly=True,
         compute='_get_wp_id_in_and_out',
+        inverse='_save_wp_id_out',
         multi=True,
         store=True,
     )

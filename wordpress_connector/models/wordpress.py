@@ -203,7 +203,7 @@ class WPConnectorProductRel(models.Model):
     )
     sku = fields.Char(
         string='Sku',
-        required=True,
+        # required=True,
     )
     # TODO lang management here!
     wp_id = fields.Integer(
