@@ -274,7 +274,7 @@ class SaleOrder(models.Model):
             'CompanyName': (demo or '')[:35],
             'Nickname': (demo or '')[:100],
             'Address': (partner.street or '')[:100],
-            'Address2': address2,
+            'Address2': address2[:35],
             'Address3': ''[:35],
             'Phone': (partner.phone or '')[:50],
             'ZipCode': (partner.zip or '')[:12],

@@ -195,7 +195,7 @@ class ProductTemplate(models.Model):
             # Loop all master product:
             for record in records:
                 # Extract data from record:
-                wp_id = record['id']
+                wp_in_id = record['id']
                 sku = record['sku']
                 name = record['name']
                 # slug = record['slug']
@@ -220,8 +220,8 @@ class ProductTemplate(models.Model):
 
                 # ODOO search:
                 products = self.search([
-                    # ('connector_id', '=', connector_id),
-                    ('wp_id', '=', wp_id),
+                    ('connector_id', '=', connector_id),
+                    ('wp_in_id', '=', wp_in_id),
                     ])
                 create_mode = False if products else True
 
@@ -231,7 +231,7 @@ class ProductTemplate(models.Model):
                 data = {
                     'connector_id': connector_id,
                     'wp_published': True,
-                    'wp_id': wp_id,
+                    'wp_in_id': wp_in_id,
                     'default_code': sku,
                     'wp_sku': sku,
                     'wp_type': record['type'],
@@ -312,7 +312,7 @@ class ProductTemplate(models.Model):
                     products.write({'wp_attribute_ids': wp_attribute_ids})
 
                 if parameters['publish']['image']:
-                    image_list.append((wp_id, images))
+                    image_list.append((wp_in_id, images))
 
                 if parameters['publish']['linked']:
                     if related_ids:
@@ -334,7 +334,7 @@ class ProductTemplate(models.Model):
                     variation_param['page'] = 1
                     while True:
                         var_reply = wcapi.get(
-                            'products/%s/variations' % wp_id,
+                            'products/%s/variations' % wp_in_id,
                             params=variation_param,
                             )
                         variation_param['page'] += 1
@@ -367,7 +367,7 @@ class ProductTemplate(models.Model):
                                 'wp_type': 'variable',
                                 'wp_published': True,
                                 'name': name,
-                                'wp_id': variant['id'],
+                                'wp_in_id': variant['id'],
                                 'default_code': variant_sku,
                                 'wp_sku': variant_sku,
                                 'lst_price': variant['regular_price'],
@@ -379,7 +379,7 @@ class ProductTemplate(models.Model):
                             # TODO Publish block also here!
 
                             odoo_variants = self.search([
-                                ('wp_id', '=', variant_id),  # never overlap
+                                ('wp_in_id', '=', variant_id),  # never overlap
                                 ])
 
                             if odoo_variants:
@@ -447,7 +447,7 @@ class ProductTemplate(models.Model):
                     ))
                 for product, item_ids in product_connection[field]:
                     related_products = self.search([
-                        ('wp_id', 'in', item_ids),
+                        ('wp_in_id', 'in', item_ids),
                         ])
                     if related_products:
                         product.write({
@@ -475,7 +475,7 @@ class ProductTemplate(models.Model):
                 path,
                 #  Default image is .000
                 '%s.000.%s' % (
-                    product.wp_id,  # default_code,
+                    product.wp_in_id,  # default_code,
                     extension,
                     ),
                 )
@@ -493,7 +493,10 @@ class ProductTemplate(models.Model):
     # -------------------------------------------------------------------------
     #                                   COLUMNS:
     # -------------------------------------------------------------------------
+    # TODO remove after copy in wp_in_id
     wp_id = fields.Integer(string='Wp ID in', readonly=True)
+
+    wp_in_id = fields.Integer(string='Wp ID in', readonly=True)
     wp_out_id = fields.Integer(string='Wp ID out', readonly=True)
     wp_sku = fields.Char('SKU', size=25, readonly=True)
     connector_id = fields.Many2one('wp.connector', 'Connector')

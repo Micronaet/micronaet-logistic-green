@@ -30,7 +30,7 @@
                     <button name="button_load_product_template_structure" type="object" string="Syncro product" icon="fa-th-list fa-2x" help="In or out syncro depend on mode selected for this connection"/>
 
                 </header>
-                <sheet>                
+                <sheet>
                     <group colspan="4" col="4">
                         <field name="name"/>
                         <field name="company_id"/>
@@ -78,9 +78,9 @@
                                     <separator string="Preload setup:" colspan="4"/>
                                     <field name="update_attribute"/>
                                     <field name="update_category"/>
-                                    
+
                                     <field name="update_tag"/>
-                                    
+
                                 </group>
                             </page>
                         </notebook>
@@ -131,7 +131,7 @@
                 </sheet>
             </form>
         </field>
-    </record>    
+    </record>
     <record id="wp_product_category_parent_action" model="ir.actions.act_window">
         <field name="name">Wordpress product category</field>
         <field name="type">ir.actions.act_window</field>
@@ -179,8 +179,6 @@
                         <field name="unused"/>
                         <field name="connector_id"/>
                         <field name="wp_id" />
-                        <field name="wp_out_id" />
-
                         <field name="name"/>
                         <field name="description"/>
                     </group>
@@ -202,7 +200,6 @@
         <field name="arch" type="xml">
             <tree string="Wordpress Attribute Term" editable="bottom">
                 <field name="wp_id" />
-                <field name="wp_out_id" />
                 <field name="name" />
             </tree>
         </field>
@@ -214,7 +211,6 @@
             <form string="Wordpress Attribute Term">
                 <group colspan="4" col="4">
                     <field name="wp_id" />
-                    <field name="wp_out_id" />
                     <field name="name" />
                 </group>
             </form>
@@ -229,7 +225,6 @@
             <tree string="Wordpress Attribute">
                 <field name="connector_id"/>
                 <field name="wp_id"/>
-                <field name="wp_out_id" />
                 <field name="name"/>
             </tree>
         </field>
@@ -243,7 +238,6 @@
                     <field name="name"/>
                     <field name="connector_id"/>
                     <field name="wp_id"/>
-                    <field name="wp_out_id" />
                     <separator string="Terms:" colspan="4"/>
                     <field name="term_ids" colspan="4" nolabel="1"/>
                 </group>
@@ -282,11 +276,11 @@
             <xpath expr="//notebook" postion="inside">
                 <page name="Wordpress" string="Wordpress">
                     <group colspan="4" col="4">
-                        <field name="wp_id" />
+                        <field name="wp_in_id" />
                         <field name="wp_out_id" />
                         <field name="wp_published"/>
                         <field name="wp_type" />
-                        <field name="wp_status" />                        
+                        <field name="wp_status" />
                     </group>
                     <notebook colspan="4">
                         <page string="Variants" attrs="{'invisible': ['|', ('wp_published', '=', False), ('wp_type', '!=', 'variable')]}">
@@ -308,7 +302,7 @@
                                      </tree>
                                 </field>
                             </group>
-                        </page>                        
+                        </page>
                         <page string="Attribute">
                             <group colspan="4" col="4">
                                 <field name="wp_attribute_ids" colspan="4" nolabel="1">
@@ -322,14 +316,14 @@
                                      </tree>
                                 </field>
                             </group>
-                        </page>                        
+                        </page>
                         <page string="Categorization">
                             <group colspan="4" col="4">
                                 <field name="wp_tag_ids" colspan="4" widget="many2many_tags"/>
                                 <field name="wp_category_ids" colspan="4" widget="many2many_tags"/>
                             </group>
-                        </page>                        
-                    </notebook>    
+                        </page>
+                    </notebook>
 
                     <separator string="Relations" colspan="4"/>
                     <notebook colspan="4">
@@ -370,7 +364,7 @@
                             </group>
                         </page>
                     </notebook>
-                    
+
                 </page>
             </xpath>
         </field>
@@ -382,7 +376,7 @@
         <field name="arch" type="xml">
             <field name="name" position="after">
                  <field name="wp_type" />
-                 
+
                  <filter name="is_master" string="Is master" domain="[('wp_master', '=', True)]"/>
                  <filter name="is_slave" string="Is slave" domain="[('wp_master', '=', False)]"/>
 
