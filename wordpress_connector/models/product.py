@@ -84,7 +84,7 @@ class ProductTemplate(models.Model):
 
     @api.multi
     def update_product_supplier(self):
-        """ Integration of supplier, taked from sku extra code
+        """ Integration of supplier, taken from sku extra code
         """
         self.ensure_one()
 
@@ -491,17 +491,73 @@ class ProductTemplate(models.Model):
                 product.wp_image = False
 
     # -------------------------------------------------------------------------
+    # Compute function:
+    # -------------------------------------------------------------------------
+    @api.depends(
+        'wp_connector_rel_ids.wp_id', 'company_id.wp_connector_in_id')
+    def _get_wp_id_in_and_out(self):
+        """ Compute ID from sub element and setup in company
+        """
+        _logger.warning('WP id updating...')
+        for template in self:
+            connector_in_id = template.wp_connector_in_id
+            connector_out_id = template.wp_connector_out_id
+            wp_in_id = wp_out_id = False
+            for line in template.wp_connector_rel_ids:
+                if line.connector_id == connector_in_id:
+                    wp_in_id = line.wp_id
+                if line.connector_id == connector_out_id:
+                    wp_out_id = line.wp_id
+
+            template.wp_in_id = wp_in_id
+            template.wp_out_id = wp_out_id
+
+    # -------------------------------------------------------------------------
     #                                   COLUMNS:
     # -------------------------------------------------------------------------
-    # TODO remove after copy in wp_in_id
+    # TODO remove: ------------------------------------------------------------
     wp_id = fields.Integer(string='Wp ID in', readonly=True)
-
-    wp_in_id = fields.Integer(string='Wp ID in', readonly=True)
-    wp_out_id = fields.Integer(string='Wp ID out', readonly=True)
     wp_sku = fields.Char('SKU', size=25, readonly=True)
     connector_id = fields.Many2one('wp.connector', 'Connector')
     wp_published = fields.Boolean(
         string='WP published', help='Product present on Wordpress site')
+    # TODO remove: ------------------------------------------------------------
+
+    wp_connector_rel_ids = fields.One2many(
+        comodel_name='wp.connector.product.rel',
+        inverse_name='template_id',
+        string='Connector relation',
+        )
+
+    wp_in_id = fields.Integer(
+        string='Wp ID in',
+        # readonly=True,
+        compute='_get_wp_id_in_and_out',
+        multi=True,
+        store=True,
+    )
+    wp_out_id = fields.Integer(
+        string='Wp ID out',
+        # readonly=True,
+        compute='_get_wp_id_in_and_out',
+        multi=True,
+        store=True,
+    )
+
+    wp_connector_in_id = fields.Many2one(
+        comodel_name='wp.connector',
+        string='Connector IN',
+        help='Connector used to import product (setup in company)',
+        related='company_id.wp_connector_in_id',
+        readonly=True,
+    )
+    wp_connector_out_id = fields.Many2one(
+        comodel_name='wp.connector',
+        string='Connector OUT',
+        help='Connector used to export product (setup in company)',
+        related='company_id.wp_connector_out_id',
+        readonly=True,
+    )
 
     # Master slave management:
     wp_master = fields.Boolean(
@@ -513,6 +569,7 @@ class ProductTemplate(models.Model):
         comodel_name='product.template',
         domain="[('wp_master_id', '=', active_id)]",
         string='Default')
+
     # TODO many2many field needed:
     wp_variation_term_id = fields.Many2one(
         comodel_name='wp.attribute.term',
@@ -522,9 +579,10 @@ class ProductTemplate(models.Model):
 
     wp_type = fields.Selection([
         ('simple', 'Simple product'),
+        ('variable', 'Variable product'),
+
         ('grouped', 'Grouped product'),
         ('external', 'External product'),
-        ('variable', 'Variable product'),
         ], 'Wordpress type', default='simple')
 
     wp_status = fields.Selection([
@@ -589,3 +647,26 @@ class ProductTemplateRelation(models.Model):
         inverse_name='product_id',
         string='Attributes')
 
+
+class ResCompany(models.Model):
+    """ Model name: Company
+    """
+    _inherit = 'res.company'
+
+    # -------------------------------------------------------------------------
+    #                                   COLUMNS:
+    # -------------------------------------------------------------------------
+    wp_connector_ids = fields.One2many(
+        comodel_name='wp.connector',
+        inverse_name='company_id',
+        string='Connector')
+
+    wp_connector_in_id = fields.Many2one(
+        comodel_name='wp.connector',
+        string='Connector IN',
+        help='Connector used for import product')
+    wp_connector_out_id = fields.Many2one(
+        comodel_name='wp.connector',
+        string='Connector OUT',
+        help='Connector used for export product',
+    )

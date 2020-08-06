@@ -251,6 +251,33 @@
         <field name="view_mode">tree,form</field>
     </record>
 
+    <!--wp.connector.product.rel-->
+    <record id="view_wp_connector_product_rel_tree" model="ir.ui.view">
+        <field name="name">Product connection</field>
+        <field name="model">wp.connector.product.rel</field>
+        <field name="arch" type="xml">
+            <tree string="Product connection" editable="bottom">
+                <field name="connector_id"/>
+                <field name="sku"/>
+                <field name="wp_id"/>
+            </tree>
+        </field>
+    </record>
+    <record id="view_wp_connector_product_rel_form" model="ir.ui.view">
+        <field name="name">Product connection form</field>
+        <field name="model">wp.connector.product.rel</field>
+        <field name="arch" type="xml">
+            <form string="Product connection" editable="bottom">
+                <group col="4">
+                    <field name="template_id"/>
+                    <field name="connector_id"/>
+                    <field name="sku"/>
+                    <field name="wp_id"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
     <!--product.product-->
     <record id="product_product_view_tree" model="ir.ui.view">
         <field name="name">Master product tree</field>
@@ -321,6 +348,12 @@
                             <group colspan="4" col="4">
                                 <field name="wp_tag_ids" colspan="4" widget="many2many_tags"/>
                                 <field name="wp_category_ids" colspan="4" widget="many2many_tags"/>
+                            </group>
+                        </page>
+                        <page string="Wordpress link">
+                            <group colspan="4" col="4">
+                                <separator string="Link info:" colspan="4"/>
+                                <field name="wp_connector_rel_ids" colspan="4" nolabel="1"/>
                             </group>
                         </page>
                     </notebook>
@@ -425,6 +458,22 @@
         <field name="view_mode">tree,form,kanban</field>
         <field name="domain">[('wp_master', '=', False)]</field>
         <field name="context">{}</field>
+    </record>
+
+    <record id="res_company_worpress_page_form" model="ir.ui.view">
+        <field name="name">res.company.wp.page.form</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="base.view_company_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page name="wordpress_page" string="Wordpress">
+                    <group col="4">
+                        <field name="wp_connector_in_id" />
+                        <field name="wp_connector_out_id" />
+                    </group>
+                </page>
+            </xpath>
+        </field>
     </record>
 
     <menuitem id="wordpress_root" name="Wordpress" sequence="10"/>

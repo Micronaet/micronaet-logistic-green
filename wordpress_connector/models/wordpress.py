@@ -1,9 +1,7 @@
 # Copyright 2019  Micronaet SRL (<http://www.micronaet.it>).
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl.html).
 
-import os
 import logging
-import base64
 import woocommerce
 from odoo import models, fields, api
 
@@ -185,6 +183,33 @@ class WPConnector(models.Model):
     # album_ids = fields.Many2many(
     #    'product.image.album',
     #    'connector_album_rel', 'server_id', 'album_id', 'Album')
+
+
+class WPConnectorProductRel(models.Model):
+    """ Model name: Wordpress Connector product rel
+    """
+    _name = 'wp.connector.product.rel'
+    _description = 'Wordpress Connector Product'
+    _order = 'template_id'
+
+    template_id = fields.Many2one(
+        comodel_name='product.template',
+        string='Template',
+    )
+    connector_id = fields.Many2one(
+        comodel_name='wp.connector',
+        string='Connector',
+        required=True,
+    )
+    sku = fields.Char(
+        string='Sku',
+        required=True,
+    )
+    # TODO lang management here!
+    wp_id = fields.Integer(
+        string='WP ID',
+        required=True,
+    )
 
 
 class ProductCategory(models.Model):
@@ -539,17 +564,3 @@ class WPAttributeRelations(models.Model):
         inverse_name='attribute_id',
         string='Terms',
         )
-
-
-class ResCompany(models.Model):
-    """ Model name: Company
-    """
-    _inherit = 'res.company'
-
-    # -------------------------------------------------------------------------
-    #                                   COLUMNS:
-    # -------------------------------------------------------------------------
-    wp_connector_ids = fields.One2many(
-        comodel_name='wp.connector',
-        inverse_name='company_id',
-        string='Connector')
