@@ -188,7 +188,7 @@ class SaleOrder(models.Model):
 
     # Check utility:
     @api.multi
-    def check_reply_status(self, reply, console_log=True):
+    def check_reply_status(self, reply, console_log=True, undo_error=False):
         """ Get Service connection to make calls:
             :return Error text if present
         """
@@ -201,6 +201,25 @@ class SaleOrder(models.Model):
             for error_block in reply['Errors']['Error']:
                 error_text += error_block['Description'].replace('\n', ' ')
                 error_text += '\n'
+
+            # -----------------------------------------------------------------
+            # Undo procedure if error:
+            # -----------------------------------------------------------------
+            if undo_error:  # Parameter for undo in case of error
+                try:
+                    master_tracking_mbe = reply['MasterTrackingMBE']
+                    self.write({
+                        'master_tracking_id': master_tracking_mbe,
+                    })
+                    error = self.delete_shipments_request()
+                    if error:
+                        _logger.error('%s' % (error, ))
+                    else:
+                        _logger.warning(
+                            'Tracking MBE used for undo request!')
+                except:
+                    _logger.error('Tracking MBE not found, no undo request!')
+
         if console_log and error_text:
             _logger.error(error_text)
         return error_text
@@ -424,7 +443,12 @@ class SaleOrder(models.Model):
         # Join quotations in one list:
         quotation_list = []
         for connection, reply in reply_list:
-            quotations = reply['ShippingOptions']['ShippingOption']
+            try:
+                quotations = reply['ShippingOptions']['ShippingOption']
+            except:
+                _logger.error('No shipping option for better quotation')
+                continue
+
             _logger.warning('Quotation founds: %s [Mode search: %s]' % (
                 len(quotations),
                 carrier_mode_search or 'disabled',
@@ -912,7 +936,7 @@ class SaleOrder(models.Model):
 
         print(data)
         reply = service.ShipmentRequest(data)
-        error = order.check_reply_status(reply)
+        error = order.check_reply_status(reply, undo_error=True)
 
         _logger.warning('\n%s\n\n%s\n' % (data, reply))
 
