@@ -385,7 +385,7 @@ class SaleOrder(models.Model):
         data = {'Item': []}
         for parcel in order.parcel_ids:
             data['Item'].append({
-                'Weight': parcel.real_weight or 0.1  # parcel.used_weight,
+                'Weight': parcel.real_weight or 0.1,  # parcel.used_weight,
                 'Dimensions': {
                     'Lenght': parcel.length,  # TODO typo but API write wrong
                     'Height': parcel.height,
