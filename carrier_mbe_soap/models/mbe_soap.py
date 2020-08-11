@@ -240,7 +240,6 @@ class SaleOrder(models.Model):
             }
         if internal:
             data['InternalReferenceID'] = connection.internal_reference
-            # data['internalReferenceID'] = connection.internal_reference
         if customer:
             data['CustomerID'] = connection.customer_id
         if system:
@@ -386,9 +385,9 @@ class SaleOrder(models.Model):
         data = {'Item': []}
         for parcel in order.parcel_ids:
             data['Item'].append({
-                'Weight': parcel.used_weight,
+                'Weight': parcel.real_weight or 0.1  # parcel.used_weight,
                 'Dimensions': {
-                    'Lenght': parcel.length,  # TODO typo but written wrong
+                    'Lenght': parcel.length,  # TODO typo but API write wrong
                     'Height': parcel.height,
                     'Width': parcel.width,
                 }
@@ -1013,7 +1012,9 @@ class SaleOrder(models.Model):
             if item.soap_connection_id]
 
         # B. Standard request:
-        all_services.append(soap_connection)
+        if not all_services:
+            # If economy present use only that quotation instead default:
+            all_services.append(soap_connection)
         all_services = set(all_services)
 
         error = ''

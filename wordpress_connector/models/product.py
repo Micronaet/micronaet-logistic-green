@@ -501,29 +501,30 @@ class ProductTemplate(models.Model):
     def _get_wp_id_in_and_out(self):
         """ Compute ID from sub element and setup in company
         """
-        _logger.warning('WP id updating...')
+        _logger.warning('Reading related field and update in template...')
         for template in self:
             connector_in_id = template.wp_connector_in_id
             connector_out_id = template.wp_connector_out_id
-            wp_in_id = wp_out_id = False
-            sku_in = sku_out = False
+            data = {}
             for line in template.wp_connector_rel_ids:
+                wp_id = line.wp_id
+                sku = line.sku
                 if line.connector_id == connector_in_id:
-                    wp_in_id = line.wp_id
-                    sku_in = line.sku
+                    if wp_id:
+                        data['wp_in_id'] = wp_id
+                    if sku:
+                        data['sku_in'] = sku
                 if line.connector_id == connector_out_id:
-                    wp_out_id = line.wp_id
-                    sku_out = line.sku
-
-            template.wp_in_id = wp_in_id
-            template.wp_in_id = wp_out_id
-            template.sku_in = sku_in
-            template.sku_out = sku_out
-
-        _logger.warning('WP id updated!')
+                    if wp_id:
+                        data['wp_out_id'] = wp_id
+                    if sku:
+                        data['sku_out'] = sku
+            if data:
+                template.write(data)
+        _logger.warning('Field updated in template!')
 
     # Inverse function (generic for both):
-    def _save_wp_id_in_and_out(self, mode='wp', direction='in'):
+    def _save_wp_id_in_and_out(self, field, direction):
         """ Inverse function for create sub record (used for both fields
         """
         self.ensure_one()
@@ -534,12 +535,16 @@ class ProductTemplate(models.Model):
 
         if direction == 'in':
             connector_id = template.wp_connector_in_id
-            sku = template.sku_in
-            wp_id = template.wp_in_id
+            value = {
+                'sku': template.sku_in,
+                'wp_id': template.wp_in_id,
+            }
         else:
             connector_id = template.wp_connector_out_id
-            sku = template.sku_out
-            wp_id = template.wp_out_id
+            value = {
+                'sku': template.sku_out,
+                'wp_id': template.wp_out_id,
+            }
 
         if not connector_id:
             return _logger.error(
@@ -553,38 +558,30 @@ class ProductTemplate(models.Model):
         else:
             line_found = False
 
-        # Mode management:
-        if mode == 'wp':
-            field = 'wp_id'
-            value = wp_id
-        else:
-            field = 'sku'
-            value = sku
-
-        # Insert managemenet:
+        # Insert management:
         if line_found:  # Update:
             line_found.write({
-                field: value,
+                field: value[field],
             })
         else:  # Create line:
             # template.wp_out_id = wp_out_id
             rel_pool.create({
                 'template_id': template.id,
                 'connector_id': connector_id.id,
-                field: value,
+                field: value[field],
             })
 
     def _save_wp_id_in(self):
-        return self._save_wp_id_in_and_out(mode='wp', direction='in')
+        return self._save_wp_id_in_and_out(field='wp_id', direction='in')
 
     def _save_wp_id_out(self):
-        return self._save_wp_id_in_and_out(mode='wp', direction='out')
+        return self._save_wp_id_in_and_out(field='wp_id', direction='out')
 
     def _save_sku_in(self):
-        return self._save_wp_id_in_and_out(mode='sku', direction='in')
+        return self._save_wp_id_in_and_out(field='sku', direction='in')
 
     def _save_sku_out(self):
-        return self._save_wp_id_in_and_out(mode='sku', direction='out')
+        return self._save_wp_id_in_and_out(field='sku', direction='out')
 
     # -------------------------------------------------------------------------
     #                                   COLUMNS:

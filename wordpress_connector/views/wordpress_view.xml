@@ -287,7 +287,7 @@
             <field name="default_code" position="before">
                 <field name="wp_published"/>
                 <field name="wp_master"/>
-                <field name="wp_sku" groups=""/>
+                <!--<field name="wp_sku" groups=""/>-->
             </field>
         </field>
     </record>
@@ -305,6 +305,9 @@
                     <group colspan="4" col="4">
                         <field name="wp_in_id" />
                         <field name="wp_out_id" />
+                        <field name="sku_in" />
+                        <field name="sku_out" />
+
                         <field name="wp_published"/>
                         <field name="wp_type" />
                         <field name="wp_status" />
