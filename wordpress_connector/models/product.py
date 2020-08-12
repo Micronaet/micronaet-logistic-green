@@ -128,7 +128,6 @@ class ProductTemplate(models.Model):
         """ Load product template from Wordpress
             (procedure launch from connector button for now)
         """
-        pdb.set_trace()
         # Company parameters:
         if self.env.user.company_id.wp_connector_in_id != connector:
             raise exceptions.Warning(
@@ -190,7 +189,7 @@ class ProductTemplate(models.Model):
             'wp_up_sell_ids': [],
             'wp_cross_sell_ids': [],
             }
-
+        pdb.set_trace()
         while True:
             reply = wcapi.get('products', params=params)
             _logger.info('Page %s, Record: %s' % (
@@ -234,6 +233,7 @@ class ProductTemplate(models.Model):
                 # ODOO search:
                 # TODO save original sku?
                 products = self.search([
+                    # TODO sku is not saved in default_code!!! 0001-02 >> 0001
                     # ('connector_id', '=', connector_id),  # Used Company IN
                     '|',
                     ('wp_id_in', '=', wp_id_in),
@@ -324,7 +324,8 @@ class ProductTemplate(models.Model):
                             attribute_list[attribute['id']]
 
                         current_term_ids = [attribute_odoo_terms[option]
-                                            for option in attribute['options']]
+                                            for option in attribute['options']
+                                            if option in attribute_odoo_terms]
                         wp_attribute_ids.append((0, 0, {
                             'attribute_id': attribute_odoo_id,
                             'term_ids': [(6, 0, current_term_ids)],
@@ -445,7 +446,7 @@ class ProductTemplate(models.Model):
                                 }))
                             odoo_variants.write(
                                 {'wp_attribute_ids': wp_attribute_ids})
-            # break  # TODO Test mode:
+            break  # TODO Test mode:
 
         # ---------------------------------------------------------------------
         # Image download:
