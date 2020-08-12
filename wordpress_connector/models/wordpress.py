@@ -262,10 +262,9 @@ class ProductCategory(models.Model):
         # ---------------------------------------------------------------------
         # Sort and create / update ODOO
         # ---------------------------------------------------------------------
-        for wp_id in sorted(wp_category,
-                            key=lambda x: (
-                                    wp_category[x]['parent'],
-                                    wp_category[x]['id'])):
+        for wp_id in sorted(wp_category, key=lambda x: (
+                wp_category[x]['parent'],
+                wp_category[x]['id'])):
             record = wp_category[wp_id]
             name = record['name']
             description = record['description']
@@ -290,8 +289,7 @@ class ProductCategory(models.Model):
     # -------------------------------------------------------------------------
     #                                   COLUMNS:
     # -------------------------------------------------------------------------
-    wp_id = fields.Integer(string='Wp ID in', readonly=True)
-    # wp_out_id = fields.Integer(string='Wp ID out', readonly=True)
+    wp_id = fields.Integer(string='Wp ID', readonly=True)
     connector_id = fields.Many2one('wp.connector', 'Connector')
     wp_description = fields.Char('WP Description')
     wp_sequence = fields.Integer('Wp Sequence')
