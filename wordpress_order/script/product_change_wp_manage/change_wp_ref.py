@@ -44,14 +44,14 @@ for template in template_pool.browse(template_ids):
     # Mode WP reference:
     default_code = template.default_code  # wp_sku
     wp_id = template.wp_id
-    template_pool.write({
+    product_id = template.id
+    template_pool.write([product_id], {
         'wp_id_in': wp_id,
-        'sku_in': default_code
-    })
+        'sku_in': default_code,
+        })
     print('Update: %s' % default_code)
 
     # Move image:
-    product_id = template.id
     old_name = '%s.000.%s' % (wp_id, extension)
     new_name = '%s.000.%s' % (product_id, extension)
 
