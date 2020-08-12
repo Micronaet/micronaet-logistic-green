@@ -4,11 +4,9 @@
 import os
 import sys
 import io
-import xlsxwriter
 import pdb
 import logging
 import subprocess
-import base64
 import shutil
 import zeep
 from odoo import models, fields, api

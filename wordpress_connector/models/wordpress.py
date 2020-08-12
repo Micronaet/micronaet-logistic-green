@@ -4,6 +4,7 @@
 import logging
 import woocommerce
 from odoo import models, fields, api
+import pdb
 
 _logger = logging.getLogger(__name__)
 
@@ -297,7 +298,7 @@ class ProductCategory(models.Model):
     # TODO Image
 
 
-class ProductCategory(models.Model):
+class ProductCategoryRelations(models.Model):
     """ Model name: Wordpress > Product Category
     """
     _inherit = 'product.category'
@@ -352,7 +353,8 @@ class WPTag(models.Model):
     def publish_tags(self, connector):
         """ Publish tags from Wordpress (out)
         """
-        import pdb; pdb.set_trace()
+        import pdb
+        pdb.set_trace()
         tags, wp_records = self.get_odoo_wp_data(connector)
         wcapi = connector.get_connector()
 
@@ -360,7 +362,7 @@ class WPTag(models.Model):
             'create': [],
             'update': [],
             }
-        import pdb; pdb.set_trace()
+        pdb.set_trace()
         wp_ids = [record.id for record in wp_records]
         created_tags = {}  # Used for link wp create ID to ODOO
         for tag in tags:
@@ -379,7 +381,7 @@ class WPTag(models.Model):
         command_data['delete'] = wp_ids
 
         # Call Wordpress
-        import pdb; pdb.set_trace()
+        pdb.set_trace()
         try:
             reply = wcapi.post('products/tags/batch', command_data).json()
             # Update created ID:
@@ -395,7 +397,7 @@ class WPTag(models.Model):
                     })
         except:
             _logger.error('Error updating Tags in Wordpress')
-        import pdb; pdb.set_trace()
+        pdb.set_trace()
 
     @api.model
     def load_tags(self, connector):

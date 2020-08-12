@@ -492,14 +492,11 @@ class ProductTemplate(models.Model):
                 product.wp_image = False
 
     # -------------------------------------------------------------------------
-    # Compute function:
+    #                            Compute function:
     # -------------------------------------------------------------------------
-    @api.depends(
-        'company_id.wp_connector_in_id', 'company_id.wp_connector_out_id',
-        # 'wp_connector_rel_ids.wp_id',
-    )
-    def _get_wp_id_in_and_out(self):
-        """ Compute ID from sub element and setup in company
+    @api.multi
+    def _get_wordpress_fields_from_rel(self, field='wp_id'):
+        """ Generic function for update 2 fields and 2 directions
         """
         _logger.warning('Reading related field and update in template...')
         for template in self:
@@ -507,26 +504,53 @@ class ProductTemplate(models.Model):
             connector_out_id = template.wp_connector_out_id
             data = {}
             for line in template.wp_connector_rel_ids:
-                wp_id = line.wp_id
-                sku = line.sku
-                if line.connector_id == connector_in_id:
-                    if wp_id:
+                if field == 'wp_id':
+                    wp_id = line.wp_id
+                    if line.connector_id == connector_in_id:
                         data['wp_in_id'] = wp_id
-                    if sku:
-                        data['sku_in'] = sku
-                if line.connector_id == connector_out_id:
-                    if wp_id:
+                    if line.connector_id == connector_out_id:
                         data['wp_out_id'] = wp_id
-                    if sku:
+                else:
+                    sku = line.sku
+                    if line.connector_id == connector_in_id:
+                        data['sku_in'] = sku
+                    if line.connector_id == connector_out_id:
                         data['sku_out'] = sku
             if data:
                 template.write(data)
         _logger.warning('Field updated in template!')
 
+    # wp_id
+    @api.multi
+    @api.depends(
+        'company_id.wp_connector_in_id', 'company_id.wp_connector_out_id',
+        'wp_connector_rel_ids.wp_id',
+    )
+    def _get_wp_id_in_and_out(self):
+        """ Compute ID from sub element and setup in company
+        """
+        return self._get_wordpress_fields_from_rel(field='wp_id')
+
+    # sku
+    @api.multi
+    @api.depends(
+        'company_id.wp_connector_in_id', 'company_id.wp_connector_out_id',
+        'wp_connector_rel_ids.wp_id',
+    )
+    def _get_sku_in_and_out(self):
+        """ Compute sku from sub element and setup in company
+        """
+        return self._get_wordpress_fields_from_rel(field='sku')
+
+    # -------------------------------------------------------------------------
+    #                          Save inverse part:
+    # -------------------------------------------------------------------------
     # Inverse function (generic for both):
     def _save_wp_id_in_and_out(self, field, direction):
         """ Inverse function for create sub record (used for both fields
         """
+        print('{}, {}'.format(field, direction))
+        pdb.set_trace()
         self.ensure_one()
         _logger.warning('Updating WP ID in correct connector...')
 
@@ -605,30 +629,30 @@ class ProductTemplate(models.Model):
         compute='_get_wp_id_in_and_out',
         inverse='_save_wp_id_in',
         multi=True,
-        store=True,
+        # store=True,
     )
     wp_out_id = fields.Integer(
         string='Wp ID out',
         compute='_get_wp_id_in_and_out',
         inverse='_save_wp_id_out',
         multi=True,
-        store=True,
+        # store=True,
     )
     sku_in = fields.Char(
         string='SKU out',
-        compute='_get_wp_id_in_and_out',
+        compute='_get_sku_in_and_out',
         size=20,
         inverse='_save_sku_in',
         multi=True,
-        store=True,
+        # store=True,
     )
     sku_out = fields.Char(
         string='SKU out',
-        compute='_get_wp_id_in_and_out',
+        compute='_get_sku_in_and_out',
         size=20,
         inverse='_save_sku_out',
         multi=True,
-        store=True,
+        # store=True,
     )
 
     wp_connector_in_id = fields.Many2one(
