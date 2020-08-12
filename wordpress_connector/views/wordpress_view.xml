@@ -303,8 +303,8 @@
             <xpath expr="//notebook" postion="inside">
                 <page name="Wordpress" string="Wordpress">
                     <group colspan="4" col="4">
-                        <field name="wp_in_id" />
-                        <field name="wp_out_id" />
+                        <field name="wp_id_in" />
+                        <field name="wp_id_out" />
                         <!--<field name="sku_in" />
                         <field name="sku_out" />-->
 
@@ -412,8 +412,8 @@
         <field name="arch" type="xml">
             <field name="name" position="after">
                  <field name="wp_type" />
-                 <field name="wp_in_id" />
-                 <field name="wp_out_id" />
+                 <field name="wp_id_in" />
+                 <field name="wp_id_out" />
 
                  <filter name="is_master" string="Is master" domain="[('wp_master', '=', True)]"/>
                  <filter name="is_slave" string="Is slave" domain="[('wp_master', '=', False)]"/>

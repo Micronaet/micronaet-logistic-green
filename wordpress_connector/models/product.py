@@ -232,7 +232,7 @@ class ProductTemplate(models.Model):
                 data = {
                     'connector_id': connector_id,
                     'wp_published': True,
-                    'wp_in_id': wp_in_id,
+                    'wp_id_in': wp_id_in,
                     'default_code': sku,
                     'wp_sku': sku,
                     'wp_type': record['type'],
@@ -313,7 +313,7 @@ class ProductTemplate(models.Model):
                     products.write({'wp_attribute_ids': wp_attribute_ids})
 
                 if parameters['publish']['image']:
-                    image_list.append((wp_in_id, images))
+                    image_list.append((wp_id_in, images))
 
                 if parameters['publish']['linked']:
                     if related_ids:
@@ -335,7 +335,7 @@ class ProductTemplate(models.Model):
                     variation_param['page'] = 1
                     while True:
                         var_reply = wcapi.get(
-                            'products/%s/variations' % wp_in_id,
+                            'products/%s/variations' % wp_id_in,
                             params=variation_param,
                             )
                         variation_param['page'] += 1
@@ -368,7 +368,7 @@ class ProductTemplate(models.Model):
                                 'wp_type': 'variable',
                                 'wp_published': True,
                                 'name': name,
-                                'wp_in_id': variant['id'],
+                                'wp_id_in': variant['id'],
                                 'default_code': variant_sku,
                                 'wp_sku': variant_sku,
                                 'lst_price': variant['regular_price'],
@@ -380,7 +380,7 @@ class ProductTemplate(models.Model):
                             # TODO Publish block also here!
 
                             odoo_variants = self.search([
-                                ('wp_in_id', '=', variant_id),  # never overlap
+                                ('wp_id_in', '=', variant_id),  # never overlap
                                 ])
 
                             if odoo_variants:
@@ -448,7 +448,7 @@ class ProductTemplate(models.Model):
                     ))
                 for product, item_ids in product_connection[field]:
                     related_products = self.search([
-                        ('wp_in_id', 'in', item_ids),
+                        ('wp_id_in', 'in', item_ids),
                         ])
                     if related_products:
                         product.write({
@@ -476,7 +476,7 @@ class ProductTemplate(models.Model):
                 path,
                 #  Default image is .000
                 '%s.000.%s' % (
-                    product.wp_in_id,  # default_code,
+                    product.id,  # wp_id_in,  # default_code,
                     extension,
                     ),
                 )
@@ -494,63 +494,39 @@ class ProductTemplate(models.Model):
     # -------------------------------------------------------------------------
     #                            Compute function:
     # -------------------------------------------------------------------------
+    # wp_id
     @api.multi
-    def _get_wordpress_fields_from_rel(self, field='wp_id'):
-        """ Generic function for update 2 fields and 2 directions
+    @api.depends(
+        'company_id.wp_connector_in_id', 'company_id.wp_connector_out_id',
+        # 'wp_connector_rel_ids.wp_id',
+    )
+    def _get_wp_id_in_and_out(self):
+        """ Compute ID from sub element and setup in company
         """
         _logger.warning('Reading related field and update in template...')
         for template in self:
             connector_in_id = template.wp_connector_in_id
             connector_out_id = template.wp_connector_out_id
-            data = {}
+            wp_id_in = wp_id_out = 0
+
             for line in template.wp_connector_rel_ids:
-                if field == 'wp_id':
-                    wp_id = line.wp_id
-                    if line.connector_id == connector_in_id:
-                        data['wp_in_id'] = wp_id
-                    if line.connector_id == connector_out_id:
-                        data['wp_out_id'] = wp_id
-                else:
-                    sku = line.sku
-                    if line.connector_id == connector_in_id:
-                        data['sku_in'] = sku
-                    if line.connector_id == connector_out_id:
-                        data['sku_out'] = sku
-            if data:
-                template.write(data)
+                wp_id = line.wp_id
+                if line.connector_id == connector_in_id:
+                    wp_id_in = wp_id
+                if line.connector_id == connector_out_id:
+                    wp_id_out = wp_id
+            template.wp_id_in = wp_id_in
+            template.wp_id_out = wp_id_out
+
         _logger.warning('Field updated in template!')
-
-    # wp_id
-    @api.multi
-    @api.depends(
-        'company_id.wp_connector_in_id', 'company_id.wp_connector_out_id',
-        'wp_connector_rel_ids.wp_id',
-    )
-    def _get_wp_id_in_and_out(self):
-        """ Compute ID from sub element and setup in company
-        """
-        return self._get_wordpress_fields_from_rel(field='wp_id')
-
-    # sku
-    @api.multi
-    @api.depends(
-        'company_id.wp_connector_in_id', 'company_id.wp_connector_out_id',
-        'wp_connector_rel_ids.wp_id',
-    )
-    def _get_sku_in_and_out(self):
-        """ Compute sku from sub element and setup in company
-        """
-        return self._get_wordpress_fields_from_rel(field='sku')
 
     # -------------------------------------------------------------------------
     #                          Save inverse part:
     # -------------------------------------------------------------------------
     # Inverse function (generic for both):
-    def _save_wp_id_in_and_out(self, field, direction):
+    def _save_wp_id_in_and_out(self, value, direction):
         """ Inverse function for create sub record (used for both fields
         """
-        print('{}, {}'.format(field, direction))
-        pdb.set_trace()
         self.ensure_one()
         _logger.warning('Updating WP ID in correct connector...')
 
@@ -559,21 +535,13 @@ class ProductTemplate(models.Model):
 
         if direction == 'in':
             connector_id = template.wp_connector_in_id
-            value = {
-                'sku': template.sku_in,
-                'wp_id': template.wp_in_id,
-            }
         else:
             connector_id = template.wp_connector_out_id
-            value = {
-                'sku': template.sku_out,
-                'wp_id': template.wp_out_id,
-            }
 
         if not connector_id:
             return _logger.error(
                 'Cannot create wp ID, setup the connector in company before'
-                'direction [%s]'.format(direction))
+                'direction [{}]'.format(direction))
 
         for line in template.wp_connector_rel_ids:
             if line.connector_id == connector_id:
@@ -585,27 +553,54 @@ class ProductTemplate(models.Model):
         # Insert management:
         if line_found:  # Update:
             line_found.write({
-                field: value[field],
+                'wp_id': value,
             })
         else:  # Create line:
-            # template.wp_out_id = wp_out_id
+            # template.wp_id_out = wp_id_out
             rel_pool.create({
                 'template_id': template.id,
                 'connector_id': connector_id.id,
-                field: value[field],
+                'wp_id': value,
             })
 
     def _save_wp_id_in(self):
-        return self._save_wp_id_in_and_out(field='wp_id', direction='in')
+        return self._save_wp_id_in_and_out(self.wp_id_in, direction='in')
 
     def _save_wp_id_out(self):
-        return self._save_wp_id_in_and_out(field='wp_id', direction='out')
+        return self._save_wp_id_in_and_out(self.wp_id_out, direction='out')
 
-    def _save_sku_in(self):
-        return self._save_wp_id_in_and_out(field='sku', direction='in')
+    # wp_id search
+    def get_wp_id_filter(self, operator, value, mode):
+        """ Search function for wp_id out
+        """
+        rel_pool = self.env['wp.connector.product.rel']
+        company_pool = self.env['res.company']
+        company = company_pool.search([])[0]
+        if mode == 'in':
+            connector_id = company.wp_connector_in_id.id
+        else:
+            connector_id = company.wp_connector_out_id.id
 
-    def _save_sku_out(self):
-        return self._save_wp_id_in_and_out(field='sku', direction='out')
+        records = rel_pool.search([
+            ('connector_id', '=', connector_id),
+            ('wp_id', operator, value),
+        ])
+        if records:
+            return [
+                ('id', 'in', [record.template_id.id for record in records])
+            ]
+        else:
+            return [('id', '=', False)]  # Nothing
+
+    def _search_wp_id_in(self, operator, value):
+        """ Search function for wp_id out
+        """
+        return self.get_wp_id_filter(operator, value, mode='in')
+
+    def _search_wp_id_out(self, operator, value):
+        """ Search function for wp_id out
+        """
+        return self.get_wp_id_filter(operator, value, mode='out')
 
     # -------------------------------------------------------------------------
     #                                   COLUMNS:
@@ -624,35 +619,19 @@ class ProductTemplate(models.Model):
         string='Connector relation',
         )
 
-    wp_in_id = fields.Integer(
+    wp_id_in = fields.Integer(
         string='Wp ID in',
         compute='_get_wp_id_in_and_out',
         inverse='_save_wp_id_in',
+        search='_search_wp_id_in',
         multi=True,
-        # store=True,
     )
-    wp_out_id = fields.Integer(
+    wp_id_out = fields.Integer(
         string='Wp ID out',
         compute='_get_wp_id_in_and_out',
         inverse='_save_wp_id_out',
+        search='_search_wp_id_out',
         multi=True,
-        # store=True,
-    )
-    sku_in = fields.Char(
-        string='SKU out',
-        compute='_get_sku_in_and_out',
-        size=20,
-        inverse='_save_sku_in',
-        multi=True,
-        # store=True,
-    )
-    sku_out = fields.Char(
-        string='SKU out',
-        compute='_get_sku_in_and_out',
-        size=20,
-        inverse='_save_sku_out',
-        multi=True,
-        # store=True,
     )
 
     wp_connector_in_id = fields.Many2one(
