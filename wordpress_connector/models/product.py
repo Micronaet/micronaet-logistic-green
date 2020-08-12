@@ -507,16 +507,24 @@ class ProductTemplate(models.Model):
         for template in self:
             connector_in_id = template.wp_connector_in_id
             connector_out_id = template.wp_connector_out_id
-            wp_id_in = wp_id_out = 0
+            wp_id_in = wp_id_out = False
+            sku_in = sku_out = False
 
             for line in template.wp_connector_rel_ids:
                 wp_id = line.wp_id
+                sku = line.sku
                 if line.connector_id == connector_in_id:
                     wp_id_in = wp_id
+                    sku_in = sku
                 if line.connector_id == connector_out_id:
                     wp_id_out = wp_id
+                    sku_out = sku
+
+            # Update multi fields:
             template.wp_id_in = wp_id_in
             template.wp_id_out = wp_id_out
+            template.sku_in = sku_in
+            template.sku_out = sku_out
 
         _logger.warning('Field updated in template!')
 
@@ -524,11 +532,12 @@ class ProductTemplate(models.Model):
     #                          Save inverse part:
     # -------------------------------------------------------------------------
     # Inverse function (generic for both):
-    def _save_wp_id_in_and_out(self, value, direction):
+    def _save_field_in_and_out(self, field, value, direction):
         """ Inverse function for create sub record (used for both fields
         """
         self.ensure_one()
-        _logger.warning('Updating WP ID in correct connector...')
+        _logger.warning('Updating {} in correct connector [{}]...'.format(
+            field, direction))
 
         rel_pool = self.env['wp.connector.product.rel']
         template = self
@@ -540,8 +549,8 @@ class ProductTemplate(models.Model):
 
         if not connector_id:
             return _logger.error(
-                'Cannot create wp ID, setup the connector in company before'
-                'direction [{}]'.format(direction))
+                'Cannot create {}}, setup the connector in company before'
+                'direction [{}]'.format(field, direction))
 
         for line in template.wp_connector_rel_ids:
             if line.connector_id == connector_id:
@@ -553,24 +562,33 @@ class ProductTemplate(models.Model):
         # Insert management:
         if line_found:  # Update:
             line_found.write({
-                'wp_id': value,
+                field: value,
             })
         else:  # Create line:
-            # template.wp_id_out = wp_id_out
             rel_pool.create({
                 'template_id': template.id,
                 'connector_id': connector_id.id,
-                'wp_id': value,
+                field: value,
             })
 
     def _save_wp_id_in(self):
-        return self._save_wp_id_in_and_out(self.wp_id_in, direction='in')
+        return self._save_field_in_and_out(
+            'wp_id', self.wp_id_in, direction='in')
 
     def _save_wp_id_out(self):
-        return self._save_wp_id_in_and_out(self.wp_id_out, direction='out')
+        return self._save_field_in_and_out(
+            'wp_id', self.wp_id_out, direction='out')
+
+    def _save_sku_in(self):
+        return self._save_field_in_and_out(
+            'sku', self.sku_in, direction='in')
+
+    def _save_sku_out(self):
+        return self._save_field_in_and_out(
+            'sku', self.sku_out, direction='out')
 
     # wp_id search
-    def get_wp_id_filter(self, operator, value, mode):
+    def get_field_filter(self, operator, value, mode, field):
         """ Search function for wp_id out
         """
         rel_pool = self.env['wp.connector.product.rel']
@@ -583,7 +601,7 @@ class ProductTemplate(models.Model):
 
         records = rel_pool.search([
             ('connector_id', '=', connector_id),
-            ('wp_id', operator, value),
+            (field, operator, value),
         ])
         if records:
             return [
@@ -595,12 +613,26 @@ class ProductTemplate(models.Model):
     def _search_wp_id_in(self, operator, value):
         """ Search function for wp_id out
         """
-        return self.get_wp_id_filter(operator, value, mode='in')
+        return self.get_field_filter(
+            operator, value, mode='in', field='wp_id')
 
     def _search_wp_id_out(self, operator, value):
         """ Search function for wp_id out
         """
-        return self.get_wp_id_filter(operator, value, mode='out')
+        return self.get_field_filter(
+            operator, value, mode='out', field='wp_id')
+
+    def _search_sku_in(self, operator, value):
+        """ Search function for sku out
+        """
+        return self.get_field_filter(
+            operator, value, mode='in', field='sku')
+
+    def _search_sku_out(self, operator, value):
+        """ Search function for sku out
+        """
+        return self.get_field_filter(
+            operator, value, mode='out', field='sku')
 
     # -------------------------------------------------------------------------
     #                                   COLUMNS:
@@ -631,6 +663,24 @@ class ProductTemplate(models.Model):
         compute='_get_wp_id_in_and_out',
         inverse='_save_wp_id_out',
         search='_search_wp_id_out',
+        multi=True,
+    )
+
+    sku_in = fields.Char(
+        size=20,
+        string='SKU in',
+        compute='_get_wp_id_in_and_out',
+        inverse='_save_sku_in',
+        search='_search_sku_out',
+        multi=True,
+    )
+
+    sku_out = fields.Char(
+        size=20,
+        string='SKU out',
+        compute='_get_wp_id_in_and_out',
+        inverse='_save_sku_out',
+        search='_search_sku_out',
         multi=True,
     )
 
