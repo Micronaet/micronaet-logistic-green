@@ -303,8 +303,12 @@
             <xpath expr="//notebook" postion="inside">
                 <page name="Wordpress" string="Wordpress">
                     <group colspan="4" col="4">
+                        <field name="wp_connector_in_id"/>
+                        <field name="wp_connector_out_id"/>
+
                         <field name="wp_id_in" />
                         <field name="wp_id_out" />
+
                         <field name="sku_in" />
                         <field name="sku_out" />
 
