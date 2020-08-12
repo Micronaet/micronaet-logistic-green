@@ -498,6 +498,7 @@ class ProductTemplate(models.Model):
                 product.wp_image = base64.encodebytes(f_data.read())
                 f_data.close()
             except:
+                _logger.error('Image not found: {}'.format(filename))
                 product.wp_image = False
 
     # -------------------------------------------------------------------------
