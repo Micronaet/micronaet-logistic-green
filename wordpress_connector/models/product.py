@@ -474,12 +474,12 @@ class ProductTemplate(models.Model):
         """
         connector = self[0].company_id.wp_connector_ids[0]
         path = connector.image_path
-        extension = connector.image_extension or 'png'
+        extension = connector.image_extension or 'jpg'
 
         for product in self:
             if not path:
                 product.wp_image = False
-                _logger.info('Missed path, check connector parameter')
+                _logger.error('Missed path, check connector parameter')
                 continue
             filename = os.path.join(
                 path,
@@ -776,7 +776,7 @@ class ProductTemplate(models.Model):
         string='Tags')
 
     wp_image = fields.Binary(
-         compute=_get_wp_image_file,
+         compute='_get_wp_image_file',
          help='Load image from folder for connector', string='WP Image')
 
 
