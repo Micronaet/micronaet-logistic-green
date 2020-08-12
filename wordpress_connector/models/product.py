@@ -471,12 +471,11 @@ class ProductTemplate(models.Model):
                 product.wp_image = False
                 _logger.info('Missed path, check connector parameter')
                 continue
-            default_code = (product.default_code or '').replace(' ', '&nbsp;')
             filename = os.path.join(
                 path,
                 #  Default image is .000
                 '%s.000.%s' % (
-                    product.id,  # wp_id_in,  # default_code,
+                    product.id,  # wp_id_in,
                     extension,
                     ),
                 )

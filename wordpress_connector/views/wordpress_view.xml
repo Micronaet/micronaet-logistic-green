@@ -414,6 +414,8 @@
                  <field name="wp_type" />
                  <field name="wp_id_in" />
                  <field name="wp_id_out" />
+                 <field name="sku_in" />
+                 <field name="sku_out" />
 
                  <filter name="is_master" string="Is master" domain="[('wp_master', '=', True)]"/>
                  <filter name="is_slave" string="Is slave" domain="[('wp_master', '=', False)]"/>
