@@ -472,7 +472,7 @@ class ProductTemplate(models.Model):
     def _get_wp_image_file(self):
         """ Return image loading from file:
         """
-        connector = self[0].company_id.wp_connector_ids[0]
+        connector = self[0].wp_connector_in_id
         path = connector.image_path
         extension = connector.image_extension or 'jpg'
 
@@ -484,14 +484,13 @@ class ProductTemplate(models.Model):
             filename = os.path.join(
                 path,
                 #  Default image is .000
-                # TODO change with new syntax:
-                '%s.000.%s' % (
-                    product.id,  # wp_id_in,
+                '{}.000.{}'.format(
+                    product.id,
                     extension,
                     ),
                 )
             if os.path.isfile(filename):
-                _logger.info('Image yet present: %s' % filename)
+                _logger.info('Found present: %s' % filename)
                 continue
 
             try:
