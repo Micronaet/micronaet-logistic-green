@@ -147,6 +147,7 @@ class ProductTemplate(models.Model):
         # NOTE: No preload parameters for get (only for publish):
         # Tag:
         tag_list = {}
+        # TODO Check with new syntax
         for tag in self.env['wp.tag'].search([
                 ('connector_id', '=', connector_id),
                 ]):
@@ -154,6 +155,7 @@ class ProductTemplate(models.Model):
 
         # Category:
         category_list = {}
+        # TODO Check with new syntax
         for category in self.env['product.category'].search([
                 ('connector_id', '=', connector_id),
                 ('wp_id', '!=', False),
@@ -161,6 +163,7 @@ class ProductTemplate(models.Model):
             category_list[category.wp_id] = category.id
 
         attribute_list = {}
+        # TODO Check with new syntax
         for attribute in self.env['wp.attribute'].search([
                 ('connector_id', '=', connector_id),
                 ]):
@@ -196,7 +199,7 @@ class ProductTemplate(models.Model):
             # Loop all master product:
             for record in records:
                 # Extract data from record:
-                wp_in_id = record['id']
+                wp_id_in = record['id']
                 sku = record['sku']
                 name = record['name']
                 # slug = record['slug']
@@ -221,8 +224,9 @@ class ProductTemplate(models.Model):
 
                 # ODOO search:
                 products = self.search([
+                    # TODO Change!!!
                     ('connector_id', '=', connector_id),
-                    ('wp_in_id', '=', wp_in_id),
+                    ('wp_id_in', '=', wp_id_in),
                     ])
                 create_mode = False if products else True
 
@@ -230,6 +234,7 @@ class ProductTemplate(models.Model):
                 # Prepare data (use publish setup):
                 # -------------------------------------------------------------
                 data = {
+                    # TODO change with new syntax!!
                     'connector_id': connector_id,
                     'wp_published': True,
                     'wp_id_in': wp_id_in,
@@ -313,6 +318,7 @@ class ProductTemplate(models.Model):
                     products.write({'wp_attribute_ids': wp_attribute_ids})
 
                 if parameters['publish']['image']:
+                    # TODO change with new syntax
                     image_list.append((wp_id_in, images))
 
                 if parameters['publish']['linked']:
@@ -364,6 +370,7 @@ class ProductTemplate(models.Model):
                                     (variant_id, [variant_images]))
 
                             variant_data = {
+                                # TODO change with new syntax:
                                 'connector_id': connector_id,
                                 'wp_type': 'variable',
                                 'wp_published': True,
@@ -380,6 +387,7 @@ class ProductTemplate(models.Model):
                             # TODO Publish block also here!
 
                             odoo_variants = self.search([
+                                # TODO change with new syntax:
                                 ('wp_id_in', '=', variant_id),  # never overlap
                                 ])
 
@@ -426,6 +434,7 @@ class ProductTemplate(models.Model):
                     counter += 1
                     image_src = quote(
                         image['src'].encode('utf8'), ':/')
+                    # TODO change with new syntax:
                     filename = '%s.%03d.jpg' % (
                         reference_id,
                         counter,
@@ -448,6 +457,7 @@ class ProductTemplate(models.Model):
                     ))
                 for product, item_ids in product_connection[field]:
                     related_products = self.search([
+                        # TODO change with new syntax:
                         ('wp_id_in', 'in', item_ids),
                         ])
                     if related_products:
@@ -474,6 +484,7 @@ class ProductTemplate(models.Model):
             filename = os.path.join(
                 path,
                 #  Default image is .000
+                # TODO change with new syntax:
                 '%s.000.%s' % (
                     product.id,  # wp_id_in,
                     extension,
@@ -570,6 +581,7 @@ class ProductTemplate(models.Model):
                 field: value,
             })
 
+    # inverse function:
     def _save_wp_id_in(self):
         return self._save_field_in_and_out(
             'wp_id', self.wp_id_in, direction='in')
