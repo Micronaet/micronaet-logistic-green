@@ -439,7 +439,7 @@
         <field name="model">product.template</field>
         <field name="inherit_id" ref="product.product_template_kanban_view"/>
         <field name="arch" type="xml">
-            <field name="image_small" position="after">
+            <field name="image_small" position="replace">
                 <field name="wp_image" />
             </field>
             <div class="o_kanban_image" position="replace">
