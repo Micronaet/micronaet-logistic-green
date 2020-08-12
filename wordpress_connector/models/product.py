@@ -8,7 +8,7 @@ import base64
 import pdb
 from urllib.request import urlretrieve
 from urllib.parse import quote
-from odoo import models, fields, api
+from odoo import models, fields, api, exceptions
 
 _logger = logging.getLogger(__name__)
 
@@ -100,7 +100,7 @@ class ProductTemplate(models.Model):
         # ---------------------------------------------------------------------
         # Update supplier for product:
         # ---------------------------------------------------------------------
-        sku = self.wp_sku
+        sku = self.sku_in
         sku, code, supplier, child, ean13 = self.clean_code(sku)
         if not sku or not supplier:
             _logger.error('Supplier not update, missed sku or supplier [%s]!' %
@@ -126,17 +126,28 @@ class ProductTemplate(models.Model):
     @api.model
     def load_product_template_structure(self, connector):
         """ Load product template from Wordpress
+            (procedure launch from connector button for now)
         """
-        # Parameters:
+        pdb.set_trace()
+        # Company parameters:
+        if self.env.user.company_id.wp_connector_in_id != connector:
+            raise exceptions.Warning(
+                'Cannot import connector that is different from company in '
+                'parameter')
+
+        # Connector parameters:
         image_path = connector.image_path
         connector_id = connector.id
         parameters = connector.get_publish_parameters()
 
+        # Wordpress parameters:
         wcapi = connector.get_connector()
+        # Product:
         params = {
             'per_page': parameters['block']['product'],
             'page': 1,
         }
+        # Variation:
         variation_param = {
             'per_page': parameters['block']['variant'],
             'page': 1,
@@ -148,7 +159,6 @@ class ProductTemplate(models.Model):
         # NOTE: No preload parameters for get (only for publish):
         # Tag:
         tag_list = {}
-        # TODO Check with new syntax
         for tag in self.env['wp.tag'].search([
                 ('connector_id', '=', connector_id),
                 ]):
@@ -156,7 +166,6 @@ class ProductTemplate(models.Model):
 
         # Category:
         category_list = {}
-        # TODO Check with new syntax
         for category in self.env['product.category'].search([
                 ('connector_id', '=', connector_id),
                 ('wp_id', '!=', False),
@@ -164,7 +173,6 @@ class ProductTemplate(models.Model):
             category_list[category.wp_id] = category.id
 
         attribute_list = {}
-        # TODO Check with new syntax
         for attribute in self.env['wp.attribute'].search([
                 ('connector_id', '=', connector_id),
                 ]):
@@ -201,7 +209,7 @@ class ProductTemplate(models.Model):
             for record in records:
                 # Extract data from record:
                 wp_id_in = record['id']
-                sku = record['sku']
+                real_sku = record['sku']
                 name = record['name']
                 # slug = record['slug']
                 # stock_status = record['stock_status']
@@ -220,27 +228,35 @@ class ProductTemplate(models.Model):
                 default_attributes = record['default_attributes']
 
                 # Clean sku for default_code
-                split_code = self.clean_code(sku)
-                sku, default_code, supplier, child, barcode = split_code
+                sku, default_code, supplier, child, barcode = \
+                    self.clean_code(real_sku)
 
                 # ODOO search:
+                # TODO save original sku?
                 products = self.search([
-                    # TODO Change!!!
-                    ('connector_id', '=', connector_id),
+                    # ('connector_id', '=', connector_id),  # Used Company IN
+                    '|',
                     ('wp_id_in', '=', wp_id_in),
+                    ('default_code', '=', sku),
                     ])
                 create_mode = False if products else True
+                if len(products) > 1:
+                    _logger.error('Multi ID or SKU present: %s' % sku)
+                    pdb.set_trace()
+                    # TODO use only first?
+                    # products = product[0]
 
                 # -------------------------------------------------------------
                 # Prepare data (use publish setup):
                 # -------------------------------------------------------------
                 data = {
-                    # TODO change with new syntax!!
-                    'connector_id': connector_id,
-                    'wp_published': True,
+                    # 'connector_id': connector_id,  # Not used
+                    # 'wp_sku': sku,
+                    'wp_published': True,  # TODO remove from here
                     'wp_id_in': wp_id_in,
                     'default_code': sku,
-                    'wp_sku': sku,
+                    'sku_in': sku,
+
                     'wp_type': record['type'],
                     'wp_status': record['status'],
                 }
@@ -319,8 +335,7 @@ class ProductTemplate(models.Model):
                     products.write({'wp_attribute_ids': wp_attribute_ids})
 
                 if parameters['publish']['image']:
-                    # TODO change with new syntax
-                    image_list.append((wp_id_in, images))
+                    image_list.append((product_id, images))
 
                 if parameters['publish']['linked']:
                     if related_ids:
@@ -368,17 +383,17 @@ class ProductTemplate(models.Model):
                                     variant_images:
                                 # Usually one:
                                 image_list.append(
-                                    (variant_id, [variant_images]))
+                                    (variant.id, [variant_images]))
 
                             variant_data = {
-                                # TODO change with new syntax:
-                                'connector_id': connector_id,
+                                # 'connector_id': connector_id,
+                                # 'wp_sku': variant_sku,
                                 'wp_type': 'variable',
                                 'wp_published': True,
                                 'name': name,
                                 'wp_id_in': variant['id'],
+                                'sku_in': variant_sku,
                                 'default_code': variant_sku,
-                                'wp_sku': variant_sku,
                                 'lst_price': variant['regular_price'],
                                 'description_sale': variant['description'],
                                 'weight': variant['weight'],
@@ -388,11 +403,19 @@ class ProductTemplate(models.Model):
                             # TODO Publish block also here!
 
                             odoo_variants = self.search([
-                                # TODO change with new syntax:
+                                '|',
                                 ('wp_id_in', '=', variant_id),  # never overlap
+                                ('default_code', '=', variant_sku),
                                 ])
 
                             if odoo_variants:
+                                if len(odoo_variants) > 1:
+                                    _logger.error('Double variant found %s' % (
+                                        variant_sku,
+                                    ))
+                                    pdb.set_trace()
+                                    odoo_variants = odoo_variants[0]
+
                                 odoo_variants.write(variant_data)
                                 _logger.info(
                                     '   >> Update %s variants' % variant_sku)
@@ -726,6 +749,7 @@ class ProductTemplate(models.Model):
         help='Term used for this variation'
         )
 
+    # TODO keep here or in relation? ------------------------------------------
     wp_type = fields.Selection([
         ('simple', 'Simple product'),
         ('variable', 'Variable product'),
@@ -733,13 +757,13 @@ class ProductTemplate(models.Model):
         ('grouped', 'Grouped product'),
         ('external', 'External product'),
         ], 'Wordpress type', default='simple')
-
     wp_status = fields.Selection([
         ('draft', 'draft'),
         ('pending', 'pending'),
         ('private', 'private'),
         ('publish', 'publish'),
         ], 'Wordpress Status', default='publish')
+    # TODO --------------------------------------------------------------------
 
     # Link management:
     wp_linked_ids = fields.Many2many(

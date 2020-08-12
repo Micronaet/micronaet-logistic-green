@@ -3,7 +3,7 @@
 
 import logging
 import woocommerce
-from odoo import models, fields, api
+from odoo import models, fields, api, exceptions
 import pdb
 
 _logger = logging.getLogger(__name__)
@@ -129,7 +129,8 @@ class WPConnector(models.Model):
             return self.env['product.template'].\
                 load_product_template_structure(connector=self)
         else:
-            pass  # TODO
+            # TODO Manage export out data
+            raise exceptions.Warning('Output not managed for now only input!')
 
     # -------------------------------------------------------------------------
     #                               COLUMNS:
@@ -428,7 +429,7 @@ class WPTag(models.Model):
     name = fields.Char('Tag name', size=64, required=True)
     description = fields.Char('Description', size=80)
     wp_id = fields.Integer(string='Wp ID in', readonly=True)
-    wp_out_id = fields.Integer(string='Wp ID out', readonly=True)
+    # wp_out_id = fields.Integer(string='Wp ID out', readonly=True)
     connector_id = fields.Many2one('wp.connector', 'Connector')
     unused = fields.Boolean('Removed', help='No more present on WP')
 
