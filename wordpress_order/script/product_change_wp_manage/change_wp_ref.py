@@ -40,9 +40,13 @@ if not template_ids:
     print('Error no product found')
     sys.exit()
 pdb.set_trace()
+
 for template in template_pool.browse(template_ids):
     # Mode WP reference:
     default_code = template.default_code  # wp_sku
+    if not default_code:
+        print('No default code jumped')
+        continue
     wp_id = template.wp_id
     product_id = template.id
     template_pool.write([product_id], {
