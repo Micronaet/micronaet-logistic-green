@@ -2,6 +2,7 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl.html).
 
 import os
+import sys
 import logging
 import base64
 import pdb
@@ -492,13 +493,13 @@ class ProductTemplate(models.Model):
             if os.path.isfile(filename):
                 _logger.info('Found present: %s' % filename)
                 continue
-            pdb.set_trace()
             try:
                 f_data = open(filename, 'rb')
                 product.wp_image = base64.encodebytes(f_data.read())
                 f_data.close()
             except:
-                _logger.error('Image not found: {}'.format(filename))
+                _logger.error('Image not found: {}\n{}'.format(
+                    filename, sys.exc_info()))
                 product.wp_image = False
 
     # -------------------------------------------------------------------------
