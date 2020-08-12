@@ -490,16 +490,12 @@ class ProductTemplate(models.Model):
                     extension,
                     ),
                 )
-            if os.path.isfile(filename):
-                _logger.info('Found present: %s' % filename)
-                continue
             try:
                 f_data = open(filename, 'rb')
                 product.wp_image = base64.encodebytes(f_data.read())
                 f_data.close()
             except:
-                _logger.error('Image not found: {}\n{}'.format(
-                    filename, sys.exc_info()))
+                _logger.error('Image not found: {}'.format(filename))
                 product.wp_image = False
 
     # -------------------------------------------------------------------------
