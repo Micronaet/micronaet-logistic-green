@@ -492,7 +492,7 @@ class ProductTemplate(models.Model):
             if os.path.isfile(filename):
                 _logger.info('Found present: %s' % filename)
                 continue
-
+            pdb.set_trace()
             try:
                 f_data = open(filename, 'rb')
                 product.wp_image = base64.encodebytes(f_data.read())
