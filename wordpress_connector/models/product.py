@@ -494,9 +494,10 @@ class ProductTemplate(models.Model):
                 f_data = open(filename, 'rb')
                 product.wp_image = base64.encodebytes(f_data.read())
                 f_data.close()
+                _logger.info('Image present: {}'.format(filename))
             except:
-                _logger.error('Image not found: {}'.format(filename))
                 product.wp_image = False
+                _logger.error('Image not present: {}'.format(filename))
 
     # -------------------------------------------------------------------------
     #                            Compute function:
