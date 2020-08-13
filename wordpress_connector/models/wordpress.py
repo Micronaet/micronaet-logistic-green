@@ -352,8 +352,6 @@ class WPTag(models.Model):
     def publish_tags(self, connector):
         """ Publish tags from Wordpress (out)
         """
-        import pdb
-        pdb.set_trace()
         tags, wp_records = self.get_odoo_wp_data(connector)
         wcapi = connector.get_connector()
 
@@ -369,10 +367,10 @@ class WPTag(models.Model):
             data = {
                 'name': key,
                 }
-            wp_old_id = tag.wp_old_id
-            if wp_old_id in wp_ids:  # Update tag name (if necessary)
-                wp_ids.remove(wp_old_id)
-                data['id'] = wp_old_id
+            wp_id = tag.wp_id
+            if wp_id in wp_ids:  # Update tag name (if necessary)
+                wp_ids.remove(wp_id)
+                data['id'] = wp_id
                 command_data['update'].append(data)
             else:
                 command_data['create'].append(data)
@@ -390,13 +388,12 @@ class WPTag(models.Model):
                 if not tag:
                     _logger.error('Tag %s in WP but no ref. in odoo' % key)
                 # Update ODOO with new ID
-                wp_out_id = record['wp_id']
+                wp_id = record['wp_id']
                 tag.write({
-                    'wp_out_id': wp_out_id,
+                    'wp_out_id': wp_id,
                     })
         except:
             _logger.error('Error updating Tags in Wordpress')
-        pdb.set_trace()
 
     @api.model
     def load_tags(self, connector):
@@ -483,7 +480,7 @@ class WPAttribute(models.Model):
                 name = record['name']
                 if name in attributes_db:  # TODO Update?
                     _logger.info('Update: %s' % name)
-                    attribute_id = attributes[name]
+                    attribute_id = attributes_db[name]
                 else:
                     _logger.info('Create: %s' % name)
                     attribute_id = self.create({
