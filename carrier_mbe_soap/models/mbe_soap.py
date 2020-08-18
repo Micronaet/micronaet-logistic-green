@@ -372,7 +372,7 @@ class SaleOrder(models.Model):
                 'City': partner.city or '',  # * 50,
                 'State': partner.state_id.code or '',  # * 2
                 'Country': partner.country_id.code or '',  # 2
-                # 'idSubzone': '',  # * int
+                'idSubzone': '',  # * int
                 },
             'ShipType': order.ship_type or '',
             'PackageType': order.package_type or '',
