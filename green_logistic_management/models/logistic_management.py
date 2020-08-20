@@ -725,7 +725,7 @@ class SaleOrder(models.Model):
 
     logistic_state = fields.Selection([
         ('draft', 'Order draft'),  # Draft, new order received
-        ('order', 'Order confirmed'),  # Quotation transformed in order
+        ('confirmed', 'Order confirmed'),  # Quotation transformed in order
         ('pending', 'Pending delivery'),  # Waiting for delivery
         ('ready', 'Ready'),  # Ready for transfer
         ('done', 'Done'),  # Delivered or closed XXX manage partial delivery
