@@ -40,6 +40,7 @@ for product in product_pool.browse(product_ids):
     })
 
 # Remove from sale order line:
+pdb.set_trace()
 line_ids = line_pool.search([])
 for line in line_pool.browse(line_ids):
     print('Line remove VAT: %s' % line.name)
