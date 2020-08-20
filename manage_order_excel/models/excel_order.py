@@ -64,7 +64,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             1, 25,
             10, 10,
             10, 10,
-            4,
+            10,
         )
         total_col = len(column_width)
 
@@ -130,11 +130,12 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                 # Supplier:
                 (0 if supplier_id else '/', 'number'),
                 (0, supplier_color),
-                '',  # TODO add formula after:
+                # '',  # TODO add formula after:
             ), style_code='text')
-            formula = '=SE(%s+%s; "OK"; "KO")' % (
+            formula = 'SE(%s + %s - %s = 0; "COMPLETO"; "PARZIALE")' % (
                 report_pool.row_col_to_cell(row, 13),
                 report_pool.row_col_to_cell(row, 15),
+                report_pool.row_col_to_cell(row, 9),
             )
             report_pool.write_formula(
                 ws_name, row, total_col - 1, formula,
