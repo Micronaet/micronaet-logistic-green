@@ -527,95 +527,32 @@ class SaleOrder(models.Model):
                 )
         return True
 
-    def check_product_service(self):
-        """ Update line with service to ready state
-        """
-        line_pool = self.env['sale.order.line']
-        lines = line_pool.search([
-            ('order_id.logistic_state', '=', 'draft'),
-            ('logistic_state', '=', 'draft'),
-            ('product_id.type', '=', 'service'),
-            ('product_id.is_expense', '=', True),
-            ])
-        _logger.info('New order: Check product-service [# %s]' % len(lines))
-        return lines.write({
-            'logistic_state': 'ready',  # immediately ready
-            })
-
     # -------------------------------------------------------------------------
     #                   WORKFLOW: [LOGISTIC OPERATION TRIGGER]
     # -------------------------------------------------------------------------
-    # A. Logistic phase 1: Check secure payment:
+    # A. Logistic phase 1: Integration with  web, pending or cancel
     # -------------------------------------------------------------------------
-
-    @api.model
-    def workflow_draft_to_payment(self):
+    @api.multi
+    def workflow_draft_to_confirmed(self):
         """ Assign logistic_state to secure order
+            Button event (for one order only but used in loop)
         """
-        _logger.info('New order: Start analysis')
-        # ---------------------------------------------------------------------
-        #                               Pre operations:
-        # ---------------------------------------------------------------------
-        # Payment article:
-        _logger.info('Check: Mark service line to ready (is not a work)')
-        self.check_product_service()  # Line with service article (not used)
+        for order in self:
+            _logger.info('Update order: %s' % order.name)
+            order.write({
+                'payment_done': True,
+                'logistic_state': 'confirmed',
+            })
 
-        # Update supplier if present:
-        _logger.info('Check: Generate first supplier if not present')
-        self.check_product_first_supplier()
+            lines = order.order_line.filtered(
+                lambda l: l.product_id.is_expense)
 
-        # ---------------------------------------------------------------------
-        # Start order payment check:
-        # ---------------------------------------------------------------------
-        orders = self.search([
-            ('logistic_state', '=', 'draft'),  # new order
-            ])
-        _logger.info('New order: Selection [# %s]' % len(orders))
-
-        # Search new order:
-        payment_order = []
-        for order in orders:
-            # -----------------------------------------------------------------
-            # 1. Marked as done (script or in form)
-            # -----------------------------------------------------------------
-            if order.payment_done:
-                payment_order.append(order)
-                continue
-
-            # -----------------------------------------------------------------
-            # 2. Secure market (sale team):
-            # -----------------------------------------------------------------
-            try:  # error if not present
-                if order.team_id.secure_payment:
-                    payment_order.append(order)
-                    continue
-            except:
-                pass
-
-            # -----------------------------------------------------------------
-            # 3. Secure payment in fiscal position
-            # -----------------------------------------------------------------
-            try:  # problem in not present
-                position = order.partner_id.property_account_position_id
-                payment = order.payment_term_id
-                if payment and payment in [
-                        secure.payment_id for secure in position.secure_ids]:
-                    payment_order.append(order)
-                    continue
-            except:
-                pass
-
-        # ---------------------------------------------------------------------
-        # Update state: order >> payment
-        # ---------------------------------------------------------------------
-        select_ids = []
-        for order in payment_order:
-            select_ids.append(order.id)
-            order.payment_done = True
-            order.logistic_state = 'payment'
-
-        # Return view tree:
-        return self.return_order_list_view(select_ids)
+            # Update line with service:
+            _logger.info(
+                'Order line expense go in ready [# %s]' % len(lines))
+            return lines.write({
+                'logistic_state': 'ready',  # immediately ready
+            })
 
     # -------------------------------------------------------------------------
     # B. Logistic phase 2: payment > order

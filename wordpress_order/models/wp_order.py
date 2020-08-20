@@ -560,7 +560,7 @@ class WPConnector(models.Model):
         _logger.warning('Orders are managed from ODOO')
         if self.manage_web_status:  # Connector manage status:
             for order in update_order_reached:
-                order.wp_wf_set_to_state('sent-to-gsped')
+                order.wp_wf_processing()
             _logger.warning(
                 'Updated Wordpress status # %s' % len(update_order_reached))
         return True
