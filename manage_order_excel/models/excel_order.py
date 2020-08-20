@@ -20,8 +20,8 @@ class SaleOrderExcelManageWizard(models.TransientModel):
     def get_suppinfo_supplier(self, product):
         for supplier in product.seller_ids:
             # First only:
-            return supplier.name.id, supplier.name.name
-        return False, ''
+            return supplier.name.id, supplier.name.name, supplier.name.ref
+        return False, '', ''
 
     @api.model
     def get_suppinfo_price(self, product):
@@ -53,7 +53,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             _('Q.'), _('Price'),
             _('ID Supplier'), _('Supplier'),
             _('Int. Stock'), _('Q. Int.'),
-            _('Supp. Stock'), _('Q. Supp.'),
+            _('Supp. Stock'), _('Q. Supp.'), _('Ref.'),
             _('Status'),
         )
         column_width = (
@@ -63,7 +63,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             7, 7,
             1, 25,
             10, 10,
-            10, 10,
+            10, 10, 8,
             10,
         )
         total_col = len(column_width)
@@ -97,7 +97,8 @@ class SaleOrderExcelManageWizard(models.TransientModel):
 
             # Readability:
             order = line.order_id
-            supplier_id, supplier_name = self.get_suppinfo_supplier(product)
+            supplier_id, supplier_name, supplier_code = \
+                self.get_suppinfo_supplier(product)
 
             # Category:
             category = ', '.join(
@@ -105,6 +106,13 @@ class SaleOrderExcelManageWizard(models.TransientModel):
 
             # Color setup:
             supplier_color = 'number_total' if supplier_id else 'number'
+            qty_needed = line.product_uom_qty
+            qty_available = product.qty_available
+            # TODO manage incremental for this report!
+            if qty_available >= qty_needed:
+                qty_covered = qty_needed
+            else:
+                qty_covered = qty_available
 
             report_pool.write_xls_line(ws_name, row, (
                 line.id,
@@ -118,29 +126,33 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                 product.name or '',
                 category or '',
 
-                (line.product_uom_qty, 'number'),
+                (qty_needed, 'number'),
                 (line.price_unit, 'number'),
 
                 supplier_id,
                 supplier_name,
 
                 # Internal:
-                (0, 'number'),
-                (0, 'number_total'),
+                (qty_available, 'number'),
+                (qty_covered, 'number_total'),
+
                 # Supplier:
                 (0 if supplier_id else '/', 'number'),
                 (0, supplier_color),
-                # '',  # TODO add formula after:
+                (supplier_code, supplier_color),
             ), style_code='text')
-            formula = 'SE(%s + %s - %s = 0; "COMPLETO"; "PARZIALE")' % (
-                report_pool.row_col_to_cell(row, 13),
-                report_pool.row_col_to_cell(row, 15),
-                report_pool.row_col_to_cell(row, 9),
+
+            formula = '=IF({0}+{1}-{2}=0, "OK", ' \
+                      'IF({0}+{1}-{2}<0, "INCOMPLETO", "ECCEDENTE")'.format(
+                          report_pool.row_col_to_cell(row, 13),
+                          report_pool.row_col_to_cell(row, 15),
+                          report_pool.row_col_to_cell(row, 8),
             )
+
             report_pool.write_formula(
                 ws_name, row, total_col - 1, formula,
-                value='KO',
-                # format_code = 'number_ok',
+                value='INCOMPLETO',
+                format_code='text',
             )
         return report_pool.return_attachment(_('current_sale_order_pending'))
 
