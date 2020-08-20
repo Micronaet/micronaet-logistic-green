@@ -4,13 +4,9 @@
 import os
 import sys
 import logging
-import odoo
 from odoo import api, fields, models, tools, exceptions, SUPERUSER_ID
 from odoo.addons import decimal_precision as dp
 from odoo.tools.translate import _
-
-from datetime import datetime, timedelta
-from dateutil.relativedelta import relativedelta
 
 _logger = logging.getLogger(__name__)
 
@@ -57,13 +53,6 @@ class ResCompany(models.Model):
         required=True,
         )
 
-    # TODO Unused:
-    #logistic_root_folder = fields.Text(
-    #    'Output root folder',
-    #    help='Master root folder for output',
-    #    required=True,
-    #    )
-
 
 class ProductTemplate(models.Model):
     """ Template add fields
@@ -73,7 +62,7 @@ class ProductTemplate(models.Model):
     # -------------------------------------------------------------------------
     # Columns:
     # -------------------------------------------------------------------------
-    is_expence = fields.Boolean(
+    is_expense = fields.Boolean(
         'Expense product',
         help='Expense product is not order and produced')
     is_refund = fields.Boolean(
@@ -449,7 +438,6 @@ class SaleOrder(models.Model):
         order_ids = []
         for order in self:
             line_state = set(order.order_line.mapped('logistic_state'))
-            line_state.discard('unused')  # remove kit line (exploded)
             # if some line are in done (multi delivery):
             line_state.discard('done')
 
@@ -467,7 +455,6 @@ class SaleOrder(models.Model):
         """
         for order in self:
             line_state = set(order.order_line.mapped('logistic_state'))
-            line_state.discard('unused')  # remove kit line (exploded)
             if tuple(line_state) == ('done', ):  # All done
                 order.write({
                     'logistic_state': 'delivering',  # XXX ex done
@@ -568,7 +555,7 @@ class SaleOrder(models.Model):
             ('order_id.logistic_state', '=', 'draft'),
             ('logistic_state', '=', 'draft'),
             ('product_id.type', '=', 'service'),
-            ('product_id.is_expence', '=', True),
+            ('product_id.is_expense', '=', True),
             ])
         _logger.info('New order: Check product-service [# %s]' % len(lines))
         return lines.write({
@@ -586,12 +573,7 @@ class SaleOrder(models.Model):
                 product = line.product_id
 
                 # Jump line:
-                # Expence product: (service # TODO after only is_expence)
-                if product.type == 'service' or product.is_expence:
-                    continue
-
-                # Unused line (ex. kit management):
-                if line.logistic_state == 'unused':
+                if product.is_expense:
                     continue
 
                 # -------------------------------------------------------------
@@ -626,10 +608,6 @@ class SaleOrder(models.Model):
         # ---------------------------------------------------------------------
         #                               Pre operations:
         # ---------------------------------------------------------------------
-        # Empty orders:
-        _logger.info('Check: Mark error state for empty orders')
-        self.check_empty_orders()  # Order without line
-
         # Payment article:
         _logger.info('Check: Mark service line to ready (is not a work)')
         self.check_product_service()  # Line with service article (not used)

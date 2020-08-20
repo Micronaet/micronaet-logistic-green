@@ -31,8 +31,8 @@
             <field name="arch" type="xml">
                 <xpath expr="//div[@name='options']/div[1]" position="before">
                     <div>
-                        <field name="is_expence"/>
-                        <label for="is_expence"/>
+                        <field name="is_expense"/>
+                        <label for="is_expense"/>
                         <field name="is_refund"/>
                         <label for="is_refund"/>
                     </div>
