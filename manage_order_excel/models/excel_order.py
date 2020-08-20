@@ -37,7 +37,8 @@ class SaleOrderExcelManageWizard(models.TransientModel):
         report_pool = self.env['excel.report']
         line_pool = self.env['sale.order.line']
         lines = line_pool.search([
-            ('order_id.logistic_state', 'in', ('confirmed', ))
+            ('order_id.logistic_state', 'in', ('confirmed', )),
+            ('product_id.is_expense', '=', False),
             ])
 
         title = (
@@ -131,10 +132,15 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                 (0, supplier_color),
                 '',  # TODO add formula after:
             ), style_code='text')
-            # report_pool.write_formula(
-            #     ws_name, row, total_col - 1, '=SE(M3+O3 = H3;"OK";"KO")',
-            #     # format_code = 'number_ok', value='',
-            # )
+            formula = '=SE(%s+%s; "OK"; "KO")' % (
+                report_pool.row_col_to_cell(row, 13),
+                report_pool.row_col_to_cell(row, 15),
+            )
+            report_pool.write_formula(
+                ws_name, row, total_col - 1, formula,
+                value='KO',
+                # format_code = 'number_ok',
+            )
         return report_pool.return_attachment(_('current_sale_order_pending'))
 
     @api.multi

@@ -31,5 +31,11 @@
             action="action_sale_order_excel_manage_wizard_form"
             sequence="40"
             />
-
+      <menuitem
+          id="menu_logistic_left_extract_excel_wizard"
+          parent="green_logistic_management.menu_logistic_left_purchase_root"
+          name="Extract confirmed order"
+          action="action_sale_order_excel_manage_wizard_form"
+          sequence="5"
+          />
 </odoo>
