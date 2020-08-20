@@ -540,7 +540,6 @@ class SaleOrder(models.Model):
         for order in self:
             _logger.info('Update order: %s' % order.name)
             order.write({
-                'payment_done': True,
                 'logistic_state': 'confirmed',
             })
 
