@@ -13,6 +13,7 @@
     'website': 'http://www.micronaet.it',
     'license': 'AGPL-3',
     'depends': [
+        'sale',
         'wordpress_connector',
         'wordpress_order',
         'green_logistic_management',

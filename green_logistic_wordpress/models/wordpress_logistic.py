@@ -18,7 +18,6 @@ class SaleOrder(models.Model):
     def wp_wf_processing(self):
         """ Override procedure also for manage Logistic status
         """
-        pdb.set_trace()
         # Call Logistic procedure when confirmed payment
         super(SaleOrder, self).workflow_draft_to_confirmed()
 
