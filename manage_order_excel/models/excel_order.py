@@ -138,8 +138,8 @@ class SaleOrderExcelManageWizard(models.TransientModel):
 
                 # Supplier:
                 (0 if supplier_id else '/', 'number'),
-                (0, supplier_color),
-                (supplier_code, supplier_color),
+                (0 if supplier_id else '', supplier_color),
+                (supplier_code, 'text_total'),
             ), style_code='text')
 
             formula = '=IF({0}+{1}-{2}=0, "OK", ' \
