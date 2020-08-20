@@ -579,21 +579,13 @@
              <field name="context">{}</field>
              <field name="domain">[('logistic_state', '=', 'draft')]</field>
          </record>
-         <record model="ir.actions.act_window" id="action_sale_order_payment_form">
-             <field name="name">Sale order payment</field>
+         <record model="ir.actions.act_window" id="action_sale_order_confirmed_form">
+             <field name="name">Sale order confirmed</field>
              <field name="res_model">sale.order</field>
              <field name="view_type">form</field>
              <field name="view_mode">tree,form</field>
              <field name="context">{}</field>
-             <field name="domain">[('logistic_state', '=', 'payment')]</field>
-         </record>
-         <record model="ir.actions.act_window" id="action_sale_order_order_form">
-             <field name="name">Sale order order</field>
-             <field name="res_model">sale.order</field>
-             <field name="view_type">form</field>
-             <field name="view_mode">tree,form</field>
-             <field name="context">{}</field>
-             <field name="domain">[('logistic_state', '=', 'order')]</field>
+             <field name="domain">[('logistic_state', '=', 'confirmed')]</field>
          </record>
          <record model="ir.actions.act_window" id="action_sale_order_pending_form">
              <field name="name">Sale order pending</field>
@@ -611,14 +603,6 @@
              <field name="context">{}</field>
              <field name="domain">[('logistic_state', '=', 'ready')]</field>
          </record>
-         <record model="ir.actions.act_window" id="action_sale_order_delivering_form">
-             <field name="name">Sale order delivering</field>
-             <field name="res_model">sale.order</field>
-             <field name="view_type">form</field>
-             <field name="view_mode">tree,form</field>
-             <field name="context">{}</field>
-             <field name="domain">[('logistic_state', '=', 'delivering')]</field>
-         </record>
          <record model="ir.actions.act_window" id="action_sale_order_done_form">
              <field name="name">Sale order done</field>
              <field name="res_model">sale.order</field>
@@ -634,14 +618,6 @@
              <field name="view_mode">tree,form</field>
              <field name="context">{}</field>
              <field name="domain">[('logistic_state', '=', 'cancel')]</field>
-         </record>
-         <record model="ir.actions.act_window" id="action_sale_order_error_form">
-             <field name="name">Sale order error</field>
-             <field name="res_model">sale.order</field>
-             <field name="view_type">form</field>
-             <field name="view_mode">tree,form</field>
-             <field name="context">{}</field>
-             <field name="domain">[('logistic_state', '=', 'error')]</field>
          </record>
 
          <!--purchase.order action:-->
@@ -750,18 +726,11 @@
                      sequence="20"
                      />
                  <menuitem
-                     id="menu_logistic_left_order_payment"
+                     id="menu_logistic_left_order_confirmed"
                      parent="menu_logistic_left_order_root"
-                     name="Logistic: Payment"
-                     action="action_sale_order_payment_form"
+                     name="Logistic: Confirmed"
+                     action="action_sale_order_confirmed_form"
                      sequence="30"
-                     />
-                 <menuitem
-                     id="menu_logistic_left_order_order"
-                     parent="menu_logistic_left_order_root"
-                     name="Logistic: Order"
-                     action="action_sale_order_order_form"
-                     sequence="40"
                      />
                  <menuitem
                      id="menu_logistic_left_order_pending"
@@ -778,13 +747,6 @@
                      sequence="60"
                      />
                  <menuitem
-                     id="menu_logistic_left_order_delivering"
-                     parent="menu_logistic_left_order_root"
-                     name="Logistic: Delivering"
-                     action="action_sale_order_delivering_form"
-                     sequence="70"
-                     />
-                 <menuitem
                      id="menu_logistic_left_order_done"
                      parent="menu_logistic_left_order_root"
                      name="Logistic: Done"
@@ -793,33 +755,19 @@
                      />
 
                  <menuitem
-                     id="menu_logistic_left_order_error"
-                     parent="menu_logistic_left_order_root"
-                     name="Logistic: Error"
-                     action="action_sale_order_error_form"
-                     sequence="120"
-                     />
-
-                 <menuitem
                      id="menu_logistic_left_order_cancel"
                      parent="menu_logistic_left_order_root"
                      name="Logistic: Cancel"
                      action="action_sale_order_cancel_form"
-                     sequence="130"
+                     sequence="90"
                      />
 
-             <menuitem
-                 id="menu_logistic_left_order_line_root"
-                 parent="menu_logistic_header_root"
-                 name="Sale order line"
-                 sequence="15"
-                 />
                  <menuitem
                      id="menu_logistic_left_order_line_all"
-                     parent="menu_logistic_left_order_line_root"
+                     parent="menu_logistic_left_order_root"
                      name="Sale order line all"
                      action="action_sale_order_line_logistic"
-                     sequence="10"
+                     sequence="100"
                      />
 
              <menuitem
@@ -855,96 +803,73 @@
                      action="action_purchase_order_done"
                      sequence="40"
                      />
-             <menuitem
-                 id="menu_logistic_left_purchase_line_root"
-                 parent="menu_logistic_header_root"
-                 name="Purchase order line"
-                 sequence="25"
-                 />
                  <menuitem
                      id="menu_logistic_left_purchase_line_detail"
-                     parent="menu_logistic_left_purchase_line_root"
+                     parent="menu_logistic_left_purchase_root"
                      name="Purchase order line"
                      action="action_purchase_order_line"
-                     sequence="10"
+                     sequence="100"
                      />
 
              <menuitem
-                 id="menu_logistic_left_pick_in_root"
+                 id="menu_logistic_left_stock_root"
                  parent="menu_logistic_header_root"
-                 name="BF load document"
+                 name="Stock"
                  sequence="30"
                  />
                  <menuitem
                      id="menu_logistic_left_pick_in_document"
-                     parent="menu_logistic_left_pick_in_root"
-                     name="BF load document"
+                     parent="menu_logistic_left_stock_root"
+                     name="Load document"
                      action="action_stock_picking_in"
                      sequence="10"
                      />
 
-             <menuitem
-                 id="menu_logistic_left_pick_out_root"
-                 parent="menu_logistic_header_root"
-                 name="BC unload document"
-                 sequence="40"
-                 />
                  <menuitem
                      id="menu_logistic_left_pick_out_document"
-                     parent="menu_logistic_left_pick_out_root"
-                     name="BC unload document"
+                     parent="menu_logistic_left_stock_root"
+                     name="Unload document"
                      action="action_stock_picking_out"
-                     sequence="10"
+                     sequence="20"
                      />
                  <menuitem
                      id="menu_logistic_left_pick_out_document_invoice"
-                     parent="menu_logistic_left_pick_out_root"
+                     parent="menu_logistic_left_stock_root"
                      name="Invoice"
                      action="action_stock_picking_invoice_out"
-                     sequence="20"
+                     sequence="30"
                      />
-             <menuitem
-                 id="menu_logistic_left_stock_move_root"
-                 parent="menu_logistic_header_root"
-                 name="Stock move"
-                 sequence="50"
-                 />
+
                  <menuitem
                      id="menu_logistic_left_stock_move_all"
-                     parent="menu_logistic_left_stock_move_root"
+                     parent="menu_logistic_left_stock_root"
                      name="Stock move all"
                      action="action_stock_move_logistic_form"
-                     sequence="10"
+                     sequence="50"
                      />
 
              <menuitem
-                 id="menu_logistic_left_configuration_anagrafic_root"
+                 id="menu_logistic_left_configuration_master_data_root"
                  parent="menu_logistic_header_root"
-                 name="Anagrafic"
+                 name="Master data"
                  sequence="90"
                  />
                  <menuitem
                      id="menu_logistic_left_configuration_anagrafic_template"
-                     parent="menu_logistic_left_configuration_anagrafic_root"
+                     parent="menu_logistic_left_configuration_master_data_root"
                      action="action_product_template_form"
                      sequence="10"
                      />
-                 <!--<menuitem
-                     id="menu_logistic_left_configuration_anagrafic_template_no_supplier"
-                     parent="menu_logistic_left_configuration_anagrafic_root"
-                     action="action_product_template_no_supplier_form"
-                     sequence="20"
-                     />-->
 
                  <menuitem
                      id="menu_logistic_left_configuration_partner_customer"
-                     parent="menu_logistic_left_configuration_anagrafic_root"
+                     parent="menu_logistic_left_configuration_master_data_root"
                      action="action_res_partner_customer_form"
                      sequence="30"
                      />
                  <menuitem
                      id="menu_logistic_left_configuration_partner_supplier"
-                     parent="menu_logistic_left_configuration_anagrafic_root"
+                     parent="menu_logistic_left_configuration_master_data_root"
                      action="action_res_partner_supplier_form"
                      sequence="40"
                      />
@@ -997,72 +922,6 @@
                      action="action_res_company_parameter"
                      sequence="10"
                      />
-
-        <!--FATTURA PA (ACCOUNTING POSITION):
-        <menuitem
-            id="menu_account_fatturapa_root"
-            name="Fattura PA"
-            parent="menu_logistic_left_configuration_root"
-            sequence="10"
-            />
-            <menuitem
-                id="menu_account_fatturapa_format"
-                action="l18n_it_fatturapa.action_fatturapa_format"
-                name="Format"
-                parent="menu_account_fatturapa_root"
-                sequence="10"/>
-            <menuitem
-                id="menu_account_fatturapa_document_type"
-                action="l18n_it_fatturapa.action_fatturapa_document_type"
-                name="Document Type"
-                parent="menu_account_fatturapa_root"
-                sequence="20"/>
-            <menuitem
-                id="menu_account_fatturapa_payment_term"
-                action="l18n_it_fatturapa.action_fatturapa_payment_term"
-                name="Payment Term"
-                parent="menu_account_fatturapa_root"
-                sequence="30"/>
-            <menuitem
-                id="menu_account_fatturapa_welfare"
-                action="l18n_it_fatturapa.action_welfare_fund_type"
-                name="Welfare"
-                parent="menu_account_fatturapa_root"
-                sequence="40"/>
-            <menuitem
-                id="menu_account_fatturapa_fiscal_position"
-                action="l18n_it_fatturapa.action_fatturapa_fiscal_position"
-                name="Fiscal position"
-                parent="menu_account_fatturapa_root"
-                sequence="50"/>-->
-
-          <!--Inventory configuration menu -->
-          <!--Stock position:-->
-         <!--<menuitem
-              id="menu_stock_position_slot_root"
-              parent="menu_logistic_left_configuration_root"
-              sequence="50"
-              name="Stock location"
-              />
-              <menuitem
-                  id="menu_stock_location_slot_form"
-                  parent="menu_stock_position_slot_root"
-                  action="logistic_stock_position.action_stock_location_slot_form"
-                  sequence="10"
-                  />
-              <menuitem
-                  id="menu_view_stock_location_table"
-                  parent="menu_stock_position_slot_root"
-                  action="logistic_stock_position.action_view_stock_location_table"
-                  sequence="20"
-                  />
-              <menuitem
-                  id="menu_view_res_partner_table"
-                  parent="menu_stock_position_slot_root"
-                  action="logistic_stock_position.action_view_res_partner_table"
-                  sequence="30"
-                  />-->
-
     </data>
 </openerp>
 
