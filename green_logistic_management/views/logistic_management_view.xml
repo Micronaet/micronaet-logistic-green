@@ -502,12 +502,6 @@
                                      <field name="logistic_undelivered_qty" />
                                  </group>
                              </page>
-                             <page string="Position">
-                                 <group colspan="4" col="4">
-                                     <separator string="Stock position:" colspan="4"/>
-                                     <field name="logistic_position" nolabel="1" colspan="4"/>
-                                 </group>
-                             </page>
                              <page string="Assigned">
                                  <group colspan="4" col="4">
                                      <separator string="Assigned from stock:" colspan="4"/>

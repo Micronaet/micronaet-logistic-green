@@ -1392,7 +1392,6 @@ class SaleOrderLine(models.Model):
             # -------------------------------------------------------------
             # state = 'draft'
             product = line.product_id
-            logistic_position = ''
 
             # -------------------------------------------------------------
             # OC: Ordered qty:
@@ -1405,10 +1404,6 @@ class SaleOrderLine(models.Model):
             logistic_covered_qty = 0.0
             for quant in line.assigned_line_ids:
                 logistic_covered_qty -= quant.quantity
-                logistic_position += _('[MAG] Q. %s > %s\n') % (
-                    -quant.quantity,
-                    product.default_slot_id.name or ''
-                    )
             line.logistic_covered_qty = logistic_covered_qty
 
             # State valuation:
@@ -1447,10 +1442,6 @@ class SaleOrderLine(models.Model):
             for move in line.load_line_ids:
                 # TODO verify:
                 logistic_received_qty += move.product_uom_qty
-                logistic_position += _('[TAV] Q. %s > %s\n') % (
-                    move.product_uom_qty,
-                    move.slot_id.name or ''
-                    )
             line.logistic_received_qty = logistic_received_qty
 
             # -------------------------------------------------------------
@@ -1488,7 +1479,6 @@ class SaleOrderLine(models.Model):
             # Write data:
             # -------------------------------------------------------------
             # line.logistic_state = state
-            line.logistic_position = logistic_position
 
     # -------------------------------------------------------------------------
     #                                   COLUMNS:
@@ -1558,13 +1548,6 @@ class SaleOrderLine(models.Model):
     logistic_undelivered_qty = fields.Float(
         'Not delivered qty', digits=dp.get_precision('Product Price'),
         help='Qty not deliverer to final customer',
-        readonly=True, compute='_get_logistic_status_field', multi=True,
-        store=False,
-        )
-
-    # Position:
-    logistic_position = fields.Text(
-        'Position', help='Stock position',
         readonly=True, compute='_get_logistic_status_field', multi=True,
         store=False,
         )
