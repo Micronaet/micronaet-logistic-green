@@ -9,8 +9,8 @@ from odoo import _
 _logger = logging.getLogger(__name__)
 
 
-class SaleOrderIntegration(models.Model):
-    """ Integrate sharing procedure
+class SaleOrder(models.Model):
+    """ Model name: Sale order integration
     """
     _inherit = 'sale.order'
 
@@ -20,9 +20,7 @@ class SaleOrderIntegration(models.Model):
         """
         pdb.set_trace()
         # Call Logistic procedure when confirmed payment
-        super(SaleOrderIntegration, self).workflow_draft_to_confirmed()
+        super(SaleOrder, self).workflow_draft_to_confirmed()
 
         # Call original wordpress procedure overridden here (after all)
-        super(SaleOrderIntegration, self).wp_wf_processing()
-
-
+        super(SaleOrder, self).wp_wf_processing()

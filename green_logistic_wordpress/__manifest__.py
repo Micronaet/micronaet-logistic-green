@@ -8,7 +8,7 @@
     'description': '''
         Integrate Logistic management with Wordpress connector
         ''',
-    'summary': 'Excel, utility, report',
+    'summary': 'Logistic, Wordpress',
     'author': 'Micronaet S.r.l. - Nicola Riolini',
     'website': 'http://www.micronaet.it',
     'license': 'AGPL-3',
