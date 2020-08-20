@@ -35,8 +35,8 @@ pdb.set_trace()
 for product in product_pool.browse(product_ids):
     print('Product remove VAT: %s' % product.default_code)
     product_pool.write([product.id], {
-        'taxes_id': False,
-        'supplier_taxes_id': False,
+        'taxes_id': [(6, 0, ())],
+        'supplier_taxes_id': [(6, 0, ())],
     })
 
 # Remove from sale order line:
@@ -45,5 +45,5 @@ line_ids = line_pool.search([])
 for line in line_pool.browse(line_ids):
     print('Line remove VAT: %s' % line.name)
     line_pool.write([line.id], {
-        'tax_id': False,
+        'tax_id': [(6, 0, ())],
     })
