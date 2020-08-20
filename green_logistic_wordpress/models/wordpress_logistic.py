@@ -21,5 +21,7 @@ class SaleOrder(models.Model):
         # Call Logistic procedure when confirmed payment
         super(SaleOrder, self).workflow_draft_to_confirmed()
 
-        # Call original wordpress procedure overridden here (after all)
-        super(SaleOrder, self).wp_wf_processing()
+        # Update Wordpress order (if comes from there)
+        if self.connector_id:
+            # Call original wordpress procedure overridden here (after all)
+            super(SaleOrder, self).wp_wf_processing()

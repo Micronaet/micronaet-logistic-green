@@ -164,9 +164,7 @@ class SaleOrderStatusExtractWizard(models.TransientModel):
     #                             COLUMNS DATA: 
     # -------------------------------------------------------------------------    
     logistic_state = fields.Selection([
-        ('unused', 'Unused'), # Line not managed    
         ('draft', 'Custom order'), # Draft, customer order
-        ('uncovered', 'Uncovered'), # Not covered with stock
         ('ordered', 'Ordered'), # Supplier order uncovered
         ('ready', 'Ready'), # Order to be picked out (all in stock)
         ('done', 'Done'), # Delivered qty (order will be closed)
@@ -174,19 +172,13 @@ class SaleOrderStatusExtractWizard(models.TransientModel):
 
     order_logistic_state = fields.Selection([
         ('draft', 'Order draft'), # Draft, new order received
-        ('payment', 'Payment confirmed'), # Payment confirmed        
         # Start automation:
-        ('order', 'Order confirmed'), # Quotation transformed in order
+        ('confirmed', 'Order confirmed'), # Quotation transformed in order
         ('pending', 'Pending delivery'), # Waiting for delivery
         ('ready', 'Ready'), # Ready for transfer
-        ('delivering', 'Delivering'), # In delivering phase
         ('done', 'Done'), # Delivered or closed XXX manage partial delivery
-        ('dropshipped', 'Dropshipped'), # Order dropshipped
-        ('unificated', 'Unificated'), # Unificated with another
-        ('error', 'Error order'), # Order without line
         ], 'Order Logistic state')
 
     from_date = fields.Date('From date')    
     to_date = fields.Date('To date')    
 
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

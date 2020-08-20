@@ -179,4 +179,4 @@ class StockChangeStandardPrice(models.TransientModel):
 
         line_pool.logistic_check_ready_order()
         return True
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
+        

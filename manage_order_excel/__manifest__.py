@@ -17,6 +17,7 @@
         'sale',
         'xlsxwriter_report',
         'wordpress_order',
+        'green_logistic_management',
         ],
     'data': [
         'security/ir.model.access.csv',
