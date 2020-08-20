@@ -126,7 +126,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                 product.name or '',
                 category or '',
 
-                (qty_needed, 'number'),
+                (qty_needed, 'number_ok'),
                 (line.price_unit, 'number'),
 
                 supplier_id,
