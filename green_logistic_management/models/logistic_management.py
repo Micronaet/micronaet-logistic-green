@@ -634,8 +634,6 @@ class SaleOrder(models.Model):
             # C. Became real order:
             order.logistic_state = 'order'
 
-        # Update default supplier for exploded component:
-
         # Return view:
         return self.return_order_list_view(selected_ids)
 
@@ -689,7 +687,6 @@ class SaleOrder(models.Model):
 
             # Create picking document:
             partner = order.partner_id
-            name = order.name  # same as order_ref
             origin = _('%s [%s]') % (order.name, order.create_date[:10])
 
             picking = picking_pool.create({
@@ -863,11 +860,6 @@ class SaleOrderLine(models.Model):
     def open_view_sale_order(self):
         """ Open order view
         """
-        # model_pool = self.env['ir.model.data']
-        # view_id = model_pool.get_object_reference(
-        #    'module_name', 'view_name')[1]
-        view_id = False
-
         return {
             'type': 'ir.actions.act_window',
             'name': _('Sale order'),
@@ -879,7 +871,7 @@ class SaleOrderLine(models.Model):
             'views': [(False, 'form'), (False, 'tree')],
             'domain': [('id', '=', self.order_id.id)],
             # 'context': self.env.context,
-            'target': 'current',  # 'new'
+            'target': 'current',
             'nodestroy': False,
             }
 
@@ -887,11 +879,6 @@ class SaleOrderLine(models.Model):
     def open_view_sale_order_product(self):
         """ Open subsituted product
         """
-        # model_pool = self.env['ir.model.data']
-        # view_id = model_pool.get_object_reference(
-        #    'module_name', 'view_name')[1]
-        view_id = False
-
         return {
             'type': 'ir.actions.act_window',
             'name': _('Product detail'),
@@ -903,7 +890,7 @@ class SaleOrderLine(models.Model):
             'views': [(False, 'form'), (False, 'tree')],
             'domain': [('id', '=', self.product_id.id)],
             # 'context': self.env.context,
-            'target': 'current', # 'new'
+            'target': 'current',
             'nodestroy': False,
             }
 
@@ -912,11 +899,6 @@ class SaleOrderLine(models.Model):
     def open_view_sale_order_original_product(self):
         """ Open original product
         """
-        # model_pool = self.env['ir.model.data']
-        # view_id = model_pool.get_object_reference(
-        #    'module_name', 'view_name')[1]
-        view_id = False
-
         return {
             'type': 'ir.actions.act_window',
             'name': _('Product detail'),
@@ -924,11 +906,11 @@ class SaleOrderLine(models.Model):
             'view_mode': 'form,tree',
             'res_id': self.origin_product_id.id,
             'res_model': 'product.product',
-            #'view_id': view_id, # False
+            # 'view_id': view_id, # False
             'views': [(False, 'form'), (False, 'tree')],
             'domain': [('id', '=', self.origin_product_id.id)],
-            #'context': self.env.context,
-            'target': 'current', # 'new'
+            # 'context': self.env.context,
+            'target': 'current',
             'nodestroy': False,
             }
 
@@ -947,7 +929,6 @@ class SaleOrderLine(models.Model):
 
         product_pool = self.env['product.product']
         quant_pool = self.env['stock.quant']
-        sale_pool = self.env['sale.order']
         lines = self.search([
             ('order_id.logistic_state', '=', 'order'),
             ('logistic_state', '=', 'draft'),
@@ -985,8 +966,7 @@ class SaleOrderLine(models.Model):
         # ---------------------------------------------------------------------
         #                  Modify sale order line status:
         # ---------------------------------------------------------------------
-        update_db = {} # Line to be updated
-        # sale_line_ready = [] # To check if order also is ready
+        update_db = {}  # Line to be updated
 
         # This fix a bug because stock status don't update immediately
         quant_used = {}  # product quant used during process
@@ -1017,7 +997,7 @@ class SaleOrderLine(models.Model):
             # Use stock to cover order:
             # -----------------------------------------------------------------
             state = False  # Used for check if used some pool product
-            for used_product in product_list: # p.p similar
+            for used_product in product_list:  # p.p similar
                 # XXX Remove used qty during assign process:
                 # TODO problem if qty_qvailable dont update with quants created
                 stock_qty = used_product.qty_available - \
@@ -1031,7 +1011,6 @@ class SaleOrderLine(models.Model):
                     if stock_qty > order_qty:
                         assign_quantity = order_qty
                         state = 'ready'
-                        # sale_line_ready.append(line)
                     else:
                         assign_quantity = stock_qty
                         state = 'uncovered'
@@ -1164,7 +1143,6 @@ class SaleOrderLine(models.Model):
         now = fields.Datetime.now()
 
         # Pool used:
-        sale_pool = self.env['sale.order']
         purchase_pool = self.env['purchase.order']
         purchase_line_pool = self.env['purchase.order.line']
 
