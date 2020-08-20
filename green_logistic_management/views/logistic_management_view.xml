@@ -49,14 +49,6 @@
              <field name="context">{}</field>
              <field name="domain">[]</field>
          </record>
-         <record model="ir.actions.act_window" id="action_product_template_no_supplier_form">
-             <field name="name">Product no supplier</field>
-             <field name="res_model">product.template</field>
-             <field name="view_type">form</field>
-             <field name="view_mode">tree,form</field>
-             <field name="context">{}</field>
-             <field name="domain">[('default_supplier_id', '=', False)]</field>
-         </record>
          <record model="ir.actions.act_window" id="action_res_partner_customer_form">
              <field name="name">Customer</field>
              <field name="res_model">res.partner</field>
@@ -340,9 +332,6 @@
              <field name="model">sale.order</field>
              <field name="inherit_id" ref="sale.view_order_form"/>
              <field name="arch" type="xml">
-                 <field name="payment_term_id" position="after">
-                     <field name="default_supplier_id" />
-                 </field>
                  <xpath expr="//page[1]" position="after">
                      <page string="Picking">
                          <group colspan="4" col="4">
@@ -395,7 +384,6 @@
                  </field>
 
                  <field name="state" position="after">
-                     <field name="default_supplier_id" />
                      <field name="logistic_state" />
                  </field>
                  <field name="invoice_status" position="attributes">
@@ -412,11 +400,9 @@
              <field name="inherit_id" ref="sale.view_sales_order_filter"/>
              <field name="arch" type="xml">
                  <field name="user_id" position="after">
-                     <field name="default_supplier_id" />
                      <field name="logistic_state" />
                  </field>
                  <xpath expr="/search/group/filter[2]" position="after">
-                     <filter string="Default supplier" domain="[]" context="{'group_by': 'default_supplier_id'}"/>
                      <filter string="Logistic state" domain="[]" context="{'group_by': 'logistic_state'}"/>
                  </xpath>
              </field>
