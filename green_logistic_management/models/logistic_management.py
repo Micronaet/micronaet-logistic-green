@@ -866,19 +866,12 @@ class SaleOrder(models.Model):
         'stock.picking', 'sale_order_id', 'Picking')
 
     logistic_state = fields.Selection([
-        ('draft', 'Order draft'), # Draft, new order received
-        ('payment', 'Payment confirmed'),  # Payment confirmed
-
-        # Start automation:
+        ('draft', 'Order draft'),  # Draft, new order received
         ('order', 'Order confirmed'),  # Quotation transformed in order
         ('pending', 'Pending delivery'),  # Waiting for delivery
-        ('ready', 'Ready'), # Ready for transfer
-        ('delivering', 'Delivering'),  # In delivering phase
+        ('ready', 'Ready'),  # Ready for transfer
         ('done', 'Done'),  # Delivered or closed XXX manage partial delivery
-        ('dropshipped', 'Dropshipped'),  # Order dropshipped
-        # ('unificated', 'Unificated'),  # Unificated with another
 
-        ('error', 'Error order'),  # Order without line
         ('cancel', 'Cancel'),  # Removed order
         ], 'Logistic state', default='draft',
         )
@@ -1014,35 +1007,6 @@ class SaleOrderLine(models.Model):
             'target': 'current', # 'new'
             'nodestroy': False,
             }
-
-    # -------------------------------------------------------------------------
-    #                   WORKFLOW: [LAVORATION OPERATION TRIGGER]
-    # -------------------------------------------------------------------------
-    # A. Draft > Progress
-    @api.multi
-    def workflow_mrp_draft_to_progress(self):
-        """ Update mrp_state
-        """
-        for line in self:
-            self.mrp_state = 'progress'
-
-    # B. Progress > Done
-    def workflow_mrp_progress_to_done(self):
-        """ Update mrp_state
-        """
-        line_pool = self.env['sale.order.line']
-
-        # line_ids = []
-        for line in self:
-            # line_ids.append(line.id)
-            line.mrp_state = 'done'
-
-            # Update also logistic state to ready:
-            line.logistic_state = 'ready'
-
-        # Check master order (reload lines for updated status):
-        # sale_lines = line_pool.browse(line_ids)
-        line_pool.logistic_check_ready_order(self)  # sale_lines)
 
     # -------------------------------------------------------------------------
     #                   WORKFLOW: [LOGISTIC OPERATION TRIGGER]
@@ -1295,9 +1259,6 @@ class SaleOrderLine(models.Model):
 
             # Filter line state:
             ('logistic_state', '=', 'uncovered'),
-
-            # Not select work line:
-            ('mrp_state', '=', False),
             ])
 
         # ---------------------------------------------------------------------
@@ -1351,13 +1312,6 @@ class SaleOrderLine(models.Model):
             is_company_parner = supplier == company.partner_id
             for line in purchase_db[supplier]:
                 product = line.product_id
-
-                # -------------------------------------------------------------
-                # Work order
-                # -------------------------------------------------------------
-                if is_company_parner and product.type == 'service':
-                    line.mrp_state = 'draft'  # put in word state
-                    continue
 
                 # -------------------------------------------------------------
                 # Use stock to cover order:
@@ -1468,13 +1422,9 @@ class SaleOrderLine(models.Model):
             # -------------------------------------------------------------
             logistic_purchase_qty = 0.0
 
-            if line.mrp_state in ('draft', 'progress'):
-                # Lavoration product (internal):
-                logistic_purchase_qty = logistic_order_qty
-            else:
-                # Purchase product:
-                for purchase in line.purchase_line_ids:
-                    logistic_purchase_qty += purchase.product_qty
+            # Purchase product:
+            for purchase in line.purchase_line_ids:
+                logistic_purchase_qty += purchase.product_qty
             line.logistic_purchase_qty = logistic_purchase_qty
 
             # -------------------------------------------------------------
@@ -1493,22 +1443,14 @@ class SaleOrderLine(models.Model):
             # BF: Received (loaded in stock):
             # -------------------------------------------------------------
             logistic_received_qty = 0.0
-            if line.mrp_state == 'done':
-                # Working product (internal):
-                logistic_received_qty = logistic_order_qty
-                logistic_position += _('[PROD] Q. %s > %s\n') % (
-                    logistic_order_qty,
-                    '',
+            # Purchase product:
+            for move in line.load_line_ids:
+                # TODO verify:
+                logistic_received_qty += move.product_uom_qty
+                logistic_position += _('[TAV] Q. %s > %s\n') % (
+                    move.product_uom_qty,
+                    move.slot_id.name or ''
                     )
-            else:
-                # Purchase product:
-                for move in line.load_line_ids:
-                    # TODO verify:
-                    logistic_received_qty += move.product_uom_qty
-                    logistic_position += _('[TAV] Q. %s > %s\n') % (
-                        move.product_uom_qty,
-                        move.slot_id.name or ''
-                        )
             line.logistic_received_qty = logistic_received_qty
 
             # -------------------------------------------------------------
@@ -1627,24 +1569,14 @@ class SaleOrderLine(models.Model):
         store=False,
         )
 
-    # TODO Remove:
-    # MRP state:
-    mrp_state = fields.Selection([
-        ('draft', 'Internal work'),
-        ('progress', 'In progress'),
-        ('done', 'Done'),
-        ], 'Working state',
-        )
-
     # State (sort of workflow):
     logistic_state = fields.Selection([
-        ('unused', 'Unused'),  # Line not managed
-
         ('draft', 'Custom order'),  # Draft, customer order
-        ('uncovered', 'Uncovered'),  # Not covered with stock
         ('ordered', 'Ordered'),  # Supplier order uncovered
         ('ready', 'Ready'),  # Order to be picked out (all in stock)
         ('done', 'Done'),  # Delivered qty (order will be closed)
+
+        ('cancel', 'Cancel'),  # Cancel only this line
         ], 'Logistic state', default='draft',
         # readonly=True,
         # compute='_get_logistic_status_field', multi=True,

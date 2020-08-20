@@ -478,7 +478,7 @@ class WPConnector(models.Model):
                                 'name': name,
                                 'default_code': sku,
 
-                                # No VAT for now:
+                                # TODO No VAT for now:
                                 'taxes_id': [(6, 0, ())],
                                 'supplier_taxes_id': [(6, 0, ())],
                                 }).id

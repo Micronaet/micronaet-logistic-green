@@ -445,26 +445,6 @@
                      <field name="logistic_remain_qty" />
                      <field name="logistic_delivered_qty" />
                      <field name="logistic_undelivered_qty" />
-                     <!--<field name="mrp_state" />-->
-                     <field name="logistic_state" />
-                 </tree>
-             </field>
-         </record>
-         <record model="ir.ui.view" id="view_sale_order_line_logistic_mrp_tree">
-             <field name="name">sale.order.line.logistic.mrp.tree</field>
-             <field name="model">sale.order.line</field>
-             <field name="priority" eval="40" />
-             <field name="arch" type="xml">
-                 <tree string="MRP lavoration" decoration-muted="mrp_state=='draft'" decoration-warning="mrp_state=='progress'">
-                     <field name="order_id" />
-                     <field name="product_id" />
-                     <field name="name" />
-                     <field name="product_uom_qty" />
-                     <!--<field name="logistic_covered_qty" />
-                     <field name="logistic_uncovered_qty" />-->
-                     <field name="mrp_state" />
-                     <button name="workflow_mrp_draft_to_progress" string="Lavoration Progress" type="object" attrs="{'invisible': [('mrp_state','!=','draft')]}" icon="fa-calendar"/>
-                     <button name="workflow_mrp_progress_to_done" string="Lavoration Done" type="object" attrs="{'invisible': [('mrp_state','!=','progress')]}" icon="fa-check-square"/>
                      <field name="logistic_state" />
                  </tree>
              </field>
@@ -485,43 +465,6 @@
                          <filter name="group_order" string="Order" context="{'group_by': 'order_id'}"/>
                          <filter name="group_product" string="Product" context="{'group_by': 'product_id'}"/>
                          <filter name="group_logistic" string="Logistic" context="{'group_by': 'logistic_state'}"/>
-                         <filter name="group_mrp" string="MRP" context="{'group_by': 'mrp_state'}"/>
-                     </group>
-                 </search>
-             </field>
-         </record>
-         <record model="ir.ui.view" id="view_sale_order_line_mrp_search">
-             <field name="name">sale.order.line.search</field>
-             <field name="model">sale.order.line</field>
-             <field name="priority" eval="40" />
-             <field name="arch" type="xml">
-                 <search string="Works sale">
-                     <field name="name" />
-
-                     <field name="product_id" domain="[('product_id.product_tmpl_id.default_code', 'ilike', self)]" />
-                     <field name="order_id" filter_domain="[('order_id','=',self)]"/>
-
-                     <filter string="Today" domain="[('order_id.date_order', '&gt;=', datetime.datetime.now().strftime('%Y-%m-%d 00:00:00')),('order_id.date_order', '&lt;=', datetime.datetime.now().strftime('%Y-%m-%d 23:23:59'))]"/>
-
-                     <filter string="Yellow" domain="[('product_id.product_tmpl_id.default_code', 'ilike', 'YE')]" />
-                     <filter string="Blue" domain="[('product_id.product_tmpl_id.default_code', 'ilike', 'BL')]" />
-                     <filter string="Green" domain="[('product_id.product_tmpl_id.default_code', 'ilike', 'GR')]" />
-                     <filter string="Orange" domain="[('product_id.product_tmpl_id.default_code', 'ilike', 'OR')]" />
-                     <filter string="Gold" domain="[('product_id.product_tmpl_id.default_code', 'ilike', 'GO')]" />
-                     <filter string="Silver" domain="[('product_id.product_tmpl_id.default_code', 'ilike', 'SI')]" />
-                     <filter string="Red" domain="[('product_id.product_tmpl_id.default_code', 'ilike', 'RE')]" />
-                     <filter string="Black" domain="[('product_id.product_tmpl_id.default_code', 'ilike', 'BK')]" />
-                     <filter string="White" domain="[('product_id.product_tmpl_id.default_code', 'ilike', 'WH')]" />
-
-                     <filter name="state_draft" string="Draft state" domain="[('mrp_state','=','draft')]"/>
-                     <filter name="state_progress" string="Progress state" domain="[('mrp_state','=','progress')]"/>
-                     <filter name="state_done" string="Done state" domain="[('mrp_state','=','done')]"/>
-
-                     <group expand="0" string="Group By...">
-                         <filter name="group_order" string="Order" context="{'group_by': 'order_id'}"/>
-                         <filter name="group_product" string="Product" context="{'group_by': 'product_id'}"/>
-                         <filter name="group_logistic" string="Logistic" context="{'group_by': 'logistic_state'}"/>
-                         <filter name="group_mrp" string="MRP" context="{'group_by': 'mrp_state'}"/>
                      </group>
                  </search>
              </field>
@@ -541,7 +484,6 @@
                              <newline/>
                              <field name="product_id" />
                              <field name="name" />
-                             <field name="mrp_state" />
                          </group>
                          <notebook colspan="4">
                              <page string="Quantity">
@@ -603,48 +545,6 @@
                     </sheet>
                  </form>
              </field>
-         </record>
-
-         <!--Lavoration action:-->
-         <record model="ir.actions.act_window" id="action_sale_order_line_logistic_mrp_all">
-             <field name="name">Sale line MRP</field>
-             <field name="res_model">sale.order.line</field>
-             <field name="view_type">form</field>
-             <field name="view_mode">tree,form</field>
-             <field name="view_id" ref="view_sale_order_line_logistic_mrp_tree"/>
-             <field name="search_view_id" ref="view_sale_order_line_mrp_search"/>
-             <field name="context">{'form_view_ref': 'green_logistic_management.view_sale_order_line_logistic_form'}</field>
-             <field name="domain">[('mrp_state', '!=', False)]</field>
-         </record>
-         <record model="ir.actions.act_window" id="action_sale_order_line_logistic_mrp_draft">
-             <field name="name">Sale line MRP draft</field>
-             <field name="res_model">sale.order.line</field>
-             <field name="view_type">form</field>
-             <field name="view_mode">tree,form</field>
-             <field name="view_id" ref="view_sale_order_line_logistic_mrp_tree"/>
-             <field name="search_view_id" ref="view_sale_order_line_mrp_search"/>
-             <field name="context">{'form_view_ref': 'green_logistic_management.view_sale_order_line_logistic_form'}</field>
-             <field name="domain">[('mrp_state', '=', 'draft')]</field>
-         </record>
-         <record model="ir.actions.act_window" id="action_sale_order_line_logistic_mrp_progress">
-             <field name="name">Sale line MRP pending</field>
-             <field name="res_model">sale.order.line</field>
-             <field name="view_type">form</field>
-             <field name="view_mode">tree,form</field>
-             <field name="view_id" ref="view_sale_order_line_logistic_mrp_tree"/>
-             <field name="search_view_id" ref="view_sale_order_line_mrp_search"/>
-             <field name="context">{'form_view_ref': 'green_logistic_management.view_sale_order_line_logistic_form'}</field>
-             <field name="domain">[('mrp_state', '=', 'progress')]</field>
-         </record>
-         <record model="ir.actions.act_window" id="action_sale_order_line_logistic_mrp_done">
-             <field name="name">Sale line MRP done</field>
-             <field name="res_model">sale.order.line</field>
-             <field name="view_type">form</field>
-             <field name="view_mode">tree,form</field>
-             <field name="view_id" ref="view_sale_order_line_logistic_mrp_tree"/>
-             <field name="search_view_id" ref="view_sale_order_line_mrp_search"/>
-             <field name="context">{'form_view_ref': 'green_logistic_management.view_sale_order_line_logistic_form'}</field>
-             <field name="domain">[('mrp_state', '=', 'done')]</field>
          </record>
 
          <!--Logistic sale order line-->
@@ -929,42 +829,6 @@
                      action="action_sale_order_line_logistic"
                      sequence="10"
                      />
-
-             <!--<menuitem
-                 id="menu_logistic_left_order_line_mrp_root"
-                 parent="menu_logistic_header_root"
-                 name="Works order"
-                 sequence="17"
-                 />
-                 <menuitem
-                     id="menu_sale_order_line_logistic_mrp_all"
-                     parent="menu_logistic_left_order_line_mrp_root"
-                     name="Works all"
-                     action="action_sale_order_line_logistic_mrp_all"
-                     sequence="10"
-                     />
-                 <menuitem
-                     id="menu_sale_order_line_logistic_mrp_draft"
-                     parent="menu_logistic_left_order_line_mrp_root"
-                     name="Works draft"
-                     action="action_sale_order_line_logistic_mrp_draft"
-                     sequence="20"
-                     />
-                 <menuitem
-                     id="menu_sale_order_line_logistic_mrp_progress"
-                     parent="menu_logistic_left_order_line_mrp_root"
-                     name="Works progress"
-                     action="action_sale_order_line_logistic_mrp_progress"
-                     sequence="30"
-                     />
-                 <menuitem
-                     id="menu_sale_order_line_logistic_mrp_done"
-                     parent="menu_logistic_left_order_line_mrp_root"
-                     name="Works done"
-                     action="action_sale_order_line_logistic_mrp_done"
-                     sequence="40"
-                     />-->
-
 
              <menuitem
                  id="menu_logistic_left_purchase_root"
