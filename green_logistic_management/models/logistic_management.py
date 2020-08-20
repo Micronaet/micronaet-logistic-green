@@ -126,9 +126,9 @@ class PurchaseOrder(models.Model):
         """
         model_pool = self.env['ir.model.data']
         tree_view_id = model_pool.get_object_reference(
-            'logistic_management', 'view_purchase_order_line_tree')[1]
+            'green_logistic_management', 'view_purchase_order_line_tree')[1]
         form_view_id = model_pool.get_object_reference(
-            'logistic_management', 'view_purchase_order_line_form')[1]
+            'green_logistic_management', 'view_purchase_order_line_form')[1]
 
         line_ids = [item.id for item in self.order_line]
 
@@ -772,9 +772,11 @@ class SaleOrderLine(models.Model):
         # Gef view
         model_pool = self.env['ir.model.data']
         tree_view_id = model_pool.get_object_reference(
-            'logistic_management', 'view_sale_order_line_logistic_tree')[1]
+            'green_logistic_management',
+            'view_sale_order_line_logistic_tree')[1]
         form_view_id = model_pool.get_object_reference(
-            'logistic_management', 'view_sale_order_line_logistic_form')[1]
+            'green_logistic_management',
+            'view_sale_order_line_logistic_form')[1]
 
         return {
             'type': 'ir.actions.act_window',
