@@ -477,6 +477,10 @@ class WPConnector(models.Model):
                             product_id = product_pool.create({
                                 'name': name,
                                 'default_code': sku,
+
+                                # No VAT for now:
+                                'taxes_id': [(6, 0, ())],
+                                'supplier_taxes_id': [(6, 0, ())],
                                 }).id
 
                         line_data = {
