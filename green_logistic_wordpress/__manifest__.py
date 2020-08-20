@@ -18,7 +18,7 @@
         'green_logistic_management',
     ],
     'data': [
-        'views/wordpress_logistic_view.xls',
+        'views/wordpress_logistic_view.xml',
     ],
     'external_dependencies': {},
     'application': False,
