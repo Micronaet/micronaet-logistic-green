@@ -310,8 +310,6 @@
                                      <group col="4" colspan="4">
                                          <separator string="Logistic parameters:" colspan="4"/>
                                          <field name="logistic_location_id" widget="selection" domain="[('usage', '!=', 'view')]"/>
-
-                                         <field name="logistic_assign_mode" />
                                          <field name="logistic_order_sort" />
 
                                          <separator string="Load document:" colspan="4"/>

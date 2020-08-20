@@ -21,13 +21,7 @@ class ResCompany(models.Model):
     #                                   COLUMNS:
     # -------------------------------------------------------------------------
     # Logistic parameters:
-    logistic_assign_mode = fields.Selection([
-        ('first_available', 'First available'),
-        # ('better_available', 'Better available'),
-        ], 'Assign stock mode', default='first_available',
-        help='Assign stock mode to order line (first available or better)',
-        required=True,
-        )
+    # TODO Needed?
     logistic_order_sort = fields.Selection([
         ('create_date', 'Create date'),
         ('validity_date', 'Validity date'),
@@ -149,7 +143,7 @@ class PurchaseOrder(models.Model):
             'views': [(tree_view_id, 'tree'), (form_view_id, 'form')],
             'domain': [('id', 'in', line_ids)],
             'context': self.env.context,
-            'target': 'current', # 'new'
+            'target': 'current',
             'nodestroy': False,
             }
 
@@ -159,7 +153,7 @@ class PurchaseOrder(models.Model):
         """ Set order as confirmed
         """
         # Export if needed the purchase order:
-        self.export_purchase_order()
+        # self.export_purchase_order()
         now = fields.Datetime.now()
 
         return self.write({
@@ -174,6 +168,7 @@ class PurchaseOrder(models.Model):
         ('draft', 'Order draft'),  # Draft purchase
         ('confirmed', 'Confirmed'),  # Purchase confirmed
         ('done', 'Done'),  # All loaded in stock
+        # TODO direct to confirm?
         ], 'Logistic state', default='draft',
         )
 
@@ -231,7 +226,7 @@ class StockMoveIn(models.Model):
         )
 
 
-class PurchaseOrderLine(models.Model):
+class PurchaseOrderLineRelations(models.Model):
     """ Model name: Purchase Order Line
     """
 
@@ -339,8 +334,6 @@ class StockPicking(models.Model):
         # ---------------------------------------------------------------------
         # DDT extra operations: (require reload)
         # ---------------------------------------------------------------------
-        # companys = self.env['res.company'].search([])
-
         # Reload picking data:
         for picking in self.browse(ddt_ids):
             sale_order = picking.sale_order_id
@@ -534,19 +527,6 @@ class SaleOrder(models.Model):
                 )
         return True
 
-    def check_empty_orders(self):
-        """ Mark empty order as unused
-        """
-        orders = self.search([
-            ('logistic_state', '=', 'draft'),
-            ('order_line', '=', False),  # Without line
-            ])
-        _logger.info('New order: Empty order [# %s]' % len(orders))
-
-        return orders.write({
-            'logistic_state': 'error',
-            })
-
     def check_product_service(self):
         """ Update line with service to ready state
         """
@@ -561,38 +541,6 @@ class SaleOrder(models.Model):
         return lines.write({
             'logistic_state': 'ready',  # immediately ready
             })
-
-    # Sale order mark default supplier:
-    @api.model
-    def mark_default_supplier_order(self, order_ids):
-        """ Mark default supplier
-        """
-        for order in self.browse(order_ids):
-            supplier_total = {}
-            for line in order.order_line:
-                product = line.product_id
-
-                # Jump line:
-                if product.is_expense:
-                    continue
-
-                # -------------------------------------------------------------
-                # Supplier check:
-                # -------------------------------------------------------------
-                supplier_id = product.default_supplier_id.id
-                if supplier_id not in supplier_total:
-                    supplier_total[supplier_id] = 1
-                else:
-                    supplier_total[supplier_id] += 1
-
-            if supplier_total:
-                better_supplier = sorted(
-                    supplier_total,
-                    key=lambda x: supplier_total[x],
-                    reverse=True,
-                    )
-                order.default_supplier_id = better_supplier[0]
-        return True
 
     # -------------------------------------------------------------------------
     #                   WORKFLOW: [LOGISTIC OPERATION TRIGGER]
@@ -838,8 +786,6 @@ class SaleOrder(models.Model):
     # -------------------------------------------------------------------------
     # Columns:
     # -------------------------------------------------------------------------
-    default_supplier_id = fields.Many2one(
-        'res.partner', 'Default supplier', domain="[('supplier', '=', True)]")
     logistic_picking_ids = fields.One2many(
         'stock.picking', 'sale_order_id', 'Picking')
 
@@ -1016,12 +962,11 @@ class SaleOrderLine(models.Model):
 
             location_id = company.logistic_location_id.id
             sort = company.logistic_order_sort
-            mode = company.logistic_assign_mode
 
             _logger.info(
                 'Update order with parameter: '
-                'Location: %s, sort: %s, mode: %s' % (
-                    location_id, sort, mode))
+                'Location: %s, sort: %s' % (
+                    location_id, sort))
         else:
             _logger.info('No line ready for assign stock qty')
             return True
@@ -1058,7 +1003,7 @@ class SaleOrderLine(models.Model):
             # -----------------------------------------------------------------
             # Similar pool generate:
             # -----------------------------------------------------------------
-            product_list = [product] # Start list first with this product
+            product_list = [product]  # Start list first with this product
             if product.similar_ids:
                 # Search other product from template list
                 template_ids = [
@@ -1071,7 +1016,7 @@ class SaleOrderLine(models.Model):
             # -----------------------------------------------------------------
             # Use stock to cover order:
             # -----------------------------------------------------------------
-            state = False # Used for check if used some pool product
+            state = False  # Used for check if used some pool product
             for used_product in product_list: # p.p similar
                 # XXX Remove used qty during assign process:
                 # TODO problem if qty_qvailable dont update with quants created
@@ -1082,7 +1027,7 @@ class SaleOrderLine(models.Model):
                 # Manage mode of use stock: (TODO better available)
                 # -------------------------------------------------------------
                 assign_quantity = 0.0  # To check is was created
-                if mode == 'first_available' and stock_qty:
+                if stock_qty:
                     if stock_qty > order_qty:
                         assign_quantity = order_qty
                         state = 'ready'
@@ -1206,13 +1151,6 @@ class SaleOrderLine(models.Model):
                 order.logistic_state = 'pending'
 
         # Sale order still in pending state so no update of logistic status
-        # ---------------------------------------------------------------------
-        # Mark sale order with extra information:
-        # ---------------------------------------------------------------------
-        # Default supplier
-        _logger.warning('Assign default supplier for order')
-        sale_pool.mark_default_supplier_order(order_touched_ids)
-
         # Return view:
         return self.return_order_line_list_view(selected_ids)
 
@@ -1266,7 +1204,7 @@ class SaleOrderLine(models.Model):
         purchase_db = {}  # supplier is the key
         for line in lines:
             product = line.product_id
-            supplier = product.default_supplier_id
+            supplier = product.default_supplier_id  # TODO manage correctly
 
             # Collect order touched:
             order_id = line.order_id.id
@@ -1306,7 +1244,7 @@ class SaleOrderLine(models.Model):
                         line.logistic_state = 'ready'
                         _logger.error(
                             'Covered line marked as uncovered, correct!')
-                    continue  # no order negative uncoveder (XXX needed)
+                    continue  # no order negative uncovered (XXX needed)
 
                 # -------------------------------------------------------------
                 # Create/Get header purchase.order (only if line was created):
@@ -1539,7 +1477,4 @@ class SaleOrderLine(models.Model):
 
         ('cancel', 'Cancel'),  # Cancel only this line
         ], 'Logistic state', default='draft',
-        # readonly=True,
-        # compute='_get_logistic_status_field', multi=True,
-        # store=True, # TODO store True # for create columns
         )
