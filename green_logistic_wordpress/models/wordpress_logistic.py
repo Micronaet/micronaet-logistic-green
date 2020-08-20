@@ -19,7 +19,7 @@ class SaleOrder(models.Model):
         """ Override procedure also for manage Logistic status
         """
         # Call Logistic procedure when confirmed payment
-        super(SaleOrder, self).workflow_draft_to_confirmed()
+        # super(SaleOrder, self).workflow_draft_to_confirmed()
 
         # Call original wordpress procedure overridden here (after all)
         super(SaleOrder, self).wp_wf_processing()
