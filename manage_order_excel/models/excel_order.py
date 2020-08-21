@@ -380,10 +380,16 @@ class SaleOrderExcelManageWizard(models.TransientModel):
         # ---------------------------------------------------------------------
         # Update logistic state for line after all
         for line in line_touched:
-            if not line.product_id.logistic_remain_qty:
+            product = line.product_id
+            if not product.logistic_remain_qty:  # All assigned or received
                 line.write({
                     'logistic_state': 'ready',
                 })
+            elif product.logistic_purchased_qty:  # Waiting order not received
+                line.write({
+                    'logistic_state': 'pending',
+                })
+            # Stay in draft mode
 
         # Update logistic state for order after all
         all_ready = set(['ready'])
