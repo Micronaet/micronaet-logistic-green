@@ -21,7 +21,7 @@ class ResCompany(models.Model):
     #                                   COLUMNS:
     # -------------------------------------------------------------------------
     # Logistic parameters:
-    # TODO Needed?
+    # TODO Needed (maybe for export in Excel)?
     logistic_order_sort = fields.Selection([
         ('create_date', 'Create date'),
         ('validity_date', 'Validity date'),
@@ -77,7 +77,6 @@ class PurchaseOrder(models.Model):
     def return_purchase_order_list_view(self, purchase_ids):
         """ Return purchase order tree from ids
         """
-        model_pool = self.env['ir.model.data']
         tree_view_id = form_view_id = False
 
         return {
@@ -85,7 +84,6 @@ class PurchaseOrder(models.Model):
             'name': _('Purchase order selected:'),
             'view_type': 'form',
             'view_mode': 'tree,form',
-            # 'res_id': 1,
             'res_model': 'purchase.order',
             'view_id': tree_view_id,
             'views': [(tree_view_id, 'tree'), (form_view_id, 'form')],
@@ -152,7 +150,7 @@ class PurchaseOrder(models.Model):
     def set_logistic_state_confirmed(self):
         """ Set purchase order as confirmed
         """
-        # Export if needed the purchase order:
+        # TODO for the future: Export if needed the purchase order
         # self.export_purchase_order()
         now = fields.Datetime.now()
 

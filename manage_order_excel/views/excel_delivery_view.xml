@@ -17,19 +17,19 @@
                 </form>
             </field>
       </record>
-      <record model="ir.actions.act_window" id="action_picking_excel_manage_wizard_form">
+      <record model="ir.actions.act_window" id="action_pending_picking_excel_manage_wizard_form">
           <field name="name">Export-Import picking</field>
-          <field name="res_model">sale.order.excel.manage.wizard</field>
+          <field name="res_model">purchase.order.excel.manage.wizard</field>
           <field name="view_type">form</field>
           <field name="view_mode">form</field>
           <field name="target">new</field>
-          <field name="view_id" ref="view_sale_order_excel_manage_wizard_form"/>
+          <field name="view_id" ref="view_purchase_order_excel_manage_wizard_form"/>
       </record>
       <menuitem
           id="menu_logistic_left_extract_picking_excel_wizard"
           parent="green_logistic_management.menu_logistic_left_purchase_root"
           name="Manage excel picking"
-          action="action_picking_excel_manage_wizard_form"
+          action="action_pending_picking_excel_manage_wizard_form"
           sequence="6"
           />
 </odoo>

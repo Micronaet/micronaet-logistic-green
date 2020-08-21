@@ -30,45 +30,39 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
     def export_waiting_delivery(self):
         """ Export XLSX file for select product
         """
-        """
         report_pool = self.env['excel.report']
-        line_pool = self.env['sale.order.line']
+        line_pool = self.env['purchase.order.line']
         lines = line_pool.search([
             ('order_id.logistic_state', 'in', ('confirmed', )),  # Order conf.
-            ('logistic_state', '=', 'draft'),  # Only draft line
-            ('product_id.is_expense', '=', False),  # No expense product
+            ('logistic_undelivered_qty', '>', 0),  # Only remain delivery line
             ])
 
         title = (
             '',
-            _('Sale order pending'),
+            _('Awaiting delivery'),
             )
 
         header = (
             'ID',
-            _('Connector'), _('Order'), _('Date'), _('Status'),
-            _('Code'), _('Name'), _('Category'),
-            _('Q.'), _('Sale Price'),
-            _('ID Supplier'), _('Default supplier'),
-            _('Int. Stock'), _('Q. Int.'),
-            _('Supp. Stock'), _('Q. Supp.'), _('Ref.'), _('Buy price'),
-            # _('Purchase supplier'),
+            _('Purchase Order'), _('Date'), _('Status'),
+            _('Code'), _('Name'),
+            _('ID Supplier'), _('Supplier'),
+            _('Buy Price'),
+            _('Q.'), _('Q. arrived'), _('All'),
             _('Status'),
         )
         column_width = (
             1,
-            20, 8, 15, 10,
-            12, 48, 25,
-            7, 7,
-            1, 25,
-            10, 10,
-            10, 10, 8, 10,
-            # 40,
+            15, 10, 12,
+            12, 48,
+            1, 30,
             10,
+            10, 10, 5,
+            11,
         )
         total_col = len(column_width)
 
-        ws_name = _('Pending sale order')
+        ws_name = _('Awaiting delivery')
         report_pool.create_worksheet(ws_name, format_code='DEFAULT')
         report_pool.column_width(ws_name, column_width)
 
@@ -82,84 +76,49 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
         report_pool.write_xls_line(ws_name, row, header, style_code='header')
 
         # Collect:
-        # TODO manage order from wizard
+        # TODO supplier filter?
         for line in sorted(
-                lines,
-                key=lambda x: (x.product_id.default_code or '')):
+                lines, key=lambda x: x.order_id.name):
             row += 1
-            product = line.product_id
-
-            # Jump service product (not used):
-            if product.type == 'service':
-                _logger.warning(
-                    'Excluded service from report: %s' % product.default_code)
-                continue
 
             # Readability:
+            product = line.product_id
             order = line.order_id
-            supplier_id, supplier_name, supplier_code, supplier_price = \
-                self.get_suppinfo_supplier(product)
+            supplier = order.partner_id
 
-            # Category:
-            category = ', '.join(
-                [item.name for item in product.wp_category_ids])
-
-            # Color setup:
-            supplier_color = 'number_total' if supplier_id else 'number'
-            qty_needed = line.product_uom_qty
-            qty_available = product.qty_available
-            # TODO manage incremental for this report!
-            if qty_available >= qty_needed:
-                qty_covered = qty_needed
-            else:
-                qty_covered = qty_available
+            waiting_qty = line.logistic_undelivered_qty  # Remain
 
             report_pool.write_xls_line(ws_name, row, (
                 line.id,
 
-                order.connector_id.name or '',
                 order.name or '',
                 order.date_order or '',
                 order.wp_status or '',
 
                 product.default_code or '',
                 product.name or '',
-                category or '',
 
-                (qty_needed, 'number_ok'),
-                (line.price_unit, 'number'),
+                supplier.id,
+                supplier.name,
+                line.price_unit,
+                # TODO confirm price?
 
-                supplier_id,
-                supplier_name,
-
-                # Internal:
-                (qty_available, 'number'),
-                (qty_covered, 'number_total'),
-
-                # Supplier:
-                (0 if supplier_id else '/', 'number'),
-                (0 if supplier_id else '', supplier_color),
-                (supplier_code, 'text_total'),
-                (supplier_price, 'number_total'),
+                (waiting_qty, 'number_ok'),
+                (0, 'number_ok'),
+                ('', 'text_ok'),
             ), style_code='text')
 
-            formula = '=IF({0}+{1}-{2}=0, "OK", ' \
-                      'IF({0}+{1}-{2}<0, "INCOMPLETO", "ECCEDENTE")'.format(
-                          report_pool.row_col_to_cell(row, 13),
-                          report_pool.row_col_to_cell(row, 15),
-                          report_pool.row_col_to_cell(row, 8),
+            formula = '=IF({0}-{1}=0, "OK", ' \
+                      'IF({0}-{1}<0, "INCOMPLETO", "ECCEDENTE")'.format(
+                          report_pool.row_col_to_cell(row, 9),
+                          report_pool.row_col_to_cell(row, 10),
                       )
-            # TODO Aggiungere colonna per cerca vert:
-            #  =SE.ERRORE(
-            #   CERCA.VERT(A7;Fornitori.$A$1:$B$3;2; 0); "CODICE ERRATO!")
             report_pool.write_formula(
                 ws_name, row, total_col - 1, formula,
                 value='INCOMPLETO',
                 format_code='text',
             )
-        return report_pool.return_attachment(_('current_sale_order_pending'))
-        """
-        return
+        return report_pool.return_attachment(_('current_picking_awaiting'))
 
     # -------------------------------------------------------------------------
     # Workflow confirmed to pending (or ready if all line are ready)
