@@ -34,7 +34,6 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
         line_pool = self.env['purchase.order.line']
         lines = line_pool.search([
             ('order_id.logistic_state', 'in', ('confirmed', )),  # Order conf.
-            ('logistic_undelivered_qty', '>', 0),  # Only remain delivery line
             ])
 
         title = (
@@ -87,13 +86,15 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
             supplier = order.partner_id
 
             waiting_qty = line.logistic_undelivered_qty  # Remain
+            if waiting_qty <= 0:
+                continue
 
             report_pool.write_xls_line(ws_name, row, (
                 line.id,
 
                 order.name or '',
                 order.date_order or '',
-                order.wp_status or '',
+                order.logistic_state or '',
 
                 product.default_code or '',
                 product.name or '',
