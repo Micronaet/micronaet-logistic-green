@@ -166,7 +166,9 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                           report_pool.row_col_to_cell(row, 15),
                           report_pool.row_col_to_cell(row, 8),
                       )
-
+            # TODO Aggiungere colonna per cerca vert:
+            #  =SE.ERRORE(
+            #   CERCA.VERT(A7;Fornitori.$A$1:$B$3;2; 0); "CODICE ERRATO!")
             report_pool.write_formula(
                 ws_name, row, total_col - 1, formula,
                 value='INCOMPLETO',
