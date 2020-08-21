@@ -11,44 +11,25 @@ from odoo.tools.translate import _
 _logger = logging.getLogger(__name__)
 
 
-class SaleOrderExcelManageWizard(models.TransientModel):
-    """ Model name: Order wizard (import / export)
+class PurchaseOrderExcelManageWizard(models.TransientModel):
+    """ Model name: Purchase order wizard (import / export)
     """
-    _name = 'sale.order.excel.manage.wizard'
-    _description = 'Extract pricelist wizard'
+    _name = 'purchase.order.excel.manage.wizard'
+    _description = 'Manage delivery via Excel file'
 
     # Static position for Excel file columns:
     _column_position = {
         'id': 0,
         'order_qty': 8,
-        'internal_qty': 13,
         'supplier_qty': 15,
-        'supplier_code': 16,
-        'supplier_price': 17,
+        # TODO manage for check: 'supplier_price': 17,
     }
-
-    @api.model
-    def get_suppinfo_supplier(self, product):
-        for supplier in product.seller_ids:
-            # First only:
-            return (
-                supplier.name.id,
-                supplier.name.name,
-                supplier.name.ref,
-                supplier.price,
-            )
-        return False, '', '', 0
-
-    @api.model
-    def get_suppinfo_price(self, product):
-        for supplier in product.seller_ids:
-            # First only:
-            return supplier.price
-        return 0
+    # TODO save last price in product suppinfo?
 
     @api.multi
-    def export_pending_order(self):
+    def export_waiting_delivery(self):
         """ Export XLSX file for select product
+        """
         """
         report_pool = self.env['excel.report']
         line_pool = self.env['sale.order.line']
@@ -177,13 +158,16 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                 format_code='text',
             )
         return report_pool.return_attachment(_('current_sale_order_pending'))
+        """
+        return
 
     # -------------------------------------------------------------------------
     # Workflow confirmed to pending (or ready if all line are ready)
     # -------------------------------------------------------------------------
     @api.multi
-    def import_pending_order(self):
+    def import_delivery_picking(self):
         """ Import sale order line selected where q. is present
+        """
         """
         purchase_pool = self.env['purchase.order']
         line_pool = self.env['sale.order.line']
@@ -449,6 +433,8 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                 'target': 'current',
                 'nodestroy': False,
                 }
+        """
+        return True
 
     # -------------------------------------------------------------------------
     #                                   COLUMNS:

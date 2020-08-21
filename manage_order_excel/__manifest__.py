@@ -15,13 +15,17 @@
     'depends': [
         'base',
         'sale',
+        'stock',
+        'purchase',
         'xlsxwriter_report',
         'wordpress_order',
         'green_logistic_management',
         ],
     'data': [
         'security/ir.model.access.csv',
+
         'views/excel_order_view.xml',
+        'views/excel_delivery_view.xml',
         ],
     'external_dependencies': {},
     'application': False,
