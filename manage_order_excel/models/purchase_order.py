@@ -67,10 +67,11 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             'ID',
             _('Connector'), _('Order'), _('Date'), _('Status'),
             _('Code'), _('Name'), _('Category'),
-            _('Q.'), _('Price'),
-            _('ID Supplier'), _('Supplier'),
+            _('Q.'), _('Sale Price'),
+            _('ID Supplier'), _('Default supplier'),
             _('Int. Stock'), _('Q. Int.'),
-            _('Supp. Stock'), _('Q. Supp.'), _('Ref.'), _('Cost'),
+            _('Supp. Stock'), _('Q. Supp.'), _('Ref.'), _('Buy price'),
+            # _('Purchase supplier'),
             _('Status'),
         )
         column_width = (
@@ -81,6 +82,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             1, 25,
             10, 10,
             10, 10, 8, 10,
+            # 40,
             10,
         )
         total_col = len(column_width)
