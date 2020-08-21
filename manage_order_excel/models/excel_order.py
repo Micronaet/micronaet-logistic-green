@@ -185,8 +185,10 @@ class SaleOrderExcelManageWizard(models.TransientModel):
         po_line_pool = self.env['purchase.order.line']
         product_pool = self.env['product.product']
         quant_pool = self.env['stock.quant']
+        partner_pool = self.env['res.partner']
 
         now = fields.Datetime.now()
+        gap = 0.000001  # For approx quantity check
 
         # ---------------------------------------------------------------------
         # Save passed file:
@@ -207,11 +209,26 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             raise exceptions.Warning(_('Cannot read XLS file'))
 
         ws = wb.sheet_by_index(0)
-        start_import = False
         import pdb; pdb.set_trace()
-        company_id = self.env.user.company_id.id = 1  # TODO read from order?
 
-        purchase_orders = {}
+        # Parameters from company (for assign qty):
+        company = self.env.user.company_id  # TODO read from order?
+        company_id = company.id
+        location_id = company.logistic_location_id.id
+        # sort = company.logistic_order_sort
+
+        # Store for manage after Excel loop:
+        purchase_data = []
+        internal_data = []
+        order_touched = []  # For end operation (dropship, default suppl.)
+        line_touched = []  # For end operation (dropship, default suppl.)
+
+        log = {
+            'error': [],
+            'warning': [],
+            'info': [],
+        }
+        start_import = False
         for row in range(ws.nrows):
             line_id = ws.cell_value(row, self._column_position['id'])
             if not start_import and line_id == 'ID':
@@ -221,6 +238,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             if not start_import:
                 _logger.info('%s. Jump line' % row)
                 continue
+
             # Extract needed data:
             order_qty = ws.cell_value(
                 row, self._column_position['order_qty'])
@@ -230,50 +248,155 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                 row, self._column_position['supplier_qty'])
             supplier_code = ws.cell_value(
                 row, self._column_position['supplier_code'])
+            supplier_price = ws.cell_value(
+                row, self._column_position['supplier_price'])
 
-
-            purchase_data = []
-            if ws.cell_value(row, 12):
-                purchase_data.append(
-                    (company_id, ws.cell_value(row, 12)))
-            if ws.cell_value(row, 14):
-                purchase_data.append(
-                    (ws.cell_value(row, 13), ws.cell_value(row, 14)))
-            if not purchase_data:
-                _logger.warning('%s. No data jump row' % row)
+            # -----------------------------------------------------------------
+            # Check data in line:
+            # -----------------------------------------------------------------
+            # A. Check ID line
+            line_id = int(line_id)
+            if not line_id:
+                log['error'].append(_('%s. No ID for this line') % row)
                 continue
 
-            line_id = int(line_id)
-            for partner_id, product_qty in purchase_data:
-                _logger.info('%s. Import line [Supplier %s]' % (
-                    row, partner_id))
+            lines = partner_pool.search([('id', '=', line_id)])
+            if not lines:
+                log['error'].append(
+                    _('%s. No lined found with ID: %s') % (
+                        row, line_id))
+                continue
+            line = lines[0]
 
-                # -------------------------------------------------------------
-                # Create purchase order (header):
-                # -------------------------------------------------------------
-                if partner_id not in purchase_orders:
-                    purchase_orders[partner_id] = purchase_pool.create({
-                        'partner_id': partner_id,
-                        'date_order': now,
-                        }).id
-                order_id = purchase_orders[partner_id]
+            # B. Check quantity:
+            if not internal_qty and not supplier_qty:
+                log['info'].append(_('%s. No qty, line not imported') % row)
+                continue
 
-                # Create purchase order line from sale:
-                line = line_pool.browse(line_id)
-                product = line.product_id
-                po_line_pool.create({
-                    'order_id': order_id,
-                    'product_id': product.id,
-                    'name': product.name,
-                    'product_qty': product_qty,
-                    'product_uom': product.uom_id.id,
-                    # TODO better:
-                    'price_unit': self.get_suppinfo_price(product),
-                    'date_planned': now,
-                    })
+            if abs(order_qty - supplier_qty - internal_qty) > gap:
+                log['error'].append(
+                    _('%s. Quantity used different from ordered') % row)
+                continue
+
+            # C. Check supplier code and price
+            supplier = False
+            if supplier_qty:
+                if not supplier_code:
+                    log['error'].append(
+                        _('%s. No supplier code but qty present') % row)
+                    continue
+
+                if not supplier_price:
+                    log['warning'].append(
+                        _('%s. No supplier price but qty present') % row)
+                    # continue  # TODO convert in error?
+
+                suppliers = partner_pool.search([('ref', '=', supplier_code)])
+                if not suppliers:
+                    log['error'].append(
+                        _('%s. No supplier found with code: %s') % (
+                            row, supplier_code))
+                    continue
+
+                if len(suppliers) > 1:
+                    log['error'].append(
+                        _('%s. More supplier with code: %s [# %s]') % (
+                            row, supplier_code, len(suppliers)))
+                    continue
+                supplier = suppliers[0]
+
+            if log['error']:
+                # TODO manage what to do
+                pass
+
+            # 1. Assign management (Internal stock):
+            if internal_qty:
+                internal_data.append((line, internal_qty))
+
+            # 2. Purchase management:
+            if supplier:   # So supplier qty present!
+                log['info'].append(_('%s. Line add in purchase order') % row)
+                purchase_data.append(
+                    (supplier, line, supplier_qty, supplier_price))
+
+            # For final logistic state update TODO (use ID?!?)
+            line_touched.append(line)  # Line
+            if line.order_id not in order_touched:  # Order
+                order_touched.append(line.order_id)
+
+        # ---------------------------------------------------------------------
+        #                 Assign management (Internal stock):
+        # ---------------------------------------------------------------------
+        for line, internal_qty in internal_data:
+            product = line.product_id
+            # TODO no check in stock, was done during assign
+            data = {
+                'company_id': company.id,
+                'in_date': now,
+                'location_id': location_id,
+                'product_id': product.id,
+                'quantity': - internal_qty,
+                'logistic_assigned_id': line.id,  # Link field
+                # 'product_tmpl_id': used_product.product_tmpl_id.id,
+                # 'lot_id'
+                # 'package_id'
+            }
+            try:
+                quant_pool.create(data)
+            except:
+                raise exceptions.Warning('Cannot create quants!')
+
+        # ---------------------------------------------------------------------
+        #                      Purchase management:
+        # ---------------------------------------------------------------------
+        purchase_orders = {}
+        for supplier, line, supplier_qty, supplier_price in purchase_data:
+            supplier_id = supplier.id
+
+            # -----------------------------------------------------------------
+            # Create purchase order (header):
+            # -----------------------------------------------------------------
+            if supplier_id not in purchase_orders:
+                purchase_orders[supplier_id] = purchase_pool.create({
+                    'partner_id': supplier_id,
+                    'date_order': now,
+                }).id
+            order_id = purchase_orders[supplier_id]
+
+            # Create purchase order line from sale:
+            product = line.product_id
+            po_line_pool.create({
+                'order_id': order_id,
+                'product_id': product.id,
+                'name': product.name,
+                'product_qty': supplier_qty,
+                'product_uom': product.uom_id.id,
+                'price_unit': supplier_price,
+                'date_planned': now,
+            })
+
+        # ---------------------------------------------------------------------
+        #                     Update order logistic status:
+        # ---------------------------------------------------------------------
+        # Update logistic state for line after all
+        for line in line_touched:
+            if not line.product_id.logistic_remain_qty:
+                line.write({
+                    'logistic_state': 'ready',
+                })
+
+        # Update logistic state for order after all
+        all_ready = set(['ready'])
+        for order in order_touched:
+            order_states = set(
+                [line.logistic_state for line in order.order_line])
+            if order_states == all_ready:
+                order.write({
+                    'logistic_state': 'ready',
+                })
 
         if purchase_orders:
-            import pdb; pdb.set_trace()
+            # For printing purchase order
             return {
                 'type': 'ir.actions.act_window',
                 'name': _('Purchase orders created'),
@@ -284,13 +407,28 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                 'view_id': False,
                 'views': [(False, 'tree'), (False, 'form')],
                 'domain': [
-                    ('id', 'in', [i for i in purchase_orders.values()])],
+                    ('id', 'in', purchase_orders.values())],
                 'context': self.env.context,
                 'target': 'current',
                 'nodestroy': False,
                 }
         else:
-            raise exceptions.Warning('No selection on file!')
+            # Open sale order when purchase not present
+            return {
+                'type': 'ir.actions.act_window',
+                'name': _('Orders updated'),
+                'view_type': 'form',
+                'view_mode': 'tree,form',
+                'res_id': False,
+                'res_model': 'sale.order',
+                'view_id': False,
+                'views': [(False, 'tree'), (False, 'form')],
+                'domain': [
+                    ('id', 'in', [o.id for o in order_touched])],
+                'context': self.env.context,
+                'target': 'current',
+                'nodestroy': False,
+                }
 
     # -------------------------------------------------------------------------
     #                                   COLUMNS:
