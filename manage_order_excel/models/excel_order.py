@@ -16,12 +16,27 @@ class SaleOrderExcelManageWizard(models.TransientModel):
     _name = 'sale.order.excel.manage.wizard'
     _description = 'Extract pricelist wizard'
 
+    # Static position for Excel file columns:
+    _column_position = {
+        'id': 0,
+        'order_qty': 8,
+        'internal_qty': 12,
+        'supplier_qty': 14,
+        'supplier_code': 15,
+        'supplier_price': 16,
+    }
+
     @api.model
     def get_suppinfo_supplier(self, product):
         for supplier in product.seller_ids:
             # First only:
-            return supplier.name.id, supplier.name.name, supplier.name.ref
-        return False, '', ''
+            return (
+                supplier.name.id,
+                supplier.name.name,
+                supplier.name.ref,
+                supplier.price,
+            )
+        return False, '', '', 0
 
     @api.model
     def get_suppinfo_price(self, product):
@@ -37,8 +52,9 @@ class SaleOrderExcelManageWizard(models.TransientModel):
         report_pool = self.env['excel.report']
         line_pool = self.env['sale.order.line']
         lines = line_pool.search([
-            ('order_id.logistic_state', 'in', ('confirmed', )),
-            ('product_id.is_expense', '=', False),
+            ('order_id.logistic_state', 'in', ('confirmed', )),  # Order conf.
+            ('logistic_state', '=', 'draft'),  # Only draft line
+            ('product_id.is_expense', '=', False),  # No expense product
             ])
 
         title = (
@@ -53,7 +69,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             _('Q.'), _('Price'),
             _('ID Supplier'), _('Supplier'),
             _('Int. Stock'), _('Q. Int.'),
-            _('Supp. Stock'), _('Q. Supp.'), _('Ref.'),
+            _('Supp. Stock'), _('Q. Supp.'), _('Ref.'), _('Cost'),
             _('Status'),
         )
         column_width = (
@@ -63,7 +79,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             7, 7,
             1, 25,
             10, 10,
-            10, 10, 8,
+            10, 10, 8, 10,
             10,
         )
         total_col = len(column_width)
@@ -97,7 +113,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
 
             # Readability:
             order = line.order_id
-            supplier_id, supplier_name, supplier_code = \
+            supplier_id, supplier_name, supplier_code, supplier_price = \
                 self.get_suppinfo_supplier(product)
 
             # Category:
@@ -140,6 +156,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                 (0 if supplier_id else '/', 'number'),
                 (0 if supplier_id else '', supplier_color),
                 (supplier_code, 'text_total'),
+                (supplier_price, 'number_total'),
             ), style_code='text')
 
             formula = '=IF({0}+{1}-{2}=0, "OK", ' \
@@ -147,7 +164,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                           report_pool.row_col_to_cell(row, 13),
                           report_pool.row_col_to_cell(row, 15),
                           report_pool.row_col_to_cell(row, 8),
-            )
+                      )
 
             report_pool.write_formula(
                 ws_name, row, total_col - 1, formula,
@@ -156,6 +173,9 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             )
         return report_pool.return_attachment(_('current_sale_order_pending'))
 
+    # -------------------------------------------------------------------------
+    # Workflow confirmed to pending (or ready if all line are ready)
+    # -------------------------------------------------------------------------
     @api.multi
     def import_pending_order(self):
         """ Import sale order line selected where q. is present
@@ -163,6 +183,10 @@ class SaleOrderExcelManageWizard(models.TransientModel):
         purchase_pool = self.env['purchase.order']
         line_pool = self.env['sale.order.line']
         po_line_pool = self.env['purchase.order.line']
+        product_pool = self.env['product.product']
+        quant_pool = self.env['stock.quant']
+
+        now = fields.Datetime.now()
 
         # ---------------------------------------------------------------------
         # Save passed file:
@@ -184,12 +208,12 @@ class SaleOrderExcelManageWizard(models.TransientModel):
 
         ws = wb.sheet_by_index(0)
         start_import = False
-        company_id = 1  # TODO read from order?
+        import pdb; pdb.set_trace()
+        company_id = self.env.user.company_id.id = 1  # TODO read from order?
 
         purchase_orders = {}
-        # import pdb; pdb.set_trace()
         for row in range(ws.nrows):
-            line_id = ws.cell_value(row, 0)
+            line_id = ws.cell_value(row, self._column_position['id'])
             if not start_import and line_id == 'ID':
                 start_import = True
                 _logger.info('%s. Header line' % row)
@@ -197,6 +221,16 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             if not start_import:
                 _logger.info('%s. Jump line' % row)
                 continue
+            # Extract needed data:
+            order_qty = ws.cell_value(
+                row, self._column_position['order_qty'])
+            internal_qty = ws.cell_value(
+                row, self._column_position['internal_qty'])
+            supplier_qty = ws.cell_value(
+                row, self._column_position['supplier_qty'])
+            supplier_code = ws.cell_value(
+                row, self._column_position['supplier_code'])
+
 
             purchase_data = []
             if ws.cell_value(row, 12):
@@ -233,7 +267,8 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                     'name': product.name,
                     'product_qty': product_qty,
                     'product_uom': product.uom_id.id,
-                    'price_unit': self.get_suppinfo_price(product),  # TODO better
+                    # TODO better:
+                    'price_unit': self.get_suppinfo_price(product),
                     'date_planned': now,
                     })
 
