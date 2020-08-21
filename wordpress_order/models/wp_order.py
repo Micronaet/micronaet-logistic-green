@@ -481,6 +481,7 @@ class WPConnector(models.Model):
                                 # TODO No VAT for now:
                                 'taxes_id': [(6, 0, ())],
                                 'supplier_taxes_id': [(6, 0, ())],
+                                'type': 'product',
                                 }).id
 
                         line_data = {

@@ -20,10 +20,10 @@ class SaleOrderExcelManageWizard(models.TransientModel):
     _column_position = {
         'id': 0,
         'order_qty': 8,
-        'internal_qty': 12,
-        'supplier_qty': 14,
-        'supplier_code': 15,
-        'supplier_price': 16,
+        'internal_qty': 13,
+        'supplier_qty': 15,
+        'supplier_code': 16,
+        'supplier_price': 17,
     }
 
     @api.model
@@ -209,7 +209,6 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             raise exceptions.Warning(_('Cannot read XLS file'))
 
         ws = wb.sheet_by_index(0)
-        import pdb; pdb.set_trace()
 
         # Parameters from company (for assign qty):
         company = self.env.user.company_id  # TODO read from order?
@@ -243,13 +242,13 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             order_qty = ws.cell_value(
                 row, self._column_position['order_qty'])
             internal_qty = ws.cell_value(
-                row, self._column_position['internal_qty'])
+                row, self._column_position['internal_qty']) or 0.0
             supplier_qty = ws.cell_value(
-                row, self._column_position['supplier_qty'])
+                row, self._column_position['supplier_qty']) or 0.0
             supplier_code = ws.cell_value(
                 row, self._column_position['supplier_code'])
             supplier_price = ws.cell_value(
-                row, self._column_position['supplier_price'])
+                row, self._column_position['supplier_price']) or 0.0
 
             # -----------------------------------------------------------------
             # Check data in line:
@@ -260,7 +259,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                 log['error'].append(_('%s. No ID for this line') % row)
                 continue
 
-            lines = partner_pool.search([('id', '=', line_id)])
+            lines = line_pool.search([('id', '=', line_id)])
             if not lines:
                 log['error'].append(
                     _('%s. No lined found with ID: %s') % (
@@ -281,6 +280,8 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             # C. Check supplier code and price
             supplier = False
             if supplier_qty:
+                import pdb;
+                pdb.set_trace()
                 if not supplier_code:
                     log['error'].append(
                         _('%s. No supplier code but qty present') % row)
