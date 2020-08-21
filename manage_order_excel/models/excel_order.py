@@ -4,6 +4,7 @@
 import xlrd
 import logging
 import base64
+import pdb
 from odoo import models, fields, api, exceptions
 from odoo.tools.translate import _
 
@@ -280,8 +281,6 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             # C. Check supplier code and price
             supplier = False
             if supplier_qty:
-                import pdb;
-                pdb.set_trace()
                 if not supplier_code:
                     log['error'].append(
                         _('%s. No supplier code but qty present') % row)
@@ -328,6 +327,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
         # ---------------------------------------------------------------------
         #                 Assign management (Internal stock):
         # ---------------------------------------------------------------------
+        # TODO check remain quantity before create order or assigned qty
         for line, internal_qty in internal_data:
             product = line.product_id
             # TODO no check in stock, was done during assign
@@ -361,6 +361,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                 purchase_orders[supplier_id] = purchase_pool.create({
                     'partner_id': supplier_id,
                     'date_order': now,
+                    'date_planned': now,
                 }).id
             order_id = purchase_orders[supplier_id]
 
@@ -374,6 +375,9 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                 'product_uom': product.uom_id.id,
                 'price_unit': supplier_price,
                 'date_planned': now,
+
+                # Link to sale:
+                'logistic_sale_id': line.id,
             })
 
         # ---------------------------------------------------------------------
@@ -381,16 +385,15 @@ class SaleOrderExcelManageWizard(models.TransientModel):
         # ---------------------------------------------------------------------
         # Update logistic state for line after all
         for line in line_touched:
-            product = line.product_id
-            if not product.logistic_remain_qty:  # All assigned or received
+            if not line.logistic_remain_qty:  # All assigned or received
                 line.write({
                     'logistic_state': 'ready',
                 })
-            elif product.logistic_purchased_qty:  # Waiting order not received
+            elif line.logistic_purchase_qty:  # Waiting order not received
                 line.write({
-                    'logistic_state': 'pending',
+                    'logistic_state': 'ordered',
                 })
-            # Stay in draft mode
+            # else: Stay in draft mode
 
         # Update logistic state for order after all
         all_ready = set(['ready'])
@@ -401,7 +404,12 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                 order.write({
                     'logistic_state': 'ready',
                 })
+            else:  # TODO always pending in else?
+                order.write({
+                    'logistic_state': 'pending',
+                })
 
+        pdb.set_trace()
         if purchase_orders:
             # For printing purchase order
             return {
@@ -414,7 +422,8 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                 'view_id': False,
                 'views': [(False, 'tree'), (False, 'form')],
                 'domain': [
-                    ('id', 'in', purchase_orders.values())],
+                    ('id', 'in', [
+                        po_id for po_id in purchase_orders.values()])],
                 'context': self.env.context,
                 'target': 'current',
                 'nodestroy': False,

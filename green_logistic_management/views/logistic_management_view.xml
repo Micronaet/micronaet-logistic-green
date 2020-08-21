@@ -419,7 +419,6 @@
                      <field name="order_id" />
                      <button name="open_view_sale_order_product" string="Open sale order product" type="object" icon="fa-arrow-circle-o-right"/>
                      <field name="product_id" />
-                     <button name="open_view_sale_order_original_product" string="Open sale order original product" type="object" icon="fa-arrow-circle-o-right" />
                      <field name="name" />
                      <field name="product_uom_qty" />
                      <field name="logistic_covered_qty" />
