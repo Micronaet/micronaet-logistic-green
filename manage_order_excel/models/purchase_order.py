@@ -66,7 +66,7 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
         report_pool.column_width(ws_name, column_width)
 
         # Title:
-        report_pool.column_hidden(ws_name, [0, 10])  # Hide ID columns
+        report_pool.column_hidden(ws_name, [0, 6])  # Hide ID columns
         row = 0
         report_pool.write_xls_line(ws_name, row, title, style_code='title')
 
@@ -106,7 +106,7 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
 
                 (waiting_qty, 'number_ok'),
                 (0, 'number_ok'),
-                ('', 'text_ok'),
+                '',
             ), style_code='text')
 
             formula = '=IF({0}-{1}=0, "OK", ' \
