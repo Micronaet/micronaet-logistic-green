@@ -189,7 +189,7 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
             'info': [],
         }
         start_import = False
-
+        pdb.set_trace()
         # Read and stock in dict data information:
         for row in range(ws.nrows):
             line_id = ws.cell_value(row, self._column_position['id'])
@@ -405,13 +405,14 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
             # Mark Sale Order Line ready:
             _logger.info('Update sale order line as ready:')
             orders = []
-            for line in sale_lines:
-                order = line.order_id
+            for order_line in sale_lines:
+                order = order_line.order_id
                 if order not in orders:
                     orders.append(order)
                 line.write({
                     'logistic_state': 'ready',
                 })
+
             all_ready = {'ready'}
             for order in orders:
                 states = set(
@@ -425,10 +426,10 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
             # -----------------------------------------------------------------
             _logger.info('Check purchase order closed:')
             for purchase in order_touched:
-                for line in purchase.order_line:
-                    if line.logistic_undelivered_qty:
+                for po_line in purchase.order_line:
+                    if po_line.logistic_undelivered_qty:
                         break
-                else: # If exit without break >> all delivered!
+                else:  # If exit without break >> all delivered!
                     purchase.write({
                         'logistic_state': 'done',
                     })

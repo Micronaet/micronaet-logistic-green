@@ -102,9 +102,11 @@ class SaleOrderExcelManageWizard(models.TransientModel):
 
         # Collect:
         # TODO manage order from wizard
+        history_status = {}
         for line in sorted(
                 lines,
-                key=lambda x: (x.product_id.default_code or '')):
+                key=lambda x: (x.order_id.name or '')
+                ):
             row += 1
             product = line.product_id
 
@@ -126,12 +128,19 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             # Color setup:
             supplier_color = 'number_total' if supplier_id else 'number'
             qty_needed = line.product_uom_qty
-            qty_available = product.qty_available
+            if product.id not in history_status:
+                history_status[product.id] = product.qty_available
+
+            qty_available = history_status[product.id]
             # TODO manage incremental for this report!
             if qty_available >= qty_needed:
                 qty_covered = qty_needed
+                history_status[product.id] -= qty_covered
+                formula_value = 'OK'
             else:
                 qty_covered = qty_available
+                history_status[product.id] -= qty_available
+                formula_value = 'INCOMPLETO'
 
             report_pool.write_xls_line(ws_name, row, (
                 line.id,
@@ -173,7 +182,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             #   CERCA.VERT(A7;Fornitori.$A$1:$B$3;2; 0); "CODICE ERRATO!")
             report_pool.write_formula(
                 ws_name, row, total_col - 1, formula,
-                value='INCOMPLETO',
+                value=formula_value,
                 format_code='text',
             )
         return report_pool.return_attachment(_('current_sale_order_pending'))
@@ -413,7 +422,6 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                     'logistic_state': 'pending',
                 })
 
-        pdb.set_trace()
         if purchase_orders:
             # For printing purchase order
             return {
