@@ -22,9 +22,9 @@ class SaleOrderExcelManageWizard(models.TransientModel):
         'id': 0,
         'order_qty': 12,
         'internal_qty': 13,
-        'supplier_qty': 15,
-        'supplier_code': 16,
-        'supplier_price': 17,
+        'supplier_qty': 16,
+        'supplier_code': 17,
+        'supplier_price': 18,
     }
 
     @api.model
@@ -199,7 +199,6 @@ class SaleOrderExcelManageWizard(models.TransientModel):
         purchase_pool = self.env['purchase.order']
         line_pool = self.env['sale.order.line']
         po_line_pool = self.env['purchase.order.line']
-        product_pool = self.env['product.product']
         quant_pool = self.env['stock.quant']
         partner_pool = self.env['res.partner']
 
@@ -228,9 +227,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
 
         # Parameters from company (for assign qty):
         company = self.env.user.company_id  # TODO read from order?
-        company_id = company.id
         location_id = company.logistic_location_id.id
-        # sort = company.logistic_order_sort
 
         # Store for manage after Excel loop:
         purchase_data = []
@@ -256,13 +253,13 @@ class SaleOrderExcelManageWizard(models.TransientModel):
 
             # Extract needed data:
             order_qty = ws.cell_value(
-                row, self._column_position['order_qty'])
+                row, self._column_position['order_qty']) or 0.0
             internal_qty = ws.cell_value(
                 row, self._column_position['internal_qty']) or 0.0
             supplier_qty = ws.cell_value(
                 row, self._column_position['supplier_qty']) or 0.0
             supplier_code = ws.cell_value(
-                row, self._column_position['supplier_code'])
+                row, self._column_position['supplier_code']) or ''
             supplier_price = ws.cell_value(
                 row, self._column_position['supplier_price']) or 0.0
 
@@ -288,10 +285,11 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                 log['info'].append(_('%s. No qty, line not imported') % row)
                 continue
 
-            if abs(order_qty - supplier_qty - internal_qty) > gap:
-                log['error'].append(
-                    _('%s. Quantity used different from ordered') % row)
-                continue
+            # TODO Import also incompleted line?!?
+            # if abs(order_qty - supplier_qty - internal_qty) > gap:
+            #    log['error'].append(
+            #        _('%s. Quantity used different from ordered') % row)
+            #    continue
 
             # C. Check supplier code and price
             supplier = False
@@ -411,7 +409,6 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             # else: Stay in draft mode
 
         # Update logistic state for order after all
-        pdb.set_trace()
         for order in order_touched:
             order_states = set(
                 [line.logistic_state for line in order.order_line])
@@ -420,6 +417,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                 order.write({
                     'logistic_state': 'ready',
                 })
+                _logger.info('Order %s ready!' % order.name)
             elif 'draft' not in order_states:  # TODO always pending in else?
                 order.write({
                     'logistic_state': 'pending',
