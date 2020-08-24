@@ -21,7 +21,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
     _column_position = {
         'id': 0,
         'order_qty': 12,
-        'internal_qty': 13,
+        'internal_qty': 14,
         'supplier_qty': 16,
         'supplier_code': 17,
         'supplier_price': 18,
@@ -175,10 +175,14 @@ class SaleOrderExcelManageWizard(models.TransientModel):
 
             formula = '=IF({0}+{1}-{2}=0, "OK", ' \
                       'IF({0}+{1}-{2}<0, "INCOMPLETO", "ECCEDENTE")'.format(
-                          report_pool.row_col_to_cell(row, 13),
-                          report_pool.row_col_to_cell(row, 15),
-                          report_pool.row_col_to_cell(row, 8),
+                          report_pool.row_col_to_cell(
+                              row, self._column_position['internal_qty']),
+                          report_pool.row_col_to_cell(
+                              row, self._column_position['supplier_qty']),
+                          report_pool.row_col_to_cell(
+                              row, self._column_position['order_qty']),
                       )
+
             # TODO Aggiungere colonna per cerca vert:
             #  =SE.ERRORE(
             #   CERCA.VERT(A7;Fornitori.$A$1:$B$3;2; 0); "CODICE ERRATO!")
