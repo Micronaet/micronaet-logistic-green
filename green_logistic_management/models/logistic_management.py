@@ -402,6 +402,12 @@ class StockQuant(models.Model):
         index=True, ondelete='cascade',  # remove stock move when delete order
         )
 
+    logistic_purchase_id = fields.Many2one(
+        'purchase.order.line', 'Link purchase generator',
+        help='Link to purchase line the assigned qty',
+        index=True, ondelete='cascade',  # remove stock move when delete order
+        )
+
 
 class SaleOrder(models.Model):
     """ Model name: Sale Order

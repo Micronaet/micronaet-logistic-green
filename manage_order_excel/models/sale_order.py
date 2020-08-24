@@ -192,7 +192,6 @@ class SaleOrderExcelManageWizard(models.TransientModel):
         quant_pool = self.env['stock.quant']
         partner_pool = self.env['res.partner']
 
-        now = fields.Datetime.now()
         gap = 0.000001  # For approx quantity check
 
         # ---------------------------------------------------------------------
@@ -200,7 +199,8 @@ class SaleOrderExcelManageWizard(models.TransientModel):
         # ---------------------------------------------------------------------
         b64_file = base64.decodebytes(self.file)
         now = ('%s' % fields.Datetime.now())[:19]
-        filename = '/tmp/tx_%s.xlsx' % now.replace(':', '_').replace('-', '_')
+        filename = '/tmp/sale_%s.xlsx' % \
+                   now.replace(':', '_').replace('-', '_')
         f = open(filename, 'wb')
         f.write(b64_file)
         f.close()
