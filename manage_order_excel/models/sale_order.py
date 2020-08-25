@@ -20,6 +20,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
     # Static position for Excel file columns:
     _column_position = {
         'id': 0,
+        'supplier_id': 9,
         'order_qty': 11,
         'internal_qty': 13,
         'supplier_qty': 15,
@@ -55,7 +56,8 @@ class SaleOrderExcelManageWizard(models.TransientModel):
         partner_pool = self.env['res.partner']
 
         lines = line_pool.search([
-            ('order_id.logistic_state', 'in', ('confirmed', )),  # Order conf.
+            ('order_id.logistic_state', 'in', (
+                'confirmed', 'pending')),  # Order conf. or pending for partial
             ('logistic_state', 'in', ('draft', 'ordered')),  # Only draft line
             ('product_id.is_expense', '=', False),  # No expense product
             ])
@@ -119,7 +121,10 @@ class SaleOrderExcelManageWizard(models.TransientModel):
         # ---------------------------------------------------------------------
         # PAGE: Order data
         # Title:
-        report_pool.column_hidden(ws_name, [0, 10])  # Hide ID columns
+        report_pool.column_hidden(ws_name, [
+            self._column_position['id'],
+            self._column_position['supplier_id'],
+        ])  # Hide ID columns
         row = 0
         report_pool.write_xls_line(ws_name, row, title, style_code='title')
 
@@ -157,7 +162,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             order_qty = line.product_uom_qty
 
             qty_needed = line.logistic_uncovered_qty  # remain to assign / ord.
-            if qty_needed:
+            if not qty_needed:
                 continue  # No uncovered qty remain
 
             if product.id not in history_status:
@@ -279,7 +284,6 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             'info': [],
         }
         start_import = False
-        pdb.set_trace()
         for row in range(ws.nrows):
             line_id = ws.cell_value(row, self._column_position['id'])
             if not start_import and line_id == 'ID':
@@ -301,6 +305,9 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                 row, self._column_position['supplier_code']) or ''
             supplier_price = ws.cell_value(
                 row, self._column_position['supplier_price']) or 0.0
+
+            if type(supplier_code) == float:
+                supplier_code = str(int(supplier_code))
 
             # -----------------------------------------------------------------
             # Check data in line:
@@ -379,6 +386,8 @@ class SaleOrderExcelManageWizard(models.TransientModel):
         # ---------------------------------------------------------------------
         #                 Assign management (Internal stock):
         # ---------------------------------------------------------------------
+        pdb.set_trace()
+
         # TODO check remain quantity before create order or assigned qty
         for line, internal_qty in internal_data:
             product = line.product_id
@@ -398,13 +407,9 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                 quant_pool.create(data)
                 reload_line = line_pool.browse(line.id)
                 if reload_line.logistic_uncovered_qty:
-                    reload_line.write({
-                        'logistic_state': 'ready'
-                    })
+                    reload_line.logistic_state = 'draft'  # not present state!
                 else:
-                    reload_line.write({
-                        'logistic_state': 'pending'
-                    })
+                    reload_line.logistic_state = 'ready'
             except:
                 raise exceptions.Warning('Cannot create quants!')
 
