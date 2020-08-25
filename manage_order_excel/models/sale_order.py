@@ -52,6 +52,8 @@ class SaleOrderExcelManageWizard(models.TransientModel):
         """
         report_pool = self.env['excel.report']
         line_pool = self.env['sale.order.line']
+        partner_pool = self.env['res.partner']
+
         lines = line_pool.search([
             ('order_id.logistic_state', 'in', ('confirmed', )),  # Order conf.
             ('logistic_state', '=', 'draft'),  # Only draft line
@@ -87,10 +89,29 @@ class SaleOrderExcelManageWizard(models.TransientModel):
         )
         total_col = len(column_width)
 
+        # 2 Pages:
         ws_name = _('Pending sale order')
         report_pool.create_worksheet(ws_name, format_code='DEFAULT')
         report_pool.column_width(ws_name, column_width)
 
+        ws_supplier_page = _('Supplier')
+        report_pool.create_worksheet(ws_supplier_page, format_code='DEFAULT')
+
+        # ---------------------------------------------------------------------
+        # PAGE: Supplier list
+        suppliers = partner_pool.search([('supplier', '=', True)])
+        row = 0
+        report_pool.write_xls_line(
+            ws_name, row, ['Codice', 'Nome'], style_code='header')
+        for supplier in sorted(suppliers, key=lambda s: s.ref):
+            row += 1
+            report_pool.write_xls_line(ws_name, row, (
+                supplier.ref,
+                supplier.name,
+            ), style_code='text')
+
+        # ---------------------------------------------------------------------
+        # PAGE: Order data
         # Title:
         report_pool.column_hidden(ws_name, [0, 10])  # Hide ID columns
         row = 0
