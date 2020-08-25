@@ -430,6 +430,52 @@ class SaleOrder(models.Model):
     #                           UTILITY:
     # -------------------------------------------------------------------------
     @api.multi
+    def check_and_update_order_status(self):
+        """ Verify current order line status and update header
+        """
+        for order in self:
+            current = order.logistic_state
+
+            # 0. Order untouchable state:
+            if current in ('draft', 'ready', 'done', 'cancel'):
+                # No change
+                continue
+
+            new = 'ready'  # Assume better status
+            for line in order.order_line:
+                line_state = line.logistic_state
+
+                # 1. Jump cancel line:
+                if line_state == 'cancel':
+                    continue
+
+                # 2. Check expense (and update wrong state):
+                product = line.product_id
+                if product.is_expense:
+                    if line_state not in ('ready', 'done'):
+                        line.logistic_state = 'ready'
+                    # Jump line
+                    continue
+
+                # 3. Check pending order:
+                if line_state == 'ordered':
+                    new = 'pending'  # Still checking next line
+
+                # 4. Check still in confirmed:
+                if line_state == 'draft':
+                    new = 'confirmed'
+                    break  # No more check!
+
+            if new != current:
+                order.write({
+                    'logistic_state': new,
+                })
+                _logger.write('Order {} change status [{} > {}]'.format(
+                    order.name, current, new,
+                ))
+
+
+    @api.multi
     def logistic_check_and_set_ready(self):
         """ Check if all line are in ready state (excluding unused)
         """

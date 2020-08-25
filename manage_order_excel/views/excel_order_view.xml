@@ -6,14 +6,15 @@
             <field name="model">sale.order.excel.manage.wizard</field>
             <field name="arch" type="xml">
                 <form string="Wizard sale and purchase" version="7.0">
-                   <header>
-                       <button string="Cancel" special="cancel" />
-                       <button name="export_pending_order" string="Export pending order" type="object" class="oe_highlight" attrs="{'invisible': [('file','!=',False)]}"/>
-                       <button name="import_pending_order" string="Import order for purchase" type="object" class="oe_highlight" attrs="{'invisible': [('file','=',False)]}"/>
-                   </header>
-                   <group colspan="4" col="4">
-                        <field name="file" />
-                   </group>
+                    <header>
+                        <button string="Cancel" special="cancel" />
+                        <button name="export_pending_order" string="Export pending order" type="object" class="oe_highlight" attrs="{'invisible': [('file','!=',False)]}"/>
+                        <button name="import_pending_order" string="Import order for purchase" type="object" class="oe_highlight" attrs="{'invisible': [('file','=',False)]}"/>
+                    </header>
+                    <group colspan="4" col="4">
+                         <field name="file" />
+                    </group>
+                    <footer></footer>
                 </form>
             </field>
       </record>

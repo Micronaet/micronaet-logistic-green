@@ -96,16 +96,20 @@ class SaleOrderExcelManageWizard(models.TransientModel):
 
         ws_supplier_page = _('Supplier')
         report_pool.create_worksheet(ws_supplier_page, format_code='DEFAULT')
+        report_pool.column_width(ws_supplier_page, (10, 45))
 
         # ---------------------------------------------------------------------
         # PAGE: Supplier list
-        suppliers = partner_pool.search([('supplier', '=', True)])
+        suppliers = partner_pool.search([
+            ('supplier', '=', True),
+            ('ref', '!=', False),
+        ])
         row = 0
         report_pool.write_xls_line(
-            ws_name, row, ['Codice', 'Nome'], style_code='header')
-        for supplier in sorted(suppliers, key=lambda s: s.ref):
+            ws_supplier_page, row, ['Codice', 'Nome'], style_code='header')
+        for supplier in sorted(suppliers, key=lambda s: int(s.ref)):
             row += 1
-            report_pool.write_xls_line(ws_name, row, (
+            report_pool.write_xls_line(ws_supplier_page, row, (
                 supplier.ref,
                 supplier.name,
             ), style_code='text')
