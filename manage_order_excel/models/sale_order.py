@@ -20,11 +20,11 @@ class SaleOrderExcelManageWizard(models.TransientModel):
     # Static position for Excel file columns:
     _column_position = {
         'id': 0,
-        'order_qty': 12,
-        'internal_qty': 14,
-        'supplier_qty': 16,
-        'supplier_code': 17,
-        'supplier_price': 18,
+        'order_qty': 11,
+        'internal_qty': 13,
+        'supplier_qty': 15,
+        'supplier_code': 16,
+        'supplier_price': 17,
     }
 
     @api.model
@@ -56,7 +56,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
 
         lines = line_pool.search([
             ('order_id.logistic_state', 'in', ('confirmed', )),  # Order conf.
-            ('logistic_state', '=', 'draft'),  # Only draft line
+            ('logistic_state', 'in', ('draft', 'ordered')),  # Only draft line
             ('product_id.is_expense', '=', False),  # No expense product
             ])
 
@@ -68,7 +68,8 @@ class SaleOrderExcelManageWizard(models.TransientModel):
         header = (
             'ID',
             _('Connector'), _('Order'), _('Date'), _('Status'),
-            _('Code'), _('Name'), _('Category'),
+            _('Code'), _('Name'),
+            # _('Category'),
             _('Q. ord.'), _('Sale Price'),
             _('ID Supplier'), _('Default supplier'),
             _('Q. need'), _('Dispo stock'), _('Q. Int.'),
@@ -79,7 +80,8 @@ class SaleOrderExcelManageWizard(models.TransientModel):
         column_width = (
             1,
             20, 8, 16, 10,
-            12, 48, 25,
+            12, 48,
+            # 25,
             7, 7,
             1, 25,
             10, 10, 10,
@@ -147,13 +149,17 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                 self.get_suppinfo_supplier(product)
 
             # Category:
-            category = ', '.join(
-                [item.name for item in product.wp_category_ids])
+            # category = ', '.join(
+            #     [item.name for item in product.wp_category_ids])
 
             # Color setup:
             supplier_color = 'number_total' if supplier_id else 'number'
             order_qty = line.product_uom_qty
+
             qty_needed = line.logistic_uncovered_qty  # remain to assign / ord.
+            if qty_needed:
+                continue  # No uncovered qty remain
+
             if product.id not in history_status:
                 history_status[product.id] = product.qty_available
 
@@ -164,8 +170,11 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                 history_status[product.id] -= qty_covered
                 formula_value = 'OK'
             else:
-                qty_covered = qty_available
-                history_status[product.id] -= qty_available
+                if qty_available > 0:
+                    qty_covered = qty_available
+                    history_status[product.id] -= qty_available
+                else:
+                    qty_covered = 0.0
                 formula_value = 'INCOMPLETO'
 
             report_pool.write_xls_line(ws_name, row, (
@@ -178,7 +187,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
 
                 product.default_code or '',
                 product.name or '',
-                category or '',
+                # category or '',
 
                 (order_qty, 'number'),
                 (line.price_unit, 'number'),
@@ -386,13 +395,22 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             }
             try:
                 quant_pool.create(data)
+                reload_line = line_pool.browse(line.id)
+                if reload_line.logistic_uncovered_qty:
+                    reload_line.write({
+                        'logistic_state': 'ready'
+                    })
+                else:
+                    reload_line.write({
+                        'logistic_state': 'pending'
+                    })
             except:
                 raise exceptions.Warning('Cannot create quants!')
 
         # ---------------------------------------------------------------------
         #                      Purchase management:
         # ---------------------------------------------------------------------
-        purchase_orders = {}
+        purchase_orders = {}  # Supplier: Purchase order ID
         for supplier, line, supplier_qty, supplier_price in purchase_data:
             supplier_id = supplier.id
 
@@ -439,19 +457,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
 
         # Update logistic state for order after all
         for order in order_touched:
-            order_states = set(
-                [line.logistic_state for line in order.order_line])
-            order_states.discard('cancel')  # Remove line cancel
-            if order_states == {'ready'}:  # All ready
-                order.write({
-                    'logistic_state': 'ready',
-                })
-                _logger.info('Order %s ready!' % order.name)
-            elif 'draft' not in order_states:  # TODO always pending in else?
-                order.write({
-                    'logistic_state': 'pending',
-                })
-            # else: remain as is
+            order.check_and_update_order_status()
 
         if purchase_orders:
             # For printing purchase order

@@ -470,7 +470,7 @@ class SaleOrder(models.Model):
                 order.write({
                     'logistic_state': new,
                 })
-                _logger.write('Order {} change status [{} > {}]'.format(
+                _logger.info('Order {} change status [{} > {}]'.format(
                     order.name, current, new,
                 ))
 
