@@ -279,6 +279,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             'info': [],
         }
         start_import = False
+        pdb.set_trace()
         for row in range(ws.nrows):
             line_id = ws.cell_value(row, self._column_position['id'])
             if not start_import and line_id == 'ID':
