@@ -35,12 +35,19 @@
                      sequence="30"
                      groups="green_logistic_management.group_green_manager,green_logistic_management.group_green_account_manager"
                      />
+             <menuitem
+                 id="menu_green_left_administering_root"
+                 parent="menu_green_header_root"
+                 name="Administering"
+                 sequence="40"
+                 groups="green_logistic_management.group_green_manager"
+                 />
                  <menuitem
-                     id="menu_green_left_administering_root"
-                     parent="menu_green_header_root"
-                     name="Administering"
-                     sequence="40"
-                     groups="green_logistic_management.group_green_manager"
+                     id="menu_green_left_order_statistic_report"
+                     parent="menu_green_left_administering_root"
+                     name="Order stats"
+                     sequence="10"
+                     action="wordpress_order.ir_sale_order_statistic_report_server_action"
                      />
         <!--<menuitem name="Carrier SOAP" id="carrier_connection_soap_root_menu" parent="sale.menu_sale_config" sequence="20"/>
             <menuitem id="carrier_connection_soap_menu" parent="carrier_connection_soap_root_menu" action="carrier_connection_soap_action" sequence="10"/>-->
