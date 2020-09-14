@@ -104,6 +104,7 @@ class SaleOrder(models.Model):
                     ('', 'number'),
                 ), style_code='text')
                 order_check = 'N'
+
             # Total line:
             report_pool.write_xls_line(ws_name, order_row, (
                 (order.amount_total, 'number_ok'),  # amount_untaxed
@@ -115,48 +116,53 @@ class SaleOrder(models.Model):
         header = ('Anno', 'Mese', 'Wordpress', 'Totale', 'Annuale')
 
         column_width = (
-            8, 4, 10, 10,
+            8, 4, 10, 10, 12,
         )
         total_col = len(column_width)
 
-        ws_name = _('Totali')
-        report_pool.create_worksheet(ws_name, format_code='DEFAULT')
-        report_pool.column_width(ws_name, column_width)
+        loop = [
+            (_('Totali'), sorted(year_page)),
+            (_('Classifica'), sorted(year_page, key=lambda k: year_page[k]))
+        ]
+        for ws_name, records in loop:
+            report_pool.create_worksheet(ws_name, format_code='DEFAULT')
+            report_pool.column_width(ws_name, column_width)
 
-        # Header:
-        row = 0
-        report_pool.write_xls_line(ws_name, row, header, style_code='header')
-        report_pool.autofilter(ws_name, [row, 0, row, total_col - 1])
-        report_pool.freeze_panes(ws_name, 1, 2)
+            # Header:
+            row = 0
+            report_pool.write_xls_line(
+                ws_name, row, header, style_code='header')
+            report_pool.autofilter(ws_name, [row, 0, row, total_col - 1])
+            report_pool.freeze_panes(ws_name, 1, 2)
 
-        total = 0.0
-        last_year = False
-        for period in sorted(year_page):
-            row += 1
-            wordpress_total = year_page[period]
-            year, month = period
+            total = 0.0
+            last_year = False
+            for period in records:
+                row += 1
+                wordpress_total = year_page[period]
+                year, month = period
 
-            if not last_year or last_year != year:
-                if last_year:  # Write previous year total:
+                if not last_year:
+                    last_year = year
+                elif last_year != year:
                     report_pool.write_xls_line(ws_name, row - 1, [
                         total,
                     ], style_code='text', col=4)
+                    total = 0.0
+                    last_year = year
 
-                total = 0.0
-                last_year = year
+                total += wordpress_total
+                report_pool.write_xls_line(ws_name, row, [
+                    year,
+                    month,
+                    wordpress_total,
+                    wordpress_total,  # TODO same for now
+                ], style_code='text')
 
-            total += wordpress_total
-            report_pool.write_xls_line(ws_name, row, [
-                period[0],
-                period[1],
-                wordpress_total,
-                wordpress_total,
-            ], style_code='text')
-
-        # Write previous year total (last not printed):
-        if year_page:
-            report_pool.write_xls_line(ws_name, row - 1, [
-                wordpress_total,
-            ], style_code='text', col=3)
+            # Write previous year total (last not printed):
+            if year_page:
+                report_pool.write_xls_line(ws_name, row, [
+                    total,
+                ], style_code='text', col=4)
 
         return report_pool.return_attachment(_('order_statistic_total'))
