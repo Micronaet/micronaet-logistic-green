@@ -237,6 +237,7 @@ class WPConnector(models.Model):
             #  Not same partner
             destinations = partner_pool.search([
                 ('parent_id', '=', partner_id),
+                ('name', '=', odoo_data['shipping']['name']),
                 ('city', '=', odoo_data['shipping']['city']),
                 ('street', '=', odoo_data['shipping']['street']),
                 ('street2', '=', odoo_data['shipping']['street2']),
