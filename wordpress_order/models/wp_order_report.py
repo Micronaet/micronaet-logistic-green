@@ -122,7 +122,11 @@ class SaleOrder(models.Model):
 
         loop = [
             (_('Totali'), sorted(year_page)),
-            (_('Classifica'), sorted(year_page, key=lambda k: year_page[k]))
+            (_('Classifica'), sorted(
+                year_page,
+                key=lambda k: year_page[k],
+                reverse=True,
+            ))
         ]
         for ws_name, records in loop:
             report_pool.create_worksheet(ws_name, format_code='DEFAULT')
