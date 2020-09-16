@@ -308,7 +308,6 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
         # ---------------------------------------------------------------------
         #                 Assign management (Internal stock):
         # ---------------------------------------------------------------------
-        pdb.set_trace()
         # TODO check remain quantity before create order or assigned qty
         for supplier, line, stock_qty, supplier_price in internal_data:
             product = line.product_id
@@ -334,6 +333,7 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
         # -----------------------------------------------------------------
         #                      Load purchased line
         # -----------------------------------------------------------------
+        pdb.set_trace()
         sale_lines = []  # To check status
         for supplier in purchase_data:
             po_order = line.order_id
