@@ -133,6 +133,7 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
         """
         move_pool = self.env['stock.move']
         quant_pool = self.env['stock.quant']
+        picking_pool = self.env['stock.picking']
 
         # Sale order detail:
         sale_line_pool = self.env['sale.order.line']
@@ -343,7 +344,7 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
             # -------------------------------------------------------------
             # Create new picking:
             # -------------------------------------------------------------
-            picking = self.create({
+            picking = picking_pool.create({
                 'partner_id': supplier.id,
                 'scheduled_date': now,
                 'origin': origin,
