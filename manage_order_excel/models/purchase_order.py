@@ -82,16 +82,15 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
         # TODO supplier filter?
         for line in sorted(
                 lines, key=lambda x: x.order_id.name):
+            waiting_qty = line.logistic_undelivered_qty  # Remain
+            if waiting_qty <= 0:
+                continue
             row += 1
 
             # Readability:
             product = line.product_id
             order = line.order_id
             supplier = order.partner_id
-
-            waiting_qty = line.logistic_undelivered_qty  # Remain
-            if waiting_qty <= 0:
-                continue
 
             report_pool.write_xls_line(ws_name, row, (
                 line.id,
@@ -139,7 +138,7 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
         sale_line_pool = self.env['sale.order.line']
 
         # Purchase order detail:
-        purchase_pool = self.env['purchase.order']
+        # purchase_pool = self.env['purchase.order']
         line_pool = self.env['purchase.order.line']
 
         # Partner:
@@ -192,6 +191,7 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
         }
         start_import = False
         # Read and stock in dict data information:
+        pdb.set_trace()
         for row in range(ws.nrows):
             line_id = ws.cell_value(row, self._column_position['id'])
             if not start_import and line_id == 'ID':
@@ -200,25 +200,6 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
                 continue
             if not start_import:
                 _logger.info('%s. Jump line' % row)
-                continue
-
-            # Extract needed data:
-            supplier_id = ws.cell_value(
-                row, self._column_position['supplier_id'])
-            supplier_price = ws.cell_value(
-                row, self._column_position['supplier_price']) or 0.0
-
-            remain_qty = ws.cell_value(
-                row, self._column_position['remain_qty'])
-            all_qty = ws.cell_value(
-                row, self._column_position['all_qty'])
-
-            # -----------------------------------------------------------------
-            # Check data in line:
-            # -----------------------------------------------------------------
-            # Quantity check
-            if not remain_qty and not all_qty:
-                log['info'].append(_('%s. No qty, line not imported') % row)
                 continue
 
             # A. Check ID line
@@ -234,9 +215,30 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
                         row, line_id))
                 continue
             line = lines[0]
+
+            # Extract needed data:
+            supplier_id = ws.cell_value(
+                row, self._column_position['supplier_id'])
+            supplier_price = ws.cell_value(
+                row, self._column_position['supplier_price']) or 0.0
+            logistic_sale_id = line.logistic_sale_id  # Linked to sale order!
+
+            # Not read reload from DB:
+            remain_qty = logistic_sale_id.logistic_remain_qty
+            all_qty = ws.cell_value(
+                row, self._column_position['all_qty'])
+
+            # -----------------------------------------------------------------
+            # Check data in line:
+            # -----------------------------------------------------------------
+            # Quantity check
+            if not remain_qty and not all_qty:
+                log['info'].append(_('%s. No qty, line not imported') % row)
+                continue
+
             logistic_undelivered_qty = line.logistic_undelivered_qty
 
-            # Check remain to deliver
+            # Check waiting VS delivered to customer
             if abs(remain_qty - logistic_undelivered_qty) > gap:
                 log['error'].append(
                     _('%s. Order quantity > than remain to deliver: %s') % (
@@ -263,7 +265,6 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
                 # continue  # TODO convert in error?
 
             # B. Check quantity:
-            logistic_sale_id = line.logistic_sale_id  # Linked to sale order!
 
             if all_qty:  # Extract arrived qty:
                 arrived_qty = remain_qty  # TODO remain to load!

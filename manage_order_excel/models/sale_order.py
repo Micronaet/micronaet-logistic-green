@@ -139,7 +139,6 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                 lines,
                 key=lambda x: (x.order_id.name or '')
                 ):
-            row += 1
             product = line.product_id
 
             # Jump service product (not used):
@@ -162,9 +161,10 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             order_qty = line.product_uom_qty
 
             qty_needed = line.logistic_uncovered_qty  # remain to assign / ord.
-            if not qty_needed:
+            if qty_needed <= 0.0:
                 continue  # No uncovered qty remain
 
+            row += 1
             if product.id not in history_status:
                 history_status[product.id] = product.qty_available
 
@@ -429,20 +429,38 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                 }).id
             order_id = purchase_orders[supplier_id]
 
-            # Create purchase order line from sale:
-            product = line.product_id
-            po_line_pool.create({
-                'order_id': order_id,
-                'product_id': product.id,
-                'name': product.name,
-                'product_qty': supplier_qty,
-                'product_uom': product.uom_id.id,
-                'price_unit': supplier_price,
-                'date_planned': now,
+            # -----------------------------------------------------------------
+            # Check over request:
+            # -----------------------------------------------------------------
+            reload_line = line_pool.browse(line.id)
+            logistic_remain_qty = reload_line.logistic_remain_qty
+            line_loop = []
+            if supplier_qty > logistic_remain_qty:
+                # Extra to stock:
+                line_loop.append(
+                    (supplier_qty - logistic_remain_qty, False)
+                )
+                supplier_qty = logistic_remain_qty
 
-                # Link to sale:
-                'logistic_sale_id': line.id,
-            })
+            # Remain or arrived:
+            line_loop.append(
+                (supplier_qty, line.id)
+            )
+            for qty, logistic_sale_id in line_loop:
+                # Create purchase order line from sale:
+                product = line.product_id
+                po_line_pool.create({
+                    'order_id': order_id,
+                    'product_id': product.id,
+                    'name': product.name,
+                    'product_qty': qty,
+                    'product_uom': product.uom_id.id,
+                    'price_unit': supplier_price,
+                    'date_planned': now,
+
+                    # Link to sale:
+                    'logistic_sale_id': logistic_sale_id,
+                })
 
         # ---------------------------------------------------------------------
         #                     Update order logistic status:
