@@ -87,6 +87,11 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
                 continue
             row += 1
 
+            if line.logistic_sale_id:
+                color = 'number_ok'
+            else:
+                color = 'number_error'
+
             # Readability:
             product = line.product_id
             order = line.order_id
@@ -105,7 +110,7 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
                 (line.price_unit, 'number'),
                 # TODO confirm price?
 
-                (waiting_qty, 'number_ok'),
+                (waiting_qty, color),
                 (0, 'number_total'),
                 ('', 'text_total'),
             ), style_code='text')
