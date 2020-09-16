@@ -351,7 +351,7 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
                 # 'move_type': 'direct',
                 'picking_type_id': logistic_pick_in_type_id,
                 'group_id': False,
-                'location_id': location_from,
+                'location_id': location_id,
                 'location_dest_id': location_to,
                 # 'priority': 1,
                 'state': 'done',  # immediately!
@@ -378,7 +378,7 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
                     'name': product.name or ' ',
                     'date': now,
                     'date_expected': now,
-                    'location_id': location_from,
+                    'location_id': location_id,
                     'location_dest_id': location_to,
                     'product_uom_qty': arrived_qty,
                     'product_uom': product.uom_id.id,
@@ -411,9 +411,13 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
                 order = order_line.order_id
                 if order not in orders:
                     orders.append(order)
-                line.write({
-                    'logistic_state': 'ready',
-                })
+
+                # Reload line to check remain awaiting:
+                if sale_line_pool.browse(
+                        order_line.id).logistic_remain_qty <= gap:
+                    order_line.write({
+                        'logistic_state': 'ready',
+                    })
 
             all_ready = {'ready'}
             for order in orders:
