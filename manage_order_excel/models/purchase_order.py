@@ -26,7 +26,7 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
         'all_qty': 10,
         'supplier_price': 7,
     }
-    # TODO save last price in product suppinfo?
+    # TODO save last price in product supp. info?
 
     @api.multi
     def export_waiting_delivery(self):
@@ -39,6 +39,7 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
             ])
 
         title = (
+            '',
             '',
             _('Awaiting delivery'),
             )
@@ -171,7 +172,7 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
         # Load parameters:
         # ---------------------------------------------------------------------
         company = self.env.user.company_id
-        location_id = company.location_id.id
+        location_id = company.logistic_location_id.id
         logistic_pick_in_type = company.logistic_pick_in_type_id
         logistic_pick_in_type_id = logistic_pick_in_type.id
         location_from = logistic_pick_in_type.default_location_src_id.id
@@ -189,7 +190,6 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
             'info': [],
         }
         start_import = False
-        pdb.set_trace()
         # Read and stock in dict data information:
         for row in range(ws.nrows):
             line_id = ws.cell_value(row, self._column_position['id'])
@@ -216,7 +216,7 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
             # Check data in line:
             # -----------------------------------------------------------------
             # Quantity check
-            if not arrived_qty and not all_qty:
+            if not remain_qty and not all_qty:
                 log['info'].append(_('%s. No qty, line not imported') % row)
                 continue
 

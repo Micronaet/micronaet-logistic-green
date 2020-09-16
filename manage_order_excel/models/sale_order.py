@@ -74,7 +74,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             # _('Category'),
             _('Q. ord.'), _('Sale Price'),
             _('ID Supplier'), _('Default supplier'),
-            _('Q. need'), _('Dispo stock'), _('Q. Int.'),
+            _('Q. need'), _('Disp. stock'), _('Q. Int.'),
             _('Supp. Stock'), _('Q. Supp.'), _('Suppl. Ref.'), _('Buy price'),
             # _('Purchase supplier'),
             _('Status'),
