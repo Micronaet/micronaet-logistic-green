@@ -386,8 +386,6 @@ class SaleOrderExcelManageWizard(models.TransientModel):
         # ---------------------------------------------------------------------
         #                 Assign management (Internal stock):
         # ---------------------------------------------------------------------
-        pdb.set_trace()
-
         # TODO check remain quantity before create order or assigned qty
         for line, internal_qty in internal_data:
             product = line.product_id

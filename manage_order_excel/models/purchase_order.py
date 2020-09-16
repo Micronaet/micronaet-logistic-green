@@ -192,6 +192,7 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
         }
         start_import = False
         # Read and stock in dict data information:
+        pdb.set_trace()
         for row in range(ws.nrows):
             line_id = ws.cell_value(row, self._column_position['id'])
             if not start_import and line_id == 'ID':
@@ -275,6 +276,7 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
             stock_qty = 0
             if logistic_sale_id and arrived_qty > remain_qty:
                 stock_qty = arrived_qty - remain_qty  # TODO remain to load!
+                arrived_qty = remain_qty
                 log['warning'].append(
                     _('%s. Extra qty, go to internal stock') % row)
             elif not logistic_sale_id:
@@ -331,19 +333,18 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
             except:
                 raise exceptions.Warning('Cannot create quants!')
 
-        # -----------------------------------------------------------------
+        # ---------------------------------------------------------------------
         #                      Load purchased line
-        # -----------------------------------------------------------------
-        pdb.set_trace()
+        # ---------------------------------------------------------------------
         sale_lines = []  # To check status
         for supplier in purchase_data:
             po_order = line.order_id
             now = '{}'.format(fields.Datetime.now())[:10]
             origin = po_order.name
 
-            # -------------------------------------------------------------
+            # -----------------------------------------------------------------
             # Create new picking:
-            # -------------------------------------------------------------
+            # -----------------------------------------------------------------
             picking = picking_pool.create({
                 'partner_id': supplier.id,
                 'scheduled_date': now,
@@ -422,7 +423,7 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
             all_ready = {'ready'}
             for order in orders:
                 states = set(
-                    [line.logistis_state for line in order.order_line])
+                    [line.logistic_state for line in order.order_line])
                 if states == all_ready:
                     order.write({
                         'logistic_state': 'ready'})

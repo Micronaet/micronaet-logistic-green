@@ -355,7 +355,7 @@
                      <button name="return_order_line_list_view" string="Logistic detail" type="object" class="oe_highlight"/>
                  </field>
                  <field name="partner_id" position="after">
-                     <field name="logistic_state" readonly="1"/>
+                     <field name="logistic_state"/> <!-- TODO readonly="1"-->
                  </field>
              </field>
          </record>
