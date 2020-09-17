@@ -239,6 +239,8 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
             if not arrived_qty and not all_qty:
                 log['info'].append(_('%s. No qty, line not imported') % row)
                 continue
+            if all_qty:  # Extract arrived qty:
+                arrived_qty = awaiting_qty  # Note: remain awaiting, not excel!
 
             # Check waiting VS delivered to customer
             # logistic_undelivered_qty = line.logistic_undelivered_qty  # PO
@@ -248,12 +250,13 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
             #             row, line_id))
             #     continue
 
-            # A. Check supplier
+            # -----------------------------------------------------------------
+            # A. Check supplier data
+            # -----------------------------------------------------------------
             if not supplier_id:
                 log['error'].append(_('%s. No ID for supplier') % row)
                 continue
             supplier_id = int(supplier_id)
-
             suppliers = partner_pool.search([('id', '=', supplier_id)])
             if not suppliers:
                 log['error'].append(
@@ -267,22 +270,19 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
                     _('%s. No purchase price but qty present') % row)
                 # continue  # TODO convert in error?
 
-            # B. Check quantity:
-
-            if all_qty:  # Extract arrived qty:
-                arrived_qty = awaiting_qty  # TODO remain to load!
-
+            # -----------------------------------------------------------------
             # Manage linked to sale order or stock assigned
-            stock_qty = 0
+            # -----------------------------------------------------------------
+            internal_qty = 0
             if logistic_sale_id and arrived_qty > awaiting_qty:
-                stock_qty = arrived_qty - awaiting_qty  # TODO remain to load!
+                internal_qty = arrived_qty - awaiting_qty  # TODO remain to load!
                 arrived_qty = awaiting_qty
                 log['warning'].append(
                     _('%s. Extra qty, go to internal stock') % row)
             elif not logistic_sale_id:
                 log['warning'].append(
                     _('%s. Extra qty for all, go to internal stock') % row)
-                stock_qty = arrived_qty  # All to internal stock
+                internal_qty = arrived_qty  # All to internal stock
 
             if log['error']:
                 # TODO manage what to do
@@ -298,10 +298,10 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
                 purchase_data[supplier].append(
                     (line, arrived_qty, supplier_price))
 
-            if stock_qty:
+            if internal_qty:
                 log['info'].append(_('%s. Delivery for internal stock') % row)
                 internal_data.append(
-                    (supplier, line, stock_qty, supplier_price)
+                    (supplier, line, internal_qty, supplier_price)
                 )
 
             # For final logistic state update
@@ -312,7 +312,7 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
         #                 Assign management (Internal stock):
         # ---------------------------------------------------------------------
         # TODO check remain quantity before create order or assigned qty
-        for supplier, line, stock_qty, supplier_price in internal_data:
+        for supplier, line, internal_qty, supplier_price in internal_data:
             product = line.product_id
             # TODO no check in stock, was done during assign
             data = {
@@ -320,7 +320,7 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
                 'in_date': now,
                 'location_id': location_id,
                 'product_id': product.id,
-                'quantity': stock_qty,
+                'quantity': internal_qty,
                 # Link:
                 'logistic_purchase_id': line.id,
                 # 'logistic_assigned_id': line.id,  # Link field
