@@ -271,11 +271,11 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
                 # continue  # TODO convert in error?
 
             # -----------------------------------------------------------------
-            # Manage linked to sale order or stock assigned
+            # Manage extra awaiting qty to stock:
             # -----------------------------------------------------------------
             internal_qty = 0
             if logistic_sale_id and arrived_qty > awaiting_qty:
-                internal_qty = arrived_qty - awaiting_qty  # TODO remain to load!
+                internal_qty = arrived_qty - awaiting_qty  # remain to load!
                 arrived_qty = awaiting_qty
                 log['warning'].append(
                     _('%s. Extra qty, go to internal stock') % row)
@@ -283,7 +283,6 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
                 log['warning'].append(
                     _('%s. Extra qty for all, go to internal stock') % row)
                 internal_qty = arrived_qty  # All to internal stock
-
             if log['error']:
                 # TODO manage what to do
                 pass
@@ -311,16 +310,15 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
         # ---------------------------------------------------------------------
         #                 Assign management (Internal stock):
         # ---------------------------------------------------------------------
-        # TODO check remain quantity before create order or assigned qty
         for supplier, line, internal_qty, supplier_price in internal_data:
             product = line.product_id
-            # TODO no check in stock, was done during assign
             data = {
                 'company_id': company.id,
                 'in_date': now,
                 'location_id': location_id,
                 'product_id': product.id,
                 'quantity': internal_qty,
+
                 # Link:
                 'logistic_purchase_id': line.id,
                 # 'logistic_assigned_id': line.id,  # Link field
@@ -338,9 +336,9 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
         # ---------------------------------------------------------------------
         sale_lines = []  # To check status
         for supplier in purchase_data:
-            po_order = line.order_id
+            # Readability data:
             now = '{}'.format(fields.Datetime.now())[:10]
-            origin = po_order.name
+            origin = 'Del. {}'.format(now)
 
             # -----------------------------------------------------------------
             # Create new picking:
@@ -362,10 +360,12 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
             # Append stock.move detail
             # -----------------------------------------------------------------
             for record in purchase_data[supplier]:
+                # Readability data:
                 line, arrived_qty, supplier_price = record
                 product = line.product_id
                 sale_line_id = line.logistic_sale_id.id
-                if sale_line_id:
+                origin = line.order_id.name
+                if sale_line_id:  # Update status at the end
                     sale_lines.append(line.logistic_sale_id)
 
                 # -------------------------------------------------------------
