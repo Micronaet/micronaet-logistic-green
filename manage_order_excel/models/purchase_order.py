@@ -21,7 +21,7 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
     _column_position = {
         'id': 0,  # PO line ID
         'supplier_id': 1,
-        'remain_qty': 8,
+        # 'awaiting_qty': 8,
         'arrived_qty': 9,
         'all_qty': 10,
         'supplier_price': 7,
@@ -228,8 +228,8 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
                 row, self._column_position['supplier_price']) or 0.0
             logistic_sale_id = line.logistic_sale_id  # Linked to sale order!
 
-            # Not read reload from DB:
-            remain_qty = logistic_sale_id.logistic_remain_qty
+            # Not read reload from DB remain to delivery (waiting):
+            awaiting_qty = logistic_sale_id.logistic_remain_qty
             all_qty = ws.cell_value(
                 row, self._column_position['all_qty'])
 
@@ -237,14 +237,14 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
             # Check data in line:
             # -----------------------------------------------------------------
             # Quantity check
-            if not remain_qty and not all_qty:
+            if not awaiting_qty and not all_qty:
                 log['info'].append(_('%s. No qty, line not imported') % row)
                 continue
 
             logistic_undelivered_qty = line.logistic_undelivered_qty
 
             # Check waiting VS delivered to customer
-            if abs(remain_qty - logistic_undelivered_qty) > gap:
+            if abs(awaiting_qty - logistic_undelivered_qty) > gap:
                 log['error'].append(
                     _('%s. Order quantity > than remain to deliver: %s') % (
                         row, line_id))
@@ -272,16 +272,16 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
             # B. Check quantity:
 
             if all_qty:  # Extract arrived qty:
-                arrived_qty = remain_qty  # TODO remain to load!
+                arrived_qty = awaiting_qty  # TODO remain to load!
             else:
                 arrived_qty = ws.cell_value(
                     row, self._column_position['arrived_qty']) or 0.0
 
             # Manage linked to sale order or stock assigned
             stock_qty = 0
-            if logistic_sale_id and arrived_qty > remain_qty:
-                stock_qty = arrived_qty - remain_qty  # TODO remain to load!
-                arrived_qty = remain_qty
+            if logistic_sale_id and arrived_qty > awaiting_qty:
+                stock_qty = arrived_qty - awaiting_qty  # TODO remain to load!
+                arrived_qty = awaiting_qty
                 log['warning'].append(
                     _('%s. Extra qty, go to internal stock') % row)
             elif not logistic_sale_id:
