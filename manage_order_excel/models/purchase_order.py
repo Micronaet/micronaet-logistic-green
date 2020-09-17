@@ -186,7 +186,6 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
         # Store for manage after Excel loop:
         purchase_data = {}  # arrived data from supplier (key was supplier)
         internal_data = []  # extra data from supplier
-
         order_touched = []  # For end operation (dropship, default suppl.)
 
         log = {
@@ -212,7 +211,6 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
             if not line_id:
                 log['error'].append(_('%s. No ID for this line') % row)
                 continue
-
             lines = line_pool.search([('id', '=', line_id)])
             if not lines:
                 log['error'].append(
@@ -226,29 +224,29 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
                 row, self._column_position['supplier_id'])
             supplier_price = ws.cell_value(
                 row, self._column_position['supplier_price']) or 0.0
-            logistic_sale_id = line.logistic_sale_id  # Linked to sale order!
-
-            # Not read reload from DB remain to delivery (waiting):
-            awaiting_qty = logistic_sale_id.logistic_remain_qty
+            arrived_qty = ws.cell_value(
+                row, self._column_position['arrived_qty']) or 0.0
             all_qty = ws.cell_value(
                 row, self._column_position['all_qty'])
+            # Not read reload from DB remain to delivery (waiting):
+            logistic_sale_id = line.logistic_sale_id  # Linked to sale order!
+            awaiting_qty = logistic_sale_id.logistic_remain_qty
 
             # -----------------------------------------------------------------
             # Check data in line:
             # -----------------------------------------------------------------
             # Quantity check
-            if not awaiting_qty and not all_qty:
+            if not arrived_qty and not all_qty:
                 log['info'].append(_('%s. No qty, line not imported') % row)
                 continue
 
-            logistic_undelivered_qty = line.logistic_undelivered_qty
-
             # Check waiting VS delivered to customer
-            if abs(awaiting_qty - logistic_undelivered_qty) > gap:
-                log['error'].append(
-                    _('%s. Order quantity > than remain to deliver: %s') % (
-                        row, line_id))
-                continue
+            # logistic_undelivered_qty = line.logistic_undelivered_qty  # PO
+            # if abs(awaiting_qty - logistic_undelivered_qty) > gap:
+            #     log['error'].append(
+            #         _('%s. Order quantity > than remain to deliver: %s') % (
+            #             row, line_id))
+            #     continue
 
             # A. Check supplier
             if not supplier_id:
@@ -273,9 +271,6 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
 
             if all_qty:  # Extract arrived qty:
                 arrived_qty = awaiting_qty  # TODO remain to load!
-            else:
-                arrived_qty = ws.cell_value(
-                    row, self._column_position['arrived_qty']) or 0.0
 
             # Manage linked to sale order or stock assigned
             stock_qty = 0
