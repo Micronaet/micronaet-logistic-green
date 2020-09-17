@@ -195,7 +195,7 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
         }
         start_import = False
         # Read and stock in dict data information:
-        # pdb.set_trace()
+        pdb.set_trace()
         for row in range(ws.nrows):
             line_id = ws.cell_value(row, self._column_position['id'])
             if not start_import and line_id == 'ID':
@@ -291,24 +291,22 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
             # -----------------------------------------------------------------
             # Populate data for next job:
             # -----------------------------------------------------------------
+            if (arrived_qty or internal_qty) and supplier not in purchase_data:
+                purchase_data[supplier] = []
+
             if arrived_qty:
                 log['info'].append(_('%s. Delivery for sale order') % row)
-
                 # Purchase / picking data:
-                if supplier not in purchase_data:
-                    purchase_data[supplier] = []
                 purchase_data[supplier].append(
                     (line, arrived_qty, supplier_price))
 
             if internal_qty:
+                log['info'].append(_('%s. Delivery for internal stock') % row)
                 # Purchase / picking data:
-                if supplier not in purchase_data:
-                    purchase_data[supplier] = []
                 purchase_data[supplier].append(
                     (line, internal_qty, supplier_price))
 
                 # Quants data:
-                log['info'].append(_('%s. Delivery for internal stock') % row)
                 internal_data.append(
                     (supplier, line, internal_qty, supplier_price)
                 )
@@ -320,7 +318,6 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
         # ---------------------------------------------------------------------
         #                 Assign management (Internal stock):
         # ---------------------------------------------------------------------
-        # pdb.set_trace()
         for supplier, line, internal_qty, supplier_price in internal_data:
             product = line.product_id
             data = {
@@ -445,7 +442,7 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
             _logger.info('Check purchase order closed:')
             for purchase in order_touched:
                 for po_line in purchase.order_line:
-                    if po_line.logistic_undelivered_qty:
+                    if po_line.logistic_undelivered_qty > 0:
                         break
                 else:  # If exit without break >> all delivered!
                     purchase.write({
