@@ -293,17 +293,21 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
             # -----------------------------------------------------------------
             if arrived_qty:
                 log['info'].append(_('%s. Delivery for sale order') % row)
+
+                # Purchase / picking data:
                 if supplier not in purchase_data:
                     purchase_data[supplier] = []
-                # Stock move:
-                internal_data.append(
-                    (supplier, line, arrived_qty, supplier_price)
-                )
-                # Stock quant:
                 purchase_data[supplier].append(
                     (line, arrived_qty, supplier_price))
 
             if internal_qty:
+                # Purchase / picking data:
+                if supplier not in purchase_data:
+                    purchase_data[supplier] = []
+                purchase_data[supplier].append(
+                    (line, internal_qty, supplier_price))
+
+                # Quants data:
                 log['info'].append(_('%s. Delivery for internal stock') % row)
                 internal_data.append(
                     (supplier, line, internal_qty, supplier_price)
