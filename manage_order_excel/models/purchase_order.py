@@ -82,7 +82,7 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
         # TODO supplier filter?
         for line in sorted(
                 lines, key=lambda x: x.order_id.name):
-            waiting_qty = line.logistic_undelivered_qty  # Remain
+            waiting_qty = line.logistic_undelivered_qty  # Remain from PO
             if waiting_qty <= 0:
                 continue
             row += 1
@@ -195,7 +195,7 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
         }
         start_import = False
         # Read and stock in dict data information:
-        pdb.set_trace()
+        # pdb.set_trace()
         for row in range(ws.nrows):
             line_id = ws.cell_value(row, self._column_position['id'])
             if not start_import and line_id == 'ID':
@@ -236,15 +236,16 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
             # Check data in line:
             # -----------------------------------------------------------------
             # Quantity check
+            if all_qty:  # Extract arrived qty:
+                arrived_qty = awaiting_qty  # Note: remain awaiting, not excel!
             if not arrived_qty and not all_qty:
                 log['info'].append(_('%s. No qty, line not imported') % row)
                 continue
-            if all_qty:  # Extract arrived qty:
-                arrived_qty = awaiting_qty  # Note: remain awaiting, not excel!
 
-            # Check waiting VS delivered to customer
+            # TODO not necessary check!
+            # Check sale waiting VS undelivered from PO (goes in stock)
             # logistic_undelivered_qty = line.logistic_undelivered_qty  # PO
-            # if abs(awaiting_qty - logistic_undelivered_qty) > gap:
+            # if abs(awaiting_qty - logistic_undelivered_qty) >= gap:
             #     log['error'].append(
             #         _('%s. Order quantity > than remain to deliver: %s') % (
             #             row, line_id))
@@ -282,9 +283,9 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
             elif not logistic_sale_id:
                 log['warning'].append(
                     _('%s. Extra qty for all, go to internal stock') % row)
-                internal_qty = arrived_qty  # All to internal stock
-            if log['error']:
-                # TODO manage what to do
+                internal_qty = arrived_qty  # All to internal stock, also extra
+                arrived_qty = 0  # Nothing linked to sale order
+            if log['error']:  # TODO manage what to do
                 pass
 
             # -----------------------------------------------------------------
@@ -294,6 +295,11 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
                 log['info'].append(_('%s. Delivery for sale order') % row)
                 if supplier not in purchase_data:
                     purchase_data[supplier] = []
+                # Stock move:
+                internal_data.append(
+                    (supplier, line, arrived_qty, supplier_price)
+                )
+                # Stock quant:
                 purchase_data[supplier].append(
                     (line, arrived_qty, supplier_price))
 
@@ -310,6 +316,7 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
         # ---------------------------------------------------------------------
         #                 Assign management (Internal stock):
         # ---------------------------------------------------------------------
+        # pdb.set_trace()
         for supplier, line, internal_qty, supplier_price in internal_data:
             product = line.product_id
             data = {
