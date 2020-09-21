@@ -62,18 +62,21 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             ])
 
         title = (
-            '',
+            'sale',
             _('Sale order pending'),
             )
 
         header = (
             'ID',
-            _('Orders'),
-            _('Code'), _('Name'),
+            _('Ordini'),
+            _('Codice'), _('Nome'),
             # _('Category'),
-            _('Default supplier'),
-            _('Q. need'), _('Disp. stock'), _('Q. Int.'),
-            _('Supp. Stock'), _('Q. Supp.'), _('Suppl. Ref.'), _('Buy price'),
+            _('Fornitore pred.'),
+            _('Q. necess.'), _('Disp. magazz.'), _('Q. da mag.'),
+
+            _('Disp. forn.'), _('Q. ord. forn.'), _('Rif. forn.'),
+            _('Prezzo acq.'),
+
             _('Status'),
         )
         column_width = (
@@ -124,6 +127,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
         # Header:
         row += 1
         report_pool.write_xls_line(ws_name, row, header, style_code='header')
+        report_pool.autofilter(ws_name, (row, 0, row, total_col))
 
         # Collect:
         # TODO manage order from wizard
@@ -188,7 +192,6 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                 product.name or '',
                 # category or '',
 
-                (order_qty, 'number'),
                 supplier_name,
 
                 # Internal:

@@ -39,7 +39,7 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
             ])
 
         title = (
-            '',
+            'purchase',
             '',
             _('Awaiting delivery'),
             )
