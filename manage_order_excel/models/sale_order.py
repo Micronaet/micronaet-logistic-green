@@ -20,12 +20,12 @@ class SaleOrderExcelManageWizard(models.TransientModel):
     # Static position for Excel file columns:
     _column_position = {
         'id': 0,
-        'supplier_id': 9,
-        'order_qty': 11,
-        'internal_qty': 13,
-        'supplier_qty': 15,
-        'supplier_code': 16,
-        'supplier_price': 17,
+        'supplier_id': 4,
+        'order_qty': 3,
+        'internal_qty': 8,
+        'supplier_qty': 10,
+        'supplier_code': 11,
+        'supplier_price': 12,
     }
 
     @api.model
@@ -69,10 +69,11 @@ class SaleOrderExcelManageWizard(models.TransientModel):
 
         header = (
             'ID',
-            _('Connector'), _('Order'), _('Date'), _('Status'),
+            # _('Connector'), _('Order'), _('Date'), _('Status'),
             _('Code'), _('Name'),
             # _('Category'),
-            _('Q. ord.'), _('Sale Price'),
+            _('Q. ord.'),
+            # _('Sale Price'),
             _('ID Supplier'), _('Default supplier'),
             _('Q. need'), _('Disp. stock'), _('Q. Int.'),
             _('Supp. Stock'), _('Q. Supp.'), _('Suppl. Ref.'), _('Buy price'),
@@ -81,10 +82,11 @@ class SaleOrderExcelManageWizard(models.TransientModel):
         )
         column_width = (
             1,
-            20, 8, 16, 10,
+            # 20, 8, 16, 10,
             12, 48,
             # 25,
-            7, 7,
+            7,
+            # 7,
             1, 25,
             10, 10, 10,
             10, 10, 8, 10,
@@ -134,7 +136,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
 
         # Collect:
         # TODO manage order from wizard
-        history_status = {}
+        collect_data = {}
         for line in sorted(
                 lines,
                 key=lambda x: (x.order_id.name or '')
@@ -146,9 +148,24 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                 _logger.warning(
                     'Excluded service from report: %s' % product.default_code)
                 continue
+            if product in collect_data:
+                collect_data[product][1] += line.product_uom_qty
+                collect_data[product][2] += line.logistic_uncovered_qty
+                collect_data[product][3].append(line.id)
+            else:
+                collect_data[product] = [
+                    product.qty_available,  # Stock availability
+                    line.product_uom_qty,  # order from file
+                    line.logistic_uncovered_qty,  # remain to assign / ord.
+                    [line.id],  # List of lines
+                    ]
+
+        for product in collect_data:
+            qty_available, order_qty, qty_needed, line_ids = \
+                collect_data[product]
+            # qty available is used once (remember: grouped by product)
 
             # Readability:
-            order = line.order_id
             supplier_id, supplier_name, supplier_code, supplier_price = \
                 self.get_suppinfo_supplier(product)
 
@@ -156,47 +173,30 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             # category = ', '.join(
             #     [item.name for item in product.wp_category_ids])
 
-            # Color setup:
-            supplier_color = 'number_total' if supplier_id else 'number'
-            order_qty = line.product_uom_qty
-
-            qty_needed = line.logistic_uncovered_qty  # remain to assign / ord.
             if qty_needed <= 0.0:
                 continue  # No uncovered qty remain
 
             row += 1
-            if product.id not in history_status:
-                history_status[product.id] = product.qty_available
-
-            qty_available = history_status[product.id]
             # TODO manage incremental for this report!
             if qty_available >= qty_needed:
                 qty_covered = qty_needed
-                history_status[product.id] -= qty_covered
                 formula_value = 'OK'
             else:
                 if qty_available > 0:
                     qty_covered = qty_available
-                    history_status[product.id] -= qty_available
+                    collect_data[product.id] -= qty_available
                 else:
                     qty_covered = 0.0
                 formula_value = 'INCOMPLETO'
 
             report_pool.write_xls_line(ws_name, row, (
-                line.id,
-
-                order.connector_id.name or '',
-                order.name or '',
-                order.date_order or '',
-                order.wp_status or '',
+                '|'.join([str(item) for item in line_ids]),
 
                 product.default_code or '',
                 product.name or '',
                 # category or '',
 
                 (order_qty, 'number'),
-                (line.price_unit, 'number'),
-
                 supplier_id,
                 supplier_name,
 
@@ -207,7 +207,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
 
                 # Supplier:
                 (0 if supplier_id else '/', 'number'),
-                (0 if supplier_id else '', supplier_color),
+                (0 if supplier_id else '', 'number_total'),
                 (supplier_code, 'text_total'),
                 (supplier_price, 'number_total'),
             ), style_code='text')
