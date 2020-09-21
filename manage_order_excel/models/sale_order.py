@@ -20,11 +20,10 @@ class SaleOrderExcelManageWizard(models.TransientModel):
     # Static position for Excel file columns:
     _column_position = {
         'id': 0,
-        'order_qty': 4,
-        'internal_qty': 8,
-        'supplier_qty': 10,
-        'supplier_code': 11,
-        'supplier_price': 12,
+        'internal_qty': 7,
+        'supplier_qty': 9,
+        'supplier_code': 10,
+        'supplier_price': 11,
     }
 
     @api.model
@@ -71,7 +70,6 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             _('Orders'),
             _('Code'), _('Name'),
             # _('Category'),
-            _('Q. ord.'),
             _('Default supplier'),
             _('Q. need'), _('Disp. stock'), _('Q. Int.'),
             _('Supp. Stock'), _('Q. Supp.'), _('Suppl. Ref.'), _('Buy price'),
@@ -81,7 +79,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             1, 20,
             12, 48,
             # 25,
-            1, 25,
+            25,
             10, 10, 10,
             10, 10, 8, 10,
             10,
@@ -212,7 +210,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                           report_pool.row_col_to_cell(
                               row, self._column_position['supplier_qty']),
                           report_pool.row_col_to_cell(
-                              row, self._column_position['order_qty']),
+                              row, self._column_position['needed_qty']),
                       )
 
             # TODO Aggiungere colonna per cerca vert:
@@ -288,8 +286,6 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                 continue
 
             # Extract needed data:
-            order_qty = ws.cell_value(
-                row, self._column_position['order_qty']) or 0.0
             internal_qty = ws.cell_value(
                 row, self._column_position['internal_qty']) or 0.0
             supplier_qty = ws.cell_value(
@@ -323,12 +319,6 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             if not internal_qty and not supplier_qty:
                 log['info'].append(_('%s. No qty, line not imported') % row)
                 continue
-
-            # TODO Import also incompleted line?!?
-            # if abs(order_qty - supplier_qty - internal_qty) > gap:
-            #    log['error'].append(
-            #        _('%s. Quantity used different from ordered') % row)
-            #    continue
 
             # C. Check supplier code and price
             supplier = False
