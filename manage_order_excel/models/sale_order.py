@@ -145,7 +145,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                 collect_data[product][3].append(line)
             else:
                 collect_data[product] = [
-                    product.qty_available or 0.0,  # Stock availability
+                    product.qty_available,  # Stock availability
                     line.product_uom_qty,  # order from file
                     line.logistic_uncovered_qty,  # remain to assign / ord.
                     [line],  # List of lines
@@ -189,7 +189,6 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                 # category or '',
 
                 (order_qty, 'number'),
-                supplier_id,
                 supplier_name,
 
                 # Internal:
