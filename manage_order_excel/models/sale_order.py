@@ -20,12 +20,12 @@ class SaleOrderExcelManageWizard(models.TransientModel):
     # Static position for Excel file columns:
     _column_position = {
         'id': 0,
-        'supplier_id': 4,
-        'order_qty': 3,
-        'internal_qty': 8,
-        'supplier_qty': 10,
-        'supplier_code': 11,
-        'supplier_price': 12,
+        'supplier_id': 5,
+        'order_qty': 4,
+        'internal_qty': 9,
+        'supplier_qty': 11,
+        'supplier_code': 12,
+        'supplier_price': 13,
     }
 
     @api.model
@@ -69,6 +69,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
 
         header = (
             'ID',
+            _('Orders'),
             _('Code'), _('Name'),
             # _('Category'),
             _('Q. ord.'),
@@ -78,7 +79,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             _('Status'),
         )
         column_width = (
-            1,
+            1, 20,
             12, 48,
             # 25,
             7,
@@ -154,7 +155,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                     [line],  # List of lines
                     ]
 
-        for product in sorted(collect_data, key=lambda p, p.name):
+        for product in sorted(collect_data, key=lambda p: p.name):
             qty_available, order_qty, qty_needed, lines = \
                 collect_data[product]
             # qty available is used once (remember: grouped by product)
@@ -185,6 +186,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
 
             report_pool.write_xls_line(ws_name, row, (
                 '|'.join([str(item.id) for item in lines]),
+                ', '.join([item.order_id.name for item in lines]),
 
                 product.default_code or '',
                 product.name or '',
