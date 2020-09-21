@@ -80,37 +80,40 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
 
         # Collect:
         # TODO supplier filter?
-        for line in sorted(
-                lines, key=lambda x: x.order_id.name):
+        collect_data = {}
+        for line in lines:
             waiting_qty = line.logistic_undelivered_qty  # Remain from PO
             if waiting_qty <= 0:
                 continue
-            row += 1
-
-            if line.logistic_sale_id:
-                color = 'number_ok'
-            else:
-                color = 'number_error'
-
             # Readability:
             product = line.product_id
             order = line.order_id
             supplier = order.partner_id
+            key = (supplier, product)
+            if key not in collect_data:
+                collect_data[key] = [
+                    0.0,
+                    []
+                ]
+            collect_data[key][0] += waiting_qty
+            collect_data[key][1].append(line)
+
+        for key in collect_data:
+            waiting_qty, lines = collect_data[key]
+            supplier, product = key
+            row += 1
 
             report_pool.write_xls_line(ws_name, row, (
-                line.id,
-                supplier.id,
+                '|'.join([str(line.id) for line in lines]),
+                ', '.join([str(line.order_id.name) for line in lines]),
 
-                order.name or '',
                 supplier.name,
-                (order.date_order or '')[:10],
 
                 product.default_code or '',
                 product.name or '',
-                (line.price_unit, 'number'),
                 # TODO confirm price?
 
-                (waiting_qty, color),
+                (waiting_qty, 'number_ok'),
                 (0, 'number_total'),
                 ('', 'text_total'),
             ), style_code='text')
