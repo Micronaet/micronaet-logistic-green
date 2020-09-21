@@ -69,28 +69,22 @@ class SaleOrderExcelManageWizard(models.TransientModel):
 
         header = (
             'ID',
-            # _('Connector'), _('Order'), _('Date'), _('Status'),
             _('Code'), _('Name'),
             # _('Category'),
             _('Q. ord.'),
-            # _('Sale Price'),
             _('ID Supplier'), _('Default supplier'),
             _('Q. need'), _('Disp. stock'), _('Q. Int.'),
             _('Supp. Stock'), _('Q. Supp.'), _('Suppl. Ref.'), _('Buy price'),
-            # _('Purchase supplier'),
             _('Status'),
         )
         column_width = (
             1,
-            # 20, 8, 16, 10,
             12, 48,
             # 25,
             7,
-            # 7,
             1, 25,
             10, 10, 10,
             10, 10, 8, 10,
-            # 40,
             10,
         )
         total_col = len(column_width)
@@ -151,17 +145,17 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             if product in collect_data:
                 collect_data[product][1] += line.product_uom_qty
                 collect_data[product][2] += line.logistic_uncovered_qty
-                collect_data[product][3].append(line.id)
+                collect_data[product][3].append(line)
             else:
                 collect_data[product] = [
                     product.qty_available,  # Stock availability
                     line.product_uom_qty,  # order from file
                     line.logistic_uncovered_qty,  # remain to assign / ord.
-                    [line.id],  # List of lines
+                    [line],  # List of lines
                     ]
 
         for product in collect_data:
-            qty_available, order_qty, qty_needed, line_ids = \
+            qty_available, order_qty, qty_needed, lines = \
                 collect_data[product]
             # qty available is used once (remember: grouped by product)
 
@@ -190,7 +184,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                 formula_value = 'INCOMPLETO'
 
             report_pool.write_xls_line(ws_name, row, (
-                '|'.join([str(item) for item in line_ids]),
+                '|'.join([str(item.id) for item in lines]),
 
                 product.default_code or '',
                 product.name or '',
