@@ -20,6 +20,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
     # Static position for Excel file columns:
     _column_position = {
         'id': 0,
+        'needed_qty': 5,
         'internal_qty': 7,
         'supplier_qty': 9,
         'supplier_code': 10,
@@ -144,7 +145,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                 collect_data[product][3].append(line)
             else:
                 collect_data[product] = [
-                    product.qty_available,  # Stock availability
+                    product.qty_available or 0.0,  # Stock availability
                     line.product_uom_qty,  # order from file
                     line.logistic_uncovered_qty,  # remain to assign / ord.
                     [line],  # List of lines
