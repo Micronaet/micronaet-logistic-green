@@ -127,7 +127,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
         # Header:
         row += 1
         report_pool.write_xls_line(ws_name, row, header, style_code='header')
-        report_pool.autofilter(ws_name, (row, 0, row, total_col))
+        report_pool.autofilter(ws_name, (row, 0, row, total_col-1))
 
         # Collect:
         # TODO manage order from wizard
