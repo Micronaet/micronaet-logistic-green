@@ -154,7 +154,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                     [line],  # List of lines
                     ]
 
-        for product in collect_data:
+        for product in sorted(collect_data, key=lambda p, p.name):
             qty_available, order_qty, qty_needed, lines = \
                 collect_data[product]
             # qty available is used once (remember: grouped by product)
