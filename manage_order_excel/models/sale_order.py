@@ -20,12 +20,11 @@ class SaleOrderExcelManageWizard(models.TransientModel):
     # Static position for Excel file columns:
     _column_position = {
         'id': 0,
-        'supplier_id': 5,
         'order_qty': 4,
-        'internal_qty': 9,
-        'supplier_qty': 11,
-        'supplier_code': 12,
-        'supplier_price': 13,
+        'internal_qty': 8,
+        'supplier_qty': 10,
+        'supplier_code': 11,
+        'supplier_price': 12,
     }
 
     @api.model
@@ -73,7 +72,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             _('Code'), _('Name'),
             # _('Category'),
             _('Q. ord.'),
-            _('ID Supplier'), _('Default supplier'),
+            _('Default supplier'),
             _('Q. need'), _('Disp. stock'), _('Q. Int.'),
             _('Supp. Stock'), _('Q. Supp.'), _('Suppl. Ref.'), _('Buy price'),
             _('Status'),
@@ -82,7 +81,6 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             1, 20,
             12, 48,
             # 25,
-            7,
             1, 25,
             10, 10, 10,
             10, 10, 8, 10,
@@ -120,7 +118,6 @@ class SaleOrderExcelManageWizard(models.TransientModel):
         # Title:
         report_pool.column_hidden(ws_name, [
             self._column_position['id'],
-            self._column_position['supplier_id'],
         ])  # Hide ID columns
         row = 0
         report_pool.write_xls_line(ws_name, row, title, style_code='title')
