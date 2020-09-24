@@ -359,6 +359,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
 
             for line in lines:
                 remain_to_cover_qty = line.logistic_remain_qty
+                product = line.product_id
 
                 # 1. Assign management (Internal stock):
                 if remain_to_cover_qty <= internal_qty:
@@ -379,7 +380,8 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                         if remain_to_cover_qty <= supplier_qty:  # Cover all
                             purchase_data.append((
                                 supplier,
-                                line,
+                                line.id,
+                                product,
                                 remain_to_cover_qty,
                                 supplier_price,
                             ))
@@ -387,7 +389,8 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                         else:  # Partially covered
                             purchase_data.append((
                                 supplier,
-                                line,
+                                line.id,
+                                product,
                                 supplier_qty,
                                 supplier_price,
                             ))
@@ -404,6 +407,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                 purchase_data.append((
                     supplier,
                     False,
+                    product,
                     supplier_qty,
                     supplier_price,
                 ))
@@ -440,7 +444,8 @@ class SaleOrderExcelManageWizard(models.TransientModel):
         #                      Purchase management:
         # ---------------------------------------------------------------------
         purchase_orders = {}  # Supplier: Purchase order ID
-        for supplier, line, supplier_qty, supplier_price in purchase_data:
+        for supplier, line_id, product, supplier_qty, supplier_price \
+                in purchase_data:
             supplier_id = supplier.id
 
             # -----------------------------------------------------------------
@@ -458,7 +463,6 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             # Check over request:
             # -----------------------------------------------------------------
             # Create purchase order line from sale:
-            product = line.product_id
             po_line_pool.create({
                 'order_id': order_id,
                 'product_id': product.id,
@@ -469,7 +473,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                 'date_planned': now,
 
                 # Link to sale:
-                'logistic_sale_id': line.id if line else False,
+                'logistic_sale_id': line_id,
             })
 
         # ---------------------------------------------------------------------
