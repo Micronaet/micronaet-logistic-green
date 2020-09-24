@@ -21,10 +21,9 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
     _column_position = {
         'id': 0,  # PO line ID
         'supplier_id': 1,
-        # 'awaiting_qty': 8,
-        'arrived_qty': 9,
-        'all_qty': 10,
-        'supplier_price': 7,
+        'supplier_price': 8,
+        'arrived_qty': 10,
+        'all_qty': 11,
     }
     # TODO save last price in product supp. info?
 
@@ -40,13 +39,12 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
 
         title = (
             'purchase',
-            '',
             _('Awaiting delivery'),
             )
 
         header = (
-            'ID', _('ID Supplier'),
-            _('Purchase Order'), _('Supplier'), _('Date'),
+            'ID', 'ID supplier',
+            _('Purchase order'), _('Supplier order'), _('Supplier'), _('Date'),
 
             _('Code'), _('Name'), _('Buy Price'),
 
@@ -55,7 +53,7 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
         )
         column_width = (
             1, 1,
-            15, 30, 10,
+            20, 15, 30, 10,
 
             12, 48, 10,
 
@@ -76,7 +74,7 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
         # Header:
         row += 1
         report_pool.write_xls_line(ws_name, row, header, style_code='header')
-        report_pool.autofilter(ws_name, [row, 2, row, 5])
+        report_pool.autofilter(ws_name, [row, 2, row, 4])
 
         # Collect:
         # TODO supplier filter?
@@ -105,7 +103,7 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
 
             report_pool.write_xls_line(ws_name, row, (
                 '|'.join([str(line.id) for line in lines]),
-                ', '.join([str(line.order_id.name) for line in lines]),
+                ', '.join(set([str(line.order_id.name) for line in lines])),
 
                 supplier.name,
 
