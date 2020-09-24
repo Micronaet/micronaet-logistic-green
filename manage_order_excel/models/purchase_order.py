@@ -205,7 +205,6 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
         }
         start_import = False
         # Read and stock in dict data information:
-        pdb.set_trace()
         for row in range(ws.nrows):
             line_ref = ws.cell_value(row, self._column_position['id'])
             if not start_import and line_ref == 'ID':
@@ -308,7 +307,7 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
                 picking_data[supplier].append(
                     (line, used_qty, supplier_price))
 
-                if not logistic_sale_id:  # Quants data (goes alse in internal)
+                if not logistic_sale_id:  # Quants data (goes also in internal)
                     internal_data.append(
                         (supplier, line, used_qty, supplier_price)
                     )
@@ -330,102 +329,102 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
                     (supplier, line, arrived_qty, supplier_price)
                 )
 
-            # =================================================================
-            #                     Stock operations:
-            # =================================================================
-            # A. Internal stock:
-            # ------------------
-            for supplier, line, internal_qty, supplier_price in internal_data:
-                product = line.product_id
-                data = {
-                    'company_id': company.id,
-                    'in_date': now,
-                    'location_id': location_id,
-                    'product_id': product.id,
-                    'quantity': internal_qty,
+        # =====================================================================
+        #                     Final Stock operations:
+        # =====================================================================
+        # A. Internal stock:
+        # ------------------
+        for supplier, line, internal_qty, supplier_price in internal_data:
+            product = line.product_id
+            data = {
+                'company_id': company.id,
+                'in_date': now,
+                'location_id': location_id,
+                'product_id': product.id,
+                'quantity': internal_qty,
 
-                    # Link:
-                    'logistic_purchase_id': line.id,
-                    # 'logistic_assigned_id': line.id,  # Link field
-                    # 'product_tmpl_id': used_product.product_tmpl_id.id,
-                    # 'lot_id'
-                    # 'package_id'
-                }
-                try:
-                    quant_pool.create(data)
-                except:
-                    raise exceptions.Warning('Cannot create quants!')
+                # Link:
+                'logistic_purchase_id': line.id,
+                # 'logistic_assigned_id': line.id,  # Link field
+                # 'product_tmpl_id': used_product.product_tmpl_id.id,
+                # 'lot_id'
+                # 'package_id'
+            }
+            try:
+                quant_pool.create(data)
+            except:
+                raise exceptions.Warning('Cannot create quants!')
 
-            # ----------------------
-            # B. Load purchased line
-            # ----------------------
-            sale_lines = []  # To check status
-            for supplier in picking_data:
+        # ----------------------
+        # B. Load purchased line
+        # ----------------------
+        sale_lines = []  # To check status
+        for supplier in picking_data:
+            # Readability data:
+            now = '{}'.format(fields.Datetime.now())[:10]
+            origin = 'Del. {}'.format(now)
+
+            # -----------------------------------------------------------------
+            # Create new picking:
+            # -----------------------------------------------------------------
+            picking = picking_pool.create({
+                'partner_id': supplier.id,
+                'scheduled_date': now,
+                'origin': origin,
+                # 'move_type': 'direct',
+                'picking_type_id': logistic_pick_in_type_id,
+                'group_id': False,
+                'location_id': location_id,
+                'location_dest_id': location_to,
+                # 'priority': 1,
+                'state': 'done',  # immediately!
+            })
+
+            # -----------------------------------------------------------------
+            # Append stock.move detail
+            # -----------------------------------------------------------------
+            for record in picking_data[supplier]:
                 # Readability data:
-                now = '{}'.format(fields.Datetime.now())[:10]
-                origin = 'Del. {}'.format(now)
+                line, arrived_qty, supplier_price = record
+                product = line.product_id
+                sale_line_id = line.logistic_sale_id.id
+                origin = line.order_id.name
+                if sale_line_id:  # Update status at the end
+                    sale_lines.append(line.logistic_sale_id)
 
                 # -------------------------------------------------------------
-                # Create new picking:
+                # Create movement (not load stock):
                 # -------------------------------------------------------------
-                picking = picking_pool.create({
+                move_pool.create({
+                    'company_id': company.id,
                     'partner_id': supplier.id,
-                    'scheduled_date': now,
-                    'origin': origin,
-                    # 'move_type': 'direct',
-                    'picking_type_id': logistic_pick_in_type_id,
-                    'group_id': False,
+                    'picking_id': picking.id,
+                    'product_id': product.id,
+                    'name': product.name or ' ',
+                    'date': now,
+                    'date_expected': now,
                     'location_id': location_id,
                     'location_dest_id': location_to,
-                    # 'priority': 1,
-                    'state': 'done',  # immediately!
+                    'product_uom_qty': arrived_qty,
+                    'product_uom': product.uom_id.id,
+                    'state': 'done',
+                    'origin': origin,
+
+                    # Sale order line link:
+                    'logistic_load_id': sale_line_id,
+
+                    # Purchase order line line:
+                    'logistic_purchase_id': line.id,
+
+                    # 'purchase_line_id': load_line.id, # XXX needed?
+                    # 'logistic_quant_id': quant.id, # XXX no quants here
+
+                    # group_id
+                    # reference'
+                    # sale_line_id
+                    # procure_method,
+                    # 'product_qty': select_qty,
                 })
-
-                # -------------------------------------------------------------
-                # Append stock.move detail
-                # -------------------------------------------------------------
-                for record in picking_data[supplier]:
-                    # Readability data:
-                    line, arrived_qty, supplier_price = record
-                    product = line.product_id
-                    sale_line_id = line.logistic_sale_id.id
-                    origin = line.order_id.name
-                    if sale_line_id:  # Update status at the end
-                        sale_lines.append(line.logistic_sale_id)
-
-                    # ---------------------------------------------------------
-                    # Create movement (not load stock):
-                    # ---------------------------------------------------------
-                    move_pool.create({
-                        'company_id': company.id,
-                        'partner_id': supplier.id,
-                        'picking_id': picking.id,
-                        'product_id': product.id,
-                        'name': product.name or ' ',
-                        'date': now,
-                        'date_expected': now,
-                        'location_id': location_id,
-                        'location_dest_id': location_to,
-                        'product_uom_qty': arrived_qty,
-                        'product_uom': product.uom_id.id,
-                        'state': 'done',
-                        'origin': origin,
-
-                        # Sale order line link:
-                        'logistic_load_id': sale_line_id,
-
-                        # Purchase order line line:
-                        'logistic_purchase_id': line.id,
-
-                        # 'purchase_line_id': load_line.id, # XXX needed?
-                        # 'logistic_quant_id': quant.id, # XXX no quants here
-
-                        # group_id
-                        # reference'
-                        # sale_line_id
-                        # procure_method,
-                        # 'product_qty': select_qty,
-                    })
 
             # -----------------------------------------------------------------
             # Update logistic status: Sale order
