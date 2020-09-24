@@ -278,7 +278,6 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             'info': [],
         }
         start_import = False
-        pdb.set_trace()
         for row in range(ws.nrows):
             line_ref = ws.cell_value(row, self._column_position['id'])
             if not start_import and line_ref == 'ID':
@@ -334,24 +333,24 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                         _('%s. No supplier code but qty present') % row)
                     continue
 
-            if not supplier_price:
-                log['warning'].append(
-                    _('%s. No supplier price but qty present') % row)
-                # continue  # TODO convert in error?
+                if not supplier_price:
+                    log['warning'].append(
+                        _('%s. No supplier price but qty present') % row)
+                    # continue  # TODO convert in error?
 
-            suppliers = partner_pool.search([('ref', '=', supplier_code)])
-            if not suppliers:
-                log['error'].append(
-                    _('%s. No supplier found with code: %s') % (
-                        row, supplier_code))
-                continue
+                suppliers = partner_pool.search([('ref', '=', supplier_code)])
+                if not suppliers:
+                    log['error'].append(
+                        _('%s. No supplier found with code: %s') % (
+                            row, supplier_code))
+                    continue
 
-            if len(suppliers) > 1:
-                log['error'].append(
-                    _('%s. More supplier with code: %s [# %s]') % (
-                        row, supplier_code, len(suppliers)))
-                continue
-            supplier = suppliers[0]
+                if len(suppliers) > 1:
+                    log['error'].append(
+                        _('%s. More supplier with code: %s [# %s]') % (
+                            row, supplier_code, len(suppliers)))
+                    continue
+                supplier = suppliers[0]
 
             if log['error']:
                 # TODO manage what to do
@@ -415,6 +414,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
         # ---------------------------------------------------------------------
         #                 Assign management (Internal stock):
         # ---------------------------------------------------------------------
+        pdb.set_trace()
         # TODO check remain quantity before create order or assigned qty
         for line, internal_qty in internal_data:
             product = line.product_id
