@@ -39,12 +39,13 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
 
         title = (
             'purchase',
+            '',
             _('Awaiting delivery'),
             )
 
         header = (
             'ID', 'ID supplier',
-            _('Purchase order'), _('Supplier order'), _('Supplier'), _('Date'),
+            _('Purchase order'), _('Supplier'), _('Date'),
 
             _('Code'), _('Name'), _('Buy Price'),
 
@@ -53,7 +54,7 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
         )
         column_width = (
             1, 1,
-            20, 15, 30, 10,
+            20, 15, 30,
 
             12, 48, 10,
 
@@ -99,16 +100,20 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
         for key in collect_data:
             waiting_qty, lines = collect_data[key]
             supplier, product = key
+            first_line = lines[0]
             row += 1
 
             report_pool.write_xls_line(ws_name, row, (
                 '|'.join([str(line.id) for line in lines]),
-                ', '.join(set([str(line.order_id.name) for line in lines])),
+                supplier.id,
 
+                first_line.order_id.name,
                 supplier.name,
+                first_line.order_id.date_order,
 
                 product.default_code or '',
                 product.name or '',
+                (first_line.price_unit or '', 'number'),
                 # TODO confirm price?
 
                 (waiting_qty, 'number_ok'),
@@ -120,6 +125,7 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
                       'IF({0}<{1}, "ECCEDENTE", "INCOMPLETO")'.format(
                           report_pool.row_col_to_cell(row, 8),
                           report_pool.row_col_to_cell(row, 9),
+                          # All: 11
                       )
             report_pool.write_formula(
                 ws_name, row, total_col - 1, formula,
