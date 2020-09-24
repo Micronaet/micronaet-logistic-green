@@ -278,9 +278,10 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             'info': [],
         }
         start_import = False
+        pdb.set_trace()
         for row in range(ws.nrows):
             line_ref = ws.cell_value(row, self._column_position['id'])
-            if not start_import and line_id == 'ID':
+            if not start_import and line_ref == 'ID':
                 start_import = True
                 _logger.info('%s. Header line' % row)
                 continue
@@ -310,9 +311,9 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                 log['error'].append(_('%s. No ID for this line') % row)
                 continue
 
-            lines = line_pool.search([
-                ('id', 'in', line_ids)],
-                order='create_date',
+            lines = sorted(
+                line_pool.browse(line_ids),
+                key=lambda l: l.order_id.date_order,
             )
             if not lines:
                 log['error'].append(
@@ -366,8 +367,8 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                     remain_to_cover_qty = 0
                 elif internal_qty:  # There's internal but not for all
                     internal_data.append((line, internal_qty))
-                    internal_qty = 0  # Used all
                     remain_to_cover_qty -= internal_qty  # correct remain qty
+                    internal_qty = 0  # Used all
 
                 if remain_to_cover_qty > 0:  # more remain qty to cover
                     # 2. Purchase management:
