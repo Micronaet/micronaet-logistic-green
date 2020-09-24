@@ -179,7 +179,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             else:
                 if qty_available > 0:
                     qty_covered = qty_available
-                    collect_data[product.id] -= qty_available
+                    collect_data[product][0] -= qty_available
                 else:
                     qty_covered = 0.0
                 formula_value = 'INCOMPLETO'
