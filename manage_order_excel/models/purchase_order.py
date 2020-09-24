@@ -243,31 +243,18 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
             for line in lines:
                 # Not read reload from DB remain to delivery (waiting):
                 logistic_sale_id = line.logistic_sale_id  # Linked sale order!
-                if logistic_sale_id:  # Use remain
-                    awaiting_qty = logistic_sale_id.logistic_remain_qty
-                else:  # Goes in internal
-                    awaiting_qty = arrived_qty
+                undelivered_qty = line.logistic_undelivered_qty
 
                 # -------------------------------------------------------------
                 # Check data in line:
                 # -------------------------------------------------------------
                 # Quantity check
                 if all_qty:  # All remain waited (not excel value)
-                    arrived_qty = awaiting_qty
+                    arrived_qty = undelivered_qty
                 if not arrived_qty:
                     log['info'].append(
                         _('%s. No qty, line not imported') % row)
                     continue
-
-                # TODO not necessary check!
-                # Check sale waiting VS undelivered from PO (goes in stock)
-                # logistic_undelivered_qty = line.logistic_undelivered_qty
-                # # PO
-                # if abs(awaiting_qty - logistic_undelivered_qty) >= gap:
-                #     log['error'].append(
-                #         _('%s. Order quantity > than remain to deliver: %s')
-                #         % (row, line_id))
-                #     continue
 
                 # -------------------------------------------------------------
                 # A. Check supplier data
@@ -293,9 +280,8 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
                 # Manage extra awaiting qty to stock:
                 # -------------------------------------------------------------
                 internal_qty = 0
-                if logistic_sale_id and arrived_qty > awaiting_qty:
-                    internal_qty = arrived_qty - awaiting_qty  # remain to load!
-                    arrived_qty = awaiting_qty
+                if logistic_sale_id and arrived_qty > 0:  # sale
+                    arrived_qty = undelivered_qty
                     log['warning'].append(
                         _('%s. Extra qty, go to internal stock') % row)
                 elif not logistic_sale_id:
