@@ -194,7 +194,7 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
         location_to = logistic_pick_in_type.default_location_dest_id.id
 
         # Store for manage after Excel loop:
-        purchase_data = {}  # arrived data from supplier (key was supplier)
+        picking_data = {}  # arrived data from supplier (key was supplier)
         internal_data = []  # extra data from supplier
         order_touched = []  # For end operation (dropship, default suppl.)
 
@@ -205,6 +205,7 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
         }
         start_import = False
         # Read and stock in dict data information:
+        pdb.set_trace()
         for row in range(ws.nrows):
             line_ref = ws.cell_value(row, self._column_position['id'])
             if not start_import and line_ref == 'ID':
@@ -289,21 +290,25 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
                     used_qty = undelivered_qty
                 else:
                     used_qty = arrived_qty
+                if used_qty < 0:
+                    continue
+
                 arrived_qty -= used_qty
 
                 # -------------------------------------------------------------
                 # Populate data for next job:
                 # -------------------------------------------------------------
-                if used_qty and supplier not in purchase_data:
-                    purchase_data[supplier] = []
+                if supplier not in picking_data:
+                    picking_data[supplier] = []
 
                 # Always create stock move:
                 log['info'].append(_('%s. Delivery for sale order') % row)
+
                 # Purchase / picking data:
-                purchase_data[supplier].append(
+                picking_data[supplier].append(
                     (line, used_qty, supplier_price))
 
-                if not logistic_sale_id:  # Quants data (goes in internal):
+                if not logistic_sale_id:  # Quants data (goes alse in internal)
                     internal_data.append(
                         (supplier, line, used_qty, supplier_price)
                     )
@@ -312,8 +317,15 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
                 if line.order_id not in order_touched:  # Purchase Order
                     order_touched.append(line.order_id)
 
+            # -----------------------------------------------------------------
             # Extra goes in internal stock:
+            # -----------------------------------------------------------------
             if arrived_qty > 0:
+                # line was last line of the list (extra will be attached here)
+                # NOTE: always present:
+                picking_data[supplier].append(
+                    (line, arrived_qty, supplier_price))
+
                 internal_data.append(
                     (supplier, line, arrived_qty, supplier_price)
                 )
@@ -348,7 +360,7 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
             # B. Load purchased line
             # ----------------------
             sale_lines = []  # To check status
-            for supplier in purchase_data:
+            for supplier in picking_data:
                 # Readability data:
                 now = '{}'.format(fields.Datetime.now())[:10]
                 origin = 'Del. {}'.format(now)
@@ -372,7 +384,7 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
                 # -------------------------------------------------------------
                 # Append stock.move detail
                 # -------------------------------------------------------------
-                for record in purchase_data[supplier]:
+                for record in picking_data[supplier]:
                     # Readability data:
                     line, arrived_qty, supplier_price = record
                     product = line.product_id
