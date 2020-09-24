@@ -222,7 +222,6 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
                 log['error'].append(_('%s. No ID for this line') % row)
                 continue
             lines = line_pool.browse(line_ids)
-            lines = sorted(lines, key=lambda l: l.create_date)
 
             if not lines:
                 log['error'].append(
@@ -235,93 +234,95 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
                 row, self._column_position['supplier_id'])
             supplier_price = ws.cell_value(
                 row, self._column_position['supplier_price']) or 0.0
-            arrived_qty = ws.cell_value(
-                row, self._column_position['arrived_qty']) or 0.0
             all_qty = ws.cell_value(
                 row, self._column_position['all_qty'])
 
+            if all_qty:
+                arrived_qty = sum([l.logistic_undelivered_qty for l in lines])
+            else:
+                arrived_qty = ws.cell_value(
+                    row, self._column_position['arrived_qty']) or 0.0
+
+            # -------------------------------------------------------------
+            # Check if arrived is present:
+            # -------------------------------------------------------------
+            if not arrived_qty:
+                log['info'].append(
+                    _('%s. No qty, line not imported') % row)
+                continue
+
+            # -------------------------------------------------------------
+            # A. Check supplier data
+            # -------------------------------------------------------------
+            if not supplier_id:
+                log['error'].append(_('%s. No ID for supplier') % row)
+                continue
+            supplier_id = int(supplier_id)
+            suppliers = partner_pool.search([('id', '=', supplier_id)])
+            if not suppliers:
+                log['error'].append(
+                    _('%s. No supplier found with ID: %s') % (
+                        row, supplier_id))
+                continue
+            supplier = suppliers[0]
+
+            if not supplier_price:
+                log['warning'].append(
+                    _('%s. No purchase price but qty present') % row)
+                # continue  # TODO convert in error?
+
+            lines = sorted(
+                lines,
+                # Before linked order create first after internal stock:
+                key=lambda l: (not l.logistic_sale_id, l.create_date),
+            )
             for line in lines:
+                if not arrived_qty:  # Nothing remain
+                    break
+
                 # Not read reload from DB remain to delivery (waiting):
                 logistic_sale_id = line.logistic_sale_id  # Linked sale order!
                 undelivered_qty = line.logistic_undelivered_qty
 
-                # -------------------------------------------------------------
-                # Check data in line:
-                # -------------------------------------------------------------
-                # Quantity check
-                if all_qty:  # All remain waited (not excel value)
-                    arrived_qty = undelivered_qty
-                if not arrived_qty:
-                    log['info'].append(
-                        _('%s. No qty, line not imported') % row)
-                    continue
+                # Extract used qty for this line:
+                if undelivered_qty <= arrived_qty:
+                    used_qty = undelivered_qty
+                else:
+                    used_qty = arrived_qty
+                arrived_qty -= used_qty
 
                 # -------------------------------------------------------------
-                # A. Check supplier data
-                # -------------------------------------------------------------
-                if not supplier_id:
-                    log['error'].append(_('%s. No ID for supplier') % row)
-                    continue
-                supplier_id = int(supplier_id)
-                suppliers = partner_pool.search([('id', '=', supplier_id)])
-                if not suppliers:
-                    log['error'].append(
-                        _('%s. No supplier found with ID: %s') % (
-                            row, supplier_id))
-                    continue
-                supplier = suppliers[0]
-
-                if not supplier_price:
-                    log['warning'].append(
-                        _('%s. No purchase price but qty present') % row)
-                    # continue  # TODO convert in error?
-
-                # -------------------------------------------------------------
-                # Manage extra awaiting qty to stock:
-                # -------------------------------------------------------------
-                internal_qty = 0
-                if logistic_sale_id and arrived_qty > 0:  # sale
-                    arrived_qty = undelivered_qty
-                    log['warning'].append(
-                        _('%s. Extra qty, go to internal stock') % row)
-                elif not logistic_sale_id:
-                    log['warning'].append(
-                        _('%s. Extra qty for all, go to internal stock') % row)
-                    internal_qty = arrived_qty  # All to internal stock, also extra
-                    arrived_qty = 0  # Nothing linked to sale order
-                if log['error']:  # TODO manage what to do
-                    pass
-
-                # -----------------------------------------------------------------
                 # Populate data for next job:
-                # -----------------------------------------------------------------
-                if (arrived_qty or internal_qty) and supplier not in purchase_data:
+                # -------------------------------------------------------------
+                if used_qty and supplier not in purchase_data:
                     purchase_data[supplier] = []
 
-                if arrived_qty:
-                    log['info'].append(_('%s. Delivery for sale order') % row)
-                    # Purchase / picking data:
-                    purchase_data[supplier].append(
-                        (line, arrived_qty, supplier_price))
+                # Always create stock move:
+                log['info'].append(_('%s. Delivery for sale order') % row)
+                # Purchase / picking data:
+                purchase_data[supplier].append(
+                    (line, used_qty, supplier_price))
 
-                if internal_qty:
-                    log['info'].append(_('%s. Delivery for internal stock') % row)
-                    # Purchase / picking data:
-                    purchase_data[supplier].append(
-                        (line, internal_qty, supplier_price))
-
-                    # Quants data:
+                if not logistic_sale_id:  # Quants data (goes in internal):
                     internal_data.append(
-                        (supplier, line, internal_qty, supplier_price)
+                        (supplier, line, used_qty, supplier_price)
                     )
 
                 # For final logistic state update
                 if line.order_id not in order_touched:  # Purchase Order
                     order_touched.append(line.order_id)
 
-            # ---------------------------------------------------------------------
-            #                 Assign management (Internal stock):
-            # ---------------------------------------------------------------------
+            # Extra goes in internal stock:
+            if arrived_qty > 0:
+                internal_data.append(
+                    (supplier, line, arrived_qty, supplier_price)
+                )
+
+            # =================================================================
+            #                     Stock operations:
+            # =================================================================
+            # A. Internal stock:
+            # ------------------
             for supplier, line, internal_qty, supplier_price in internal_data:
                 product = line.product_id
                 data = {
@@ -343,18 +344,18 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
                 except:
                     raise exceptions.Warning('Cannot create quants!')
 
-            # ---------------------------------------------------------------------
-            #                      Load purchased line
-            # ---------------------------------------------------------------------
+            # ----------------------
+            # B. Load purchased line
+            # ----------------------
             sale_lines = []  # To check status
             for supplier in purchase_data:
                 # Readability data:
                 now = '{}'.format(fields.Datetime.now())[:10]
                 origin = 'Del. {}'.format(now)
 
-                # -----------------------------------------------------------------
+                # -------------------------------------------------------------
                 # Create new picking:
-                # -----------------------------------------------------------------
+                # -------------------------------------------------------------
                 picking = picking_pool.create({
                     'partner_id': supplier.id,
                     'scheduled_date': now,
@@ -368,9 +369,9 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
                     'state': 'done',  # immediately!
                 })
 
-                # -----------------------------------------------------------------
+                # -------------------------------------------------------------
                 # Append stock.move detail
-                # -----------------------------------------------------------------
+                # -------------------------------------------------------------
                 for record in purchase_data[supplier]:
                     # Readability data:
                     line, arrived_qty, supplier_price = record
@@ -380,9 +381,9 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
                     if sale_line_id:  # Update status at the end
                         sale_lines.append(line.logistic_sale_id)
 
-                    # -------------------------------------------------------------
+                    # ---------------------------------------------------------
                     # Create movement (not load stock):
-                    # -------------------------------------------------------------
+                    # ---------------------------------------------------------
                     move_pool.create({
                         'company_id': company.id,
                         'partner_id': supplier.id,
