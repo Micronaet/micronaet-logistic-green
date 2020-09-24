@@ -279,7 +279,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
         }
         start_import = False
         for row in range(ws.nrows):
-            line_id = ws.cell_value(row, self._column_position['id'])
+            line_ref = ws.cell_value(row, self._column_position['id'])
             if not start_import and line_id == 'ID':
                 start_import = True
                 _logger.info('%s. Header line' % row)
@@ -305,18 +305,20 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             # Check data in line:
             # -----------------------------------------------------------------
             # A. Check ID line
-            line_id = int(line_id)
-            if not line_id:
+            line_ids = [int(line_id) for line_id in line_ref.split('|')]
+            if not line_ids:
                 log['error'].append(_('%s. No ID for this line') % row)
                 continue
 
-            lines = line_pool.search([('id', '=', line_id)])
+            lines = line_pool.search([
+                ('id', 'in', line_ids)],
+                order='create_date',
+            )
             if not lines:
                 log['error'].append(
                     _('%s. No lined found with ID: %s') % (
-                        row, line_id))
+                        row, line_ids))
                 continue
-            line = lines[0]
 
             # B. Check quantity:
             if not internal_qty and not supplier_qty:
@@ -331,43 +333,79 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                         _('%s. No supplier code but qty present') % row)
                     continue
 
-                if not supplier_price:
-                    log['warning'].append(
-                        _('%s. No supplier price but qty present') % row)
-                    # continue  # TODO convert in error?
+            if not supplier_price:
+                log['warning'].append(
+                    _('%s. No supplier price but qty present') % row)
+                # continue  # TODO convert in error?
 
-                suppliers = partner_pool.search([('ref', '=', supplier_code)])
-                if not suppliers:
-                    log['error'].append(
-                        _('%s. No supplier found with code: %s') % (
-                            row, supplier_code))
-                    continue
+            suppliers = partner_pool.search([('ref', '=', supplier_code)])
+            if not suppliers:
+                log['error'].append(
+                    _('%s. No supplier found with code: %s') % (
+                        row, supplier_code))
+                continue
 
-                if len(suppliers) > 1:
-                    log['error'].append(
-                        _('%s. More supplier with code: %s [# %s]') % (
-                            row, supplier_code, len(suppliers)))
-                    continue
-                supplier = suppliers[0]
+            if len(suppliers) > 1:
+                log['error'].append(
+                    _('%s. More supplier with code: %s [# %s]') % (
+                        row, supplier_code, len(suppliers)))
+                continue
+            supplier = suppliers[0]
 
             if log['error']:
                 # TODO manage what to do
                 pass
 
-            # 1. Assign management (Internal stock):
-            if internal_qty:
-                internal_data.append((line, internal_qty))
+            for line in lines:
+                remain_to_cover_qty = line.logistic_remain_qty
 
-            # 2. Purchase management:
-            if supplier:   # So supplier qty present!
-                log['info'].append(_('%s. Line add in purchase order') % row)
-                purchase_data.append(
-                    (supplier, line, supplier_qty, supplier_price))
+                # 1. Assign management (Internal stock):
+                if remain_to_cover_qty <= internal_qty:
+                    internal_data.append((line, remain_to_cover_qty))
+                    internal_qty -= remain_to_cover_qty  # Remain
+                    remain_to_cover_qty = 0
+                elif internal_qty:  # There's internal but not for all
+                    internal_data.append((line, internal_qty))
+                    internal_qty = 0  # Used all
+                    remain_to_cover_qty -= internal_qty  # correct remain qty
 
-            # For final logistic state update TODO (use ID?!?)
-            line_touched.append(line)  # Line
-            if line.order_id not in order_touched:  # Order
-                order_touched.append(line.order_id)
+                if remain_to_cover_qty > 0:  # more remain qty to cover
+                    # 2. Purchase management:
+                    if supplier:   # So supplier qty present!
+                        log['info'].append(
+                            _('%s. Line add in purchase order') % row)
+
+                        if remain_to_cover_qty <= supplier_qty:  # Cover all
+                            purchase_data.append((
+                                supplier,
+                                line,
+                                remain_to_cover_qty,
+                                supplier_price,
+                            ))
+                            supplier_qty -= remain_to_cover_qty  # Remain
+                        else:  # Partially covered
+                            purchase_data.append((
+                                supplier,
+                                line,
+                                supplier_qty,
+                                supplier_price,
+                            ))
+                            supplier_qty -= 0  # Used all
+
+                # For final logistic state update TODO (use ID?!?)
+                line_touched.append(line)  # Line
+                if line.order_id not in order_touched:  # Order
+                    order_touched.append(line.order_id)
+
+            # TODO check if remain something
+            # if internal_qty not checked (assigned more, dismiss!)
+            if supplier_qty:  # Check if something for internal stock
+                purchase_data.append((
+                    supplier,
+                    False,
+                    supplier_qty,
+                    supplier_price,
+                ))
 
         # ---------------------------------------------------------------------
         #                 Assign management (Internal stock):
@@ -418,35 +456,20 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             # -----------------------------------------------------------------
             # Check over request:
             # -----------------------------------------------------------------
-            reload_line = line_pool.browse(line.id)
-            logistic_remain_qty = reload_line.logistic_remain_qty
-            line_loop = []
-            if supplier_qty > logistic_remain_qty:
-                # Extra to stock:
-                line_loop.append(
-                    (supplier_qty - logistic_remain_qty, False)
-                )
-                supplier_qty = logistic_remain_qty
+            # Create purchase order line from sale:
+            product = line.product_id
+            po_line_pool.create({
+                'order_id': order_id,
+                'product_id': product.id,
+                'name': product.name,
+                'product_qty': supplier_qty,
+                'product_uom': product.uom_id.id,
+                'price_unit': supplier_price,
+                'date_planned': now,
 
-            # Remain or arrived:
-            line_loop.append(
-                (supplier_qty, line.id)
-            )
-            for qty, logistic_sale_id in line_loop:
-                # Create purchase order line from sale:
-                product = line.product_id
-                po_line_pool.create({
-                    'order_id': order_id,
-                    'product_id': product.id,
-                    'name': product.name,
-                    'product_qty': qty,
-                    'product_uom': product.uom_id.id,
-                    'price_unit': supplier_price,
-                    'date_planned': now,
-
-                    # Link to sale:
-                    'logistic_sale_id': logistic_sale_id,
-                })
+                # Link to sale:
+                'logistic_sale_id': line.id if line else False,
+            })
 
         # ---------------------------------------------------------------------
         #                     Update order logistic status:
