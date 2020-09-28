@@ -209,7 +209,7 @@
 
          <!--purchase.order-->
          <record model="ir.ui.view" id="view_purchase_order_logistic_workflow_tree">
-             <field name="name">purchase.order.form</field>
+             <field name="name">purchase.order.tree</field>
              <field name="model">purchase.order</field>
              <field name="inherit_id" ref="purchase.purchase_order_tree"/>
              <field name="arch" type="xml">
@@ -227,6 +227,9 @@
                  </field>
                  <field name="invoice_status" position="attributes">
                      <attribute name="invisible">1</attribute>
+                 </field>
+                 <field name="state" position="after">
+                     <button name="set_logistic_state_confirmed" string="Confirm" type="object" attrs="{'invisible': [('logistic_state','!=','draft')]}" class="oe_highlight"/>
                  </field>
              </field>
          </record>
