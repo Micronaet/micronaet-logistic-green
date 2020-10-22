@@ -205,6 +205,7 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
         }
         start_import = False
         # Read and stock in dict data information:
+        pdb.set_trace()
         for row in range(ws.nrows):
             line_ref = ws.cell_value(row, self._column_position['id'])
             if not start_import and line_ref == 'ID':
@@ -305,7 +306,7 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
 
                 # Purchase / picking data:
                 picking_data[supplier].append(
-                    (line, used_qty, supplier_price))
+                    (line, used_qty, supplier_price, False))
 
                 if not logistic_sale_id:  # Quants data (goes also in internal)
                     internal_data.append(
@@ -323,7 +324,7 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
                 # line was last line of the list (extra will be attached here)
                 # NOTE: always present:
                 picking_data[supplier].append(
-                    (line, arrived_qty, supplier_price))
+                    (line, arrived_qty, supplier_price, True))
 
                 internal_data.append(
                     (supplier, line, arrived_qty, supplier_price)
@@ -385,12 +386,16 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
             # -----------------------------------------------------------------
             for record in picking_data[supplier]:
                 # Readability data:
-                line, arrived_qty, supplier_price = record
+                line, arrived_qty, supplier_price, go_internal = record
                 product = line.product_id
-                sale_line_id = line.logistic_sale_id.id
+                if go_internal:
+                    sale_line_id = False
+                else:
+                    sale_line_id = line.logistic_sale_id.id
+                    if sale_line_id:  # Update status at the end
+                        sale_lines.append(line.logistic_sale_id)
+
                 origin = line.order_id.name
-                if sale_line_id:  # Update status at the end
-                    sale_lines.append(line.logistic_sale_id)
 
                 # -------------------------------------------------------------
                 # Create movement (not load stock):
