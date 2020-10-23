@@ -205,7 +205,6 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
         }
         start_import = False
         # Read and stock in dict data information:
-        pdb.set_trace()
         for row in range(ws.nrows):
             line_ref = ws.cell_value(row, self._column_position['id'])
             if not start_import and line_ref == 'ID':
