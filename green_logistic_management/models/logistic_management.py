@@ -1069,26 +1069,6 @@ class SaleOrderLine(models.Model):
             raise exceptions.Warning(
                 'Line is in %s state, nothing to undo!' % line.logistic_state)
 
-        # B. Check quants:
-        if line.assigned_line_ids:
-            for quant in line.assigned_line_ids:
-                comment += _(
-                        'Free stock qty: %s<br/>' % -quant.quantity)
-            line.assigned_line_ids.unlink()
-
-        # C. Check Purchase Order:
-        if line.purchase_line_ids:
-            for po_line in line.purchase_line_ids:
-                po_order = po_line.order_id
-                comment += _(
-                    'Remove PO line (call supplier if not delivered %s) '
-                    'Q. %s [Ref. %s]!<br/>' % (
-                        po_order.partner_id.name,
-                        line.product_uom_qty,
-                        po_order.name,
-                    ))
-            line.purchase_line_ids.unlink()
-
         # D. Check stock move:
         if line.load_line_ids:
             for move in line.load_line_ids:
@@ -1118,9 +1098,27 @@ class SaleOrderLine(models.Model):
                         raise exceptions.Warning('Cannot create quants!')
             line.load_line_ids.unlink()
 
-        # TODO check if is delivered (hide undo page?)
+        # C. Check Purchase Order:
+        if line.purchase_line_ids:
+            for po_line in line.purchase_line_ids:
+                po_order = po_line.order_id
+                comment += _(
+                    'Remove PO line (call supplier if not delivered %s) '
+                    'Q. %s [Ref. %s]!<br/>' % (
+                        po_order.partner_id.name,
+                        line.product_uom_qty,
+                        po_order.name,
+                    ))
+            line.purchase_line_ids.unlink()
 
-        # Save message:
+        # B. Check quants:
+        if line.assigned_line_ids:
+            for quant in line.assigned_line_ids:
+                comment += _(
+                        'Free stock qty: %s<br/>' % -quant.quantity)
+            line.assigned_line_ids.unlink()
+
+        # TODO check if is delivered (hide undo page?)
 
         # Log operation:
         line.order_id.write_log_chatter_message(comment)
