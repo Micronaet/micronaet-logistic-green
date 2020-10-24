@@ -1084,7 +1084,7 @@ class SaleOrderLine(models.Model):
             undo_comment += _('<br><b>Assigned to remove:</b><br/>')
             for quant in line.assigned_line_ids:
                 undo_comment += _(
-                        'Stock free this q.: %s!<br/>' % quant.quantity)
+                        'Stock free this q.: %s!<br/>' % -quant.quantity)
 
         # C. Check Purchase Order:
         if line.purchase_line_ids:
