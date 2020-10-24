@@ -1061,7 +1061,7 @@ class SaleOrderLine(models.Model):
         product = line.product_id
 
         # TODO manage service?
-        comment = _('Undo Line: [%s] %s x q. %s') % (
+        comment = _('Undo Line: [%s] %s x q. %s\n') % (
             line.product_id.default_code, line.name, line.product_uom_qty,
         )
         if product.type == 'service':
@@ -1082,7 +1082,7 @@ class SaleOrderLine(models.Model):
 
             for move in line.load_line_ids:
                 comment += _(
-                    _('Remove delivered q. %s (%s)<br/>') % (
+                    _('Remove delivered q. %s (%s)\n') % (
                         move.product_uom_qty,
                         _('loaded in stock') if undo_mode == 'stock' else
                         _('refund product to supplier!'),
@@ -1113,7 +1113,7 @@ class SaleOrderLine(models.Model):
                 po_order = po_line.order_id
                 comment += _(
                     _('Remove PO line (call supplier if not delivered %s) '
-                      'Q. %s [Ref. %s]!<br/>') % (
+                      'Q. %s [Ref. %s]!\n') % (
                           po_order.partner_id.name,
                           line.product_uom_qty,
                           po_order.name,
@@ -1124,7 +1124,7 @@ class SaleOrderLine(models.Model):
         if line.assigned_line_ids:
             for quant in line.assigned_line_ids:
                 comment += _(
-                        'Free stock qty: %s<br/>') % -quant.quantity
+                    'Free stock qty: %s\n') % -quant.quantity
             line.assigned_line_ids.unlink()
 
         # TODO check if is delivered (hide undo page?)
