@@ -335,6 +335,14 @@
              <field name="model">sale.order</field>
              <field name="inherit_id" ref="sale.view_order_form"/>
              <field name="arch" type="xml">
+                 <!-- UNDO -->
+                 <xpath expr="//field[@name='order_line']/tree/field[@name='product_id']" position="after">
+                     <button name="unlink_for_undo" string="" type="object" class="oe_link" icon="fa-chain-broken"
+                         groups="tyres_logistic_management.group_undo_operator" attrs="{'invisible': [('undo_returned','=',False)]}"
+                         confirm="Unlink operation will delete linked document line (ex. purchase line, pick in line)"/>
+                     <field name="undo_returned" invisible="1" />
+                 </xpath>
+
                  <xpath expr="//button[@name='action_confirm'][1]" position="attributes">
                      <attribute name="invisible">1</attribute>
                  </xpath>

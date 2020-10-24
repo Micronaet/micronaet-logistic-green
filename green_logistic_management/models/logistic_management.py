@@ -1031,6 +1031,29 @@ class SaleOrderLine(models.Model):
             # -------------------------------------------------------------
             # line.logistic_state = state
 
+    @api.multi
+    def unlink_for_undo(self):
+        """ Button for unlink document and restart from draft
+        """
+        model_pool = self.env['ir.model.data']
+        form_view_id = model_pool.get_object_reference(
+            'green_logistic_management', 'view_undo_detail_form')[1]
+
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Line for undo'),
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'sale.order.line',
+            'res_id': self.id,
+            'view_id': form_view_id,
+            'views': [(form_view_id, 'form')],
+            'domain': [],
+            'context': self.env.context,
+            'target': 'new',
+            'nodestroy': False,
+        }
+
     # -------------------------------------------------------------------------
     # Function field:
     # -------------------------------------------------------------------------
