@@ -1032,8 +1032,72 @@ class SaleOrderLine(models.Model):
             # line.logistic_state = state
 
     # -------------------------------------------------------------------------
+    # Function field:
+    # -------------------------------------------------------------------------
+    @api.multi
+    def _get_undo_comment(self, ):
+        """ Generate undo comment for user
+        """
+        line = self
+        line.ensure_one()
+        self.undo_mode = 'nothing'  # default
+        undo_comment = ''
+        product = line.product_id
+
+        # TODO manage service?
+        if product.type == 'service':
+            self.undo_comment = _(
+                'Product is a service, no need to undo nothing')
+            return
+
+        # A. Nothing to do:
+        if self.logistic_state in ('draft', 'cancel'):
+            self.undo_comment = _(
+                'Order in <b>%s</b> mode: Nothing to do' % self.logistic_state)
+            return
+
+        # B. Check quants:
+        for quant in line.assigned_line_ids:
+            undo_comment += _(
+                    '<br><b>Assigned to remove:</b><br/>'
+                    'Stock free this q.: %s!<br/>' % (
+                        quant.quantity,
+                    )
+                )
+
+        # C. Check Purchase Order:
+        for po_line in line.purchase_line_ids:
+            # TODO Manage dropship undo?
+            po_order = po_line.order_id
+            undo_comment += _(
+                    '<br><b>Purchase order to undo:</b><br/>'
+                    'Call supplier: %s to remove q. %s [Ref. %s]!<br/>' % (
+                        po_order.supplier_id.name,
+                        line.product_uom_qty,
+                        po_order.name,
+                    )
+                )
+
+        # D. Check stock move:
+        for move in line.load_line_ids:
+            self.undo_mode = 'stock'
+            undo_comment += _(
+                    '<br><b>Delivered q. to remove (goes in stock?):</b><br/>'
+                    'Call supplier to refund q. %s or load in stock!<br/>' % (
+                        move.product_uom_qty,
+                    )
+                )
+        # TODO check if is delivered (hide undo page?)
+        self.undo_comment = undo_comment
+
+    # -------------------------------------------------------------------------
     #                                   COLUMNS:
     # -------------------------------------------------------------------------
+    undo_comment = fields.Text(
+        'Undo comment', compute=_get_undo_comment, multi=True)
+    undo_mode = fields.Selection(
+        'Undo mode', compute=_get_undo_comment, multi=True)
+
     # RELATION MANY 2 ONE:
     # A. Assigned stock:
     assigned_line_ids = fields.One2many(
