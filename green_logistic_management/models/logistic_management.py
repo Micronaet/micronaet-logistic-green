@@ -415,6 +415,20 @@ class SaleOrder(models.Model):
 
     _inherit = 'sale.order'
 
+    @api.model
+    def write_log_chatter_message(self, message):
+        """ Write message for log operation in order chatter
+        """
+        user = self.env['res.users'].browse(self.env.uid)
+        body = _('%s [User: %s]') % (
+            message,
+            user.name,
+        )
+        self.message_post(
+            body=body,
+            # subtype='mt_comment', partner_ids=followers
+        )
+
     # BUTTON EVENTS:
     # Extra operation before WF
     @api.multi
@@ -1031,6 +1045,80 @@ class SaleOrderLine(models.Model):
             # -------------------------------------------------------------
             # line.logistic_state = state
 
+    # -------------------------------------------------------------------------
+    #                              UNDO Management:
+    # -------------------------------------------------------------------------
+    @api.multi
+    def line_unlink_for_undo(self):
+        """ Undo without stock load
+        """
+        undo_mode = self.env.context.get('undo_mode')
+        line = self
+        line.ensure_one()
+        product = line.product_id
+
+        # TODO manage service?
+        comment = ''
+        if product.type == 'service':
+            raise exceptions.Warning('Product is service, nothing to do!')
+
+        # A. Nothing to do:
+        if self.logistic_state in ('draft', 'cancel'):
+            raise exceptions.Warning(
+                'Line is in %s state, nothing to undo!' % self.logistic_state)
+
+        # B. Check quants:
+        if line.assigned_line_ids:
+            for quant in line.assigned_line_ids:
+                comment += _(
+                        'Stock free this q.: %s!<br/>' % -quant.quantity)
+            line.assigned_line_ids.unlink()
+
+        # C. Check Purchase Order:
+        if line.purchase_line_ids:
+            for po_line in line.purchase_line_ids:
+                po_order = po_line.order_id
+                comment += _(
+                    'Call supplier (if not delivered): '
+                    '%s to remove q. %s [Ref. %s]!<br/>' % (
+                        po_order.partner_id.name,
+                        line.product_uom_qty,
+                        po_order.name,
+                    ))
+            line.purchase_line_ids.unlink()
+
+        # D. Check stock move:
+        if line.load_line_ids:
+            for move in line.load_line_ids:
+                comment += _(
+                    'Call supplier to refund q. %s or load in stock!'
+                    '<br/>' % move.product_uom_qty
+                )
+                if undo_mode == 'stock':
+                    # TODO Generate stock.quants for purchase q.
+                    pass
+            line.load_line_ids.unlink()
+
+        # TODO check if is delivered (hide undo page?)
+
+        # Save message:
+
+        # Log operation:
+        line.order_id.write_log_chatter_message(comment)
+
+        return self.write({
+            'logistic_state': 'draft',
+            })
+
+    @api.multi
+    def line_unlink_for_stock_undo(self):
+        """ Undo with stock load
+        """
+        # Load in stock delivered qty:
+
+        # Normal unlink operation:
+        return self.line_unlink_for_undo()
+
     @api.multi
     def unlink_for_undo(self):
         """ Button for unlink document and restart from draft
@@ -1063,11 +1151,11 @@ class SaleOrderLine(models.Model):
         """
         line = self
         line.ensure_one()
-        self.undo_mode = 'nothing'  # default
         undo_comment = ''
         product = line.product_id
 
         # TODO manage service?
+        self.undo_mode = 'nothing'
         if product.type == 'service':
             self.undo_comment = _(
                 'Product is a service, no need to undo nothing')
@@ -1080,6 +1168,7 @@ class SaleOrderLine(models.Model):
             return
 
         # B. Check quants:
+        self.undo_mode = 'purchase'
         if line.assigned_line_ids:
             undo_comment += _('<br><b>Assigned to remove:</b><br/>')
             for quant in line.assigned_line_ids:
@@ -1103,11 +1192,11 @@ class SaleOrderLine(models.Model):
 
         # D. Check stock move:
         if line.load_line_ids:
+            self.undo_mode = 'stock'
             undo_comment += _(
                     '<br><b>Delivered q. to remove (goes in stock?):</b><br/>')
 
             for move in line.load_line_ids:
-                self.undo_mode = 'stock'
                 undo_comment += _(
                         'Call supplier to refund q. %s or load in stock!'
                         '<br/>' % move.product_uom_qty
@@ -1115,6 +1204,7 @@ class SaleOrderLine(models.Model):
 
         # TODO check if is delivered (hide undo page?)
         self.undo_comment = undo_comment
+    # -------------------------------------------------------------------------
 
     # -------------------------------------------------------------------------
     #                                   COLUMNS:
