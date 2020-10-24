@@ -1244,6 +1244,9 @@ class SaleOrderLine(models.Model):
             ('stock', 'Also stock to reload'),
         ],
         string='Undo mode', compute=_get_undo_comment, multi=True)
+    product_type = fields.Selection(
+        string='Type', related='product_id.type',
+    )
 
     # RELATION MANY 2 ONE:
     # A. Assigned stock:
