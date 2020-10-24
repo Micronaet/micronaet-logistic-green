@@ -1054,7 +1054,6 @@ class SaleOrderLine(models.Model):
         """ Undo without stock load
         """
         line = self
-        pdb.set_trace()
 
         quant_pool = self.env['stock.quant']
         undo_mode = self.env.context.get('undo_mode')
@@ -1062,14 +1061,16 @@ class SaleOrderLine(models.Model):
         product = line.product_id
 
         # TODO manage service?
-        comment = ''
+        comment = _('Undo Line: %s x q. %s') % (
+            line.name, line.product_uom_qty,
+        )
         if product.type == 'service':
-            raise exceptions.Warning('Product is service, nothing to do!')
+            raise exceptions.Warning(_('Product is service, nothing to do!'))
 
-        # A. Nothing to do:
+        # A. Nothing to do (was hidden the button but keep the same):
         if line.logistic_state in ('draft', 'cancel'):
             raise exceptions.Warning(
-                'Line is in %s state, nothing to undo!' % line.logistic_state)
+                _('Line is in %s state, nothing to undo!') % line.logistic_state)
 
         # D. Check stock move:
         if line.load_line_ids:
@@ -1080,11 +1081,10 @@ class SaleOrderLine(models.Model):
 
             for move in line.load_line_ids:
                 comment += _(
-                    'Remove delivered q. %s (%s)'
-                    '<br/>' % (
+                    _('Remove delivered q. %s (%s)<br/>') % (
                         move.product_uom_qty,
-                        'loaded in stock' if undo_mode == 'stock' else
-                        'refund product to supplier!',
+                        _('loaded in stock') if undo_mode == 'stock' else
+                        _('refund product to supplier!'),
                     ))
                 if undo_mode == 'stock':
                     # Generate stock.quants for purchase q.
@@ -1094,13 +1094,16 @@ class SaleOrderLine(models.Model):
                         'location_id': location_id,
                         'product_id': product.id,
                         'quantity': move.product_uom_qty,
-                        # Link:
-                        'logistic_purchase_id': line.id,  # TODO maybe deleted
-                    }
+                        # TODO show that is a load for undo?
+                        }
                     try:
                         quant_pool.create(data)
                     except:
-                        raise exceptions.Warning('Cannot create quants!')
+                        raise exceptions.Warning(_('Cannot create quants!'))
+            # Delete stock move:
+            line.load_line_ids.write({
+                'state': 'draft',
+            })
             line.load_line_ids.unlink()
 
         # C. Check Purchase Order:
@@ -1108,19 +1111,19 @@ class SaleOrderLine(models.Model):
             for po_line in line.purchase_line_ids:
                 po_order = po_line.order_id
                 comment += _(
-                    'Remove PO line (call supplier if not delivered %s) '
-                    'Q. %s [Ref. %s]!<br/>' % (
-                        po_order.partner_id.name,
-                        line.product_uom_qty,
-                        po_order.name,
-                    ))
+                    _('Remove PO line (call supplier if not delivered %s) '
+                      'Q. %s [Ref. %s]!<br/>') % (
+                          po_order.partner_id.name,
+                          line.product_uom_qty,
+                          po_order.name,
+                      ))
             line.purchase_line_ids.unlink()
 
         # B. Check quants:
         if line.assigned_line_ids:
             for quant in line.assigned_line_ids:
                 comment += _(
-                        'Free stock qty: %s<br/>' % -quant.quantity)
+                        'Free stock qty: %s<br/>') % -quant.quantity
             line.assigned_line_ids.unlink()
 
         # TODO check if is delivered (hide undo page?)
