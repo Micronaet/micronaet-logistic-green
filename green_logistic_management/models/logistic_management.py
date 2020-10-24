@@ -4,6 +4,7 @@
 import os
 import sys
 import logging
+import pdb
 from odoo import api, fields, models, tools, exceptions, SUPERUSER_ID
 from odoo.addons import decimal_precision as dp
 from odoo.tools.translate import _
@@ -1053,6 +1054,7 @@ class SaleOrderLine(models.Model):
         """ Undo without stock load
         """
         line = self
+        pdb.set_trace()
 
         quant_pool = self.env['stock.quant']
         undo_mode = self.env.context.get('undo_mode')
