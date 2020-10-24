@@ -1052,8 +1052,9 @@ class SaleOrderLine(models.Model):
     def line_unlink_for_undo(self):
         """ Undo without stock load
         """
-        undo_mode = self.env.context.get('undo_mode')
         line = self
+
+        undo_mode = self.env.context.get('undo_mode')
         line.ensure_one()
         product = line.product_id
 
@@ -1117,7 +1118,7 @@ class SaleOrderLine(models.Model):
         # Load in stock delivered qty:
 
         # Normal unlink operation:
-        return self.line_unlink_for_undo()
+        return self.with_context(undo_mode='stock').line_unlink_for_undo()
 
     @api.multi
     def unlink_for_undo(self):
