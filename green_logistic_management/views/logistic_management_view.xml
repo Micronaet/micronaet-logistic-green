@@ -335,7 +335,7 @@
              <field name="arch" type="xml">
                  <form>
                      <header>
-                         <button name="line_unlink_for_undo" type="object" string="Undo with refund" attrs="{'invisible': [('undo_mode', 'not in', ('purchase', 'stock'))]}"/>
+                         <button name="line_unlink_for_undo" type="object" string="Undo with refund (if necessary)" attrs="{'invisible': [('undo_mode', 'not in', ('purchase', 'stock'))]}"/>
                          <button name="line_unlink_for_stock_undo" type="object" string="Undo with stock load" attrs="{'invisible': [('undo_mode', '!=', 'stock')]}"/>
                      </header>
                      <sheet>

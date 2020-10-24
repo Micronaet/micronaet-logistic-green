@@ -1061,8 +1061,8 @@ class SaleOrderLine(models.Model):
         product = line.product_id
 
         # TODO manage service?
-        comment = _('Undo Line: %s x q. %s') % (
-            line.name, line.product_uom_qty,
+        comment = _('Undo Line: [%s] %s x q. %s') % (
+            line.product_id.default_code, line.name, line.product_uom_qty,
         )
         if product.type == 'service':
             raise exceptions.Warning(_('Product is service, nothing to do!'))
@@ -1070,7 +1070,8 @@ class SaleOrderLine(models.Model):
         # A. Nothing to do (was hidden the button but keep the same):
         if line.logistic_state in ('draft', 'cancel'):
             raise exceptions.Warning(
-                _('Line is in %s state, nothing to undo!') % line.logistic_state)
+                _('Line is in %s state, nothing to undo!') %
+                line.logistic_state)
 
         # D. Check stock move:
         if line.load_line_ids:
