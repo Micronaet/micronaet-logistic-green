@@ -1080,36 +1080,39 @@ class SaleOrderLine(models.Model):
             return
 
         # B. Check quants:
-        for quant in line.assigned_line_ids:
-            undo_comment += _(
-                    '<br><b>Assigned to remove:</b><br/>'
-                    'Stock free this q.: %s!<br/>' % (
-                        quant.quantity,
-                    )
-                )
+        if line.assigned_line_ids:
+            undo_comment += _('<br><b>Assigned to remove:</b><br/>')
+            for quant in line.assigned_line_ids:
+                undo_comment += _(
+                        'Stock free this q.: %s!<br/>' % quant.quantity)
 
         # C. Check Purchase Order:
-        for po_line in line.purchase_line_ids:
-            # TODO Manage dropship undo?
-            po_order = po_line.order_id
-            undo_comment += _(
-                    '<br><b>Purchase order to undo:</b><br/>'
-                    'Call supplier: %s to remove q. %s [Ref. %s]!<br/>' % (
-                        po_order.supplier_id.name,
-                        line.product_uom_qty,
-                        po_order.name,
+        if line.purchase_line_ids:
+            undo_comment += _('<br><b>Purchase order to undo:</b><br/>')
+            for po_line in line.purchase_line_ids:
+                # TODO Manage dropship undo?
+                po_order = po_line.order_id
+                undo_comment += _(
+                        'Call supplier (if not delivered): '
+                        '%s to remove q. %s [Ref. %s]!<br/>' % (
+                            po_order.partner_id.name,
+                            line.product_uom_qty,
+                            po_order.name,
+                        )
                     )
-                )
 
         # D. Check stock move:
-        for move in line.load_line_ids:
-            self.undo_mode = 'stock'
+        if line.load_line_ids:
             undo_comment += _(
-                    '<br><b>Delivered q. to remove (goes in stock?):</b><br/>'
-                    'Call supplier to refund q. %s or load in stock!<br/>' % (
-                        move.product_uom_qty,
+                    '<br><b>Delivered q. to remove (goes in stock?):</b><br/>')
+
+            for move in line.load_line_ids:
+                self.undo_mode = 'stock'
+                undo_comment += _(
+                        'Call supplier to refund q. %s or load in stock!'
+                        '<br/>' % move.product_uom_qty
                     )
-                )
+
         # TODO check if is delivered (hide undo page?)
         self.undo_comment = undo_comment
 
@@ -1119,7 +1122,12 @@ class SaleOrderLine(models.Model):
     undo_comment = fields.Text(
         'Undo comment', compute=_get_undo_comment, multi=True)
     undo_mode = fields.Selection(
-        'Undo mode', compute=_get_undo_comment, multi=True)
+        selection=[
+            ('nothing', 'Nothing to do'),
+            ('purchase', 'Purchase (only order to undo)'),
+            ('stock', 'Also stock to reload'),
+        ],
+        string='Undo mode', compute=_get_undo_comment, multi=True)
 
     # RELATION MANY 2 ONE:
     # A. Assigned stock:
