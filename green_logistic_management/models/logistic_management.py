@@ -1073,6 +1073,11 @@ class SaleOrderLine(models.Model):
 
         # D. Check stock move:
         if line.load_line_ids:
+            # Parameter for stock:
+            company = self.env.user.company_id
+            location_id = company.logistic_location_id.id
+            now = fields.Datetime.now()
+
             for move in line.load_line_ids:
                 comment += _(
                     'Remove delivered q. %s (%s)'
@@ -1083,11 +1088,9 @@ class SaleOrderLine(models.Model):
                     ))
                 if undo_mode == 'stock':
                     # Generate stock.quants for purchase q.
-                    company = self.env.user.company_id
-                    location_id = company.logistic_location_id.id
                     data = {
                         'company_id': company.id,
-                        'in_date': fields.now,
+                        'in_date': now,
                         'location_id': location_id,
                         'product_id': product.id,
                         'quantity': move.product_uom_qty,
