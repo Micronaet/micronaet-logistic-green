@@ -1129,8 +1129,12 @@ class SaleOrderLine(models.Model):
 
         # TODO check if is delivered (hide undo page?)
 
-        # Log operation:
-        line.order_id.write_log_chatter_message(comment)
+        # Change status and log on order:
+        order = line.order_id
+        order.write_log_chatter_message(comment)
+        order.write({
+            'logistic_state': 'draft',
+        })
 
         return self.write({
             'logistic_state': 'draft',
