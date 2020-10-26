@@ -270,7 +270,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
         purchase_data = []
         internal_data = []
         order_touched = []  # For end operation (dropship, default suppl.)
-        line_touched = []  # For end operation (dropship, default suppl.)
+        line_touched_ids = []  # For end operation (dropship, default suppl.)
 
         log = {
             'error': [],
@@ -278,6 +278,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             'info': [],
         }
         start_import = False
+        pdb.set_trace()
         for row in range(ws.nrows):
             line_ref = ws.cell_value(row, self._column_position['id'])
             if not start_import and line_ref == 'ID':
@@ -396,7 +397,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                             supplier_qty -= 0  # Used all
 
                 # For final logistic state update TODO (use ID?!?)
-                line_touched.append(line)  # Line
+                line_touched_ids.append(line.id)  # Line
                 if line.order_id not in order_touched:  # Order
                     order_touched.append(line.order_id)
 
@@ -431,11 +432,11 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             }
             try:
                 quant_pool.create(data)
-                reload_line = line_pool.browse(line.id)
-                if reload_line.logistic_uncovered_qty:
-                    reload_line.logistic_state = 'draft'  # not present state!
-                else:
-                    reload_line.logistic_state = 'ready'
+                # reload_line = line_pool.browse(line.id)
+                # if reload_line.logistic_remain_qty > 0:  # _uncovered_qty:
+                #    reload_line.logistic_state = 'draft'  # not present state!
+                # else:
+                #    reload_line.logistic_state = 'ready'
             except:
                 raise exceptions.Warning('Cannot create quants!')
 
@@ -479,8 +480,8 @@ class SaleOrderExcelManageWizard(models.TransientModel):
         #                     Update order logistic status:
         # ---------------------------------------------------------------------
         # Update logistic state for line after all
-        for line in line_touched:
-            if not line.logistic_remain_qty:  # All assigned or received
+        for line in line_pool.browse(line_touched_ids):
+            if line.logistic_remain_qty <= 0.0:  # All assigned or received
                 line.write({
                     'logistic_state': 'ready',
                 })
