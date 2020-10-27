@@ -278,7 +278,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             'info': [],
         }
         start_import = False
-        pdb.set_trace()
+        # pdb.set_trace()
         for row in range(ws.nrows):
             line_ref = ws.cell_value(row, self._column_position['id'])
             if not start_import and line_ref == 'ID':
@@ -434,7 +434,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             }
             try:
                 quant_pool.create(data)
-                pdb.set_trace()
+                # pdb.set_trace()
                 line.write({'logistic_state': new_state})
             except:
                 raise exceptions.Warning('Cannot create quants!')
@@ -479,7 +479,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
         #                     Update order logistic status:
         # ---------------------------------------------------------------------
         # Update logistic state for line after all
-        pdb.set_trace()
+        # pdb.set_trace()
         for line in line_pool.browse(line_touched_ids):
             if line.logistic_remain_qty <= 0.0:  # All assigned or received
                 line.write({
