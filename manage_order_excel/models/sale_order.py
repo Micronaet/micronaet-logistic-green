@@ -363,11 +363,11 @@ class SaleOrderExcelManageWizard(models.TransientModel):
 
                 # 1. Assign management (Internal stock):
                 if remain_to_cover_qty <= internal_qty:
-                    internal_data.append((line, remain_to_cover_qty))
+                    internal_data.append((line, remain_to_cover_qty, 'ready'))
                     internal_qty -= remain_to_cover_qty  # Remain
                     remain_to_cover_qty = 0
                 elif internal_qty:  # There's internal but not for all
-                    internal_data.append((line, internal_qty))
+                    internal_data.append((line, internal_qty, 'draft'))
                     remain_to_cover_qty -= internal_qty  # correct remain qty
                     internal_qty = 0  # Used all
 
@@ -418,7 +418,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
         #                 Assign management (Internal stock):
         # ---------------------------------------------------------------------
         # TODO check remain quantity before create order or assigned qty
-        for line, internal_qty in internal_data:
+        for line, internal_qty, new_state in internal_data:
             product = line.product_id
             # TODO no check in stock, was done during assign
             data = {
@@ -435,12 +435,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             try:
                 quant_pool.create(data)
                 pdb.set_trace()
-                reload_line = line_pool.browse(line.id)
-                if reload_line.logistic_remain_qty > 0:  # _uncovered_qty:
-                    reload_line.logistic_state = 'draft'  # not present state!
-                else:
-                    reload_line.logistic_state = 'ready'
-
+                line.write({'logistic_state': new_state})
             except:
                 raise exceptions.Warning('Cannot create quants!')
 
