@@ -372,7 +372,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                     internal_qty = 0  # Used all
 
                 if remain_to_cover_qty > 0:  # more remain qty to cover
-                    # 2. Purchase management:
+                    # 2. Purchase management (for not covered):
                     if supplier:   # So supplier qty present!
                         log['info'].append(
                             _('%s. Line add in purchase order') % row)
@@ -394,10 +394,12 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                                 supplier_qty,
                                 supplier_price,
                             ))
-                            supplier_qty -= 0  # Used all
+                            supplier_qty = 0  # Used all
 
-                # For final logistic state update TODO (use ID?!?)
-                line_touched_ids.append(line.id)  # Line
+                    # For final logistic state update TODO (use ID?!?)
+                    line_touched_ids.append(line.id)  # Line (only purchased)
+
+                # All must be checked:
                 if line.order_id not in order_touched:  # Order
                     order_touched.append(line.order_id)
 
@@ -432,11 +434,13 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             }
             try:
                 quant_pool.create(data)
-                # reload_line = line_pool.browse(line.id)
-                # if reload_line.logistic_remain_qty > 0:  # _uncovered_qty:
-                #    reload_line.logistic_state = 'draft'  # not present state!
-                # else:
-                #    reload_line.logistic_state = 'ready'
+                pdb.set_trace()
+                reload_line = line_pool.browse(line.id)
+                if reload_line.logistic_remain_qty > 0:  # _uncovered_qty:
+                    reload_line.logistic_state = 'draft'  # not present state!
+                else:
+                    reload_line.logistic_state = 'ready'
+
             except:
                 raise exceptions.Warning('Cannot create quants!')
 
@@ -480,6 +484,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
         #                     Update order logistic status:
         # ---------------------------------------------------------------------
         # Update logistic state for line after all
+        pdb.set_trace()
         for line in line_pool.browse(line_touched_ids):
             if line.logistic_remain_qty <= 0.0:  # All assigned or received
                 line.write({

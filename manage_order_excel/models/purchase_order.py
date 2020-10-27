@@ -238,6 +238,7 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
                 row, self._column_position['all_qty'])
 
             if all_qty:
+                # Manage not delivered to client
                 arrived_qty = sum([l.logistic_undelivered_qty for l in lines])
             else:
                 arrived_qty = ws.cell_value(
@@ -291,7 +292,6 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
                     used_qty = arrived_qty
                 if used_qty < 0:
                     continue
-
                 arrived_qty -= used_qty
 
                 # -------------------------------------------------------------
@@ -449,12 +449,11 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
                     })
 
             all_ready = {'ready'}
-            for order in orders:
+            for order in orders:  # TODO reload?
                 states = set(
                     [line.logistic_state for line in order.order_line])
                 if states == all_ready:
-                    order.write({
-                        'logistic_state': 'ready'})
+                    order.write({'logistic_state': 'ready'})
 
             # -----------------------------------------------------------------
             # Check Purchase order ready
