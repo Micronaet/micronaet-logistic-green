@@ -1133,9 +1133,9 @@ class SaleOrderLine(models.Model):
         order = line.order_id
         order.write_log_chatter_message(comment)
         order.write({
-            'logistic_state': 'draft',
+            'logistic_state': 'confirmed',
         })
-
+        # Update line:
         return self.write({
             'logistic_state': 'draft',
             })
