@@ -182,6 +182,10 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
             raise exceptions.Warning(_('Cannot read XLS file'))
 
         ws = wb.sheet_by_index(0)
+        # Check sheet mode:
+        sheet_mode = ws.cell_value(0, 0)
+        if sheet_mode != 'purchase':
+            raise exceptions.Warning('Wrong Excel file mode')
 
         # ---------------------------------------------------------------------
         # Load parameters:

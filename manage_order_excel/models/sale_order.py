@@ -262,6 +262,11 @@ class SaleOrderExcelManageWizard(models.TransientModel):
 
         ws = wb.sheet_by_index(0)
 
+        # Check sheet mode:
+        sheet_mode = ws.cell_value(0, 0)
+        if sheet_mode != 'sale':
+            raise exceptions.Warning('Wrong Excel file mode')
+
         # Parameters from company (for assign qty):
         company = self.env.user.company_id  # TODO read from order?
         location_id = company.logistic_location_id.id
