@@ -276,19 +276,23 @@ class ProductCategory(models.Model):
             sequence = record['menu_order']
             image = record['image']  # TODO
 
+            _logger.info('Create category: %s [%s]' % (name, parent_wp_id))
             if parent_wp_id and parent_wp_id not in cache_category:
                 _logger.error('Parent not yet created for category: %s' % name)
                 continue  # Not created
             parent = cache_category.get(parent_wp_id, False)
-            if wp_id not in cache_category:  # Create (and cache element)
-                cache_category[wp_id] = self.create({
-                    'connector_id': connector.id,
-                    'wp_id': wp_id,
-                    'name': name,
-                    'wp_description': description,
-                    'parent_id': False if not parent else parent.id,
-                    'wp_sequence': sequence,
-                })
+            data = {
+                'connector_id': connector.id,
+                'wp_id': wp_id,
+                'name': name,
+                'wp_description': description,
+                'parent_id': False if not parent else parent.id,
+                'wp_sequence': sequence,
+            }
+            if wp_id in cache_category:
+                cache_category[wp_id].write(data)
+            else:  # Create (and cache element)
+                cache_category[wp_id] = self.create(data)
 
     # -------------------------------------------------------------------------
     #                                   COLUMNS:
