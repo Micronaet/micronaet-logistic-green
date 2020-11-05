@@ -1,6 +1,7 @@
 # Copyright 2019  Micronaet SRL (<http://www.micronaet.it>).
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl.html).
 
+import sys
 import logging
 import woocommerce
 from odoo import models, fields, api, exceptions
@@ -219,6 +220,45 @@ class ProductCategory(models.Model):
     """
     _inherit = 'product.category'
     _order = 'wp_sequence'  # Force sort
+
+    @api.model
+    def load_category_out(self, connector):
+        """ Load category to Wordpress
+        """
+        # Load current category:
+        connector_id = connector.id
+        wcapi = connector.get_connector()
+
+        odoo_category = {}
+        # Parent category:
+        pdb.set_trace()
+        for category in self.search([
+                ('connector_id', '=', connector_id),
+                ('parent_id', '=', False),
+                ]):
+            try:
+                wp_id = category.wp_id
+                data = {
+                    'name': category.name,
+                    'parent': 0,
+                    'description': category.description,
+                }
+                if wp_id:  # Update:
+                    reply = wcapi.put('products/categories/%s' % wp_id, data)
+                    if not reply.ok:
+                        _logger.error('Not updated with: %s' % (data, ))
+                else:
+                    reply = wcapi.post('products/categories', data)
+                    if not reply.ok:
+                        _logger.error('Error: %s' % reply.text)
+                        continue
+                    wp_id = reply.json()['id']
+                    category.write({
+                        'wp_id': wp_id,
+                    })
+            except:
+                _logger.error('Error with wordpress:\n%s' % (sys.exc_info(), ))
+                continue
 
     @api.model
     def load_category(self, connector):
