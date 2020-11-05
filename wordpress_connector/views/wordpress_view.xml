@@ -104,7 +104,7 @@
         <field name="arch" type="xml">
             <tree string="Wordpress Category" decoration-info="parent_id == False">
                 <field name="wp_sequence" />
-                <field name="connector_id" readonly="1"/>
+                <field name="connector_id" />
                 <field name="parent_id" />
                 <field name="name" />
                 <field name="wp_description" />
@@ -119,7 +119,7 @@
             <form string="Wordpress Category">
                 <sheet>
                     <group colspan="4" col="4">
-                        <field name="connector_id" readonly="1"/>
+                        <field name="connector_id" />
                         <field name="wp_sequence" />
                         <field name="parent_id" />
                         <field name="name" />
