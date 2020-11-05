@@ -420,7 +420,7 @@ class WPTag(models.Model):
                 'description': description
                 }
             if wp_id in tags_db:
-                tags_db[name].write(data)
+                tags_db[wp_id].write(data)
             else:
                 self.create(data)
 
