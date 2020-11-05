@@ -413,15 +413,16 @@ class WPTag(models.Model):
             wp_id = record['id']
             name = record['name']
             description = record['description']
-            if name in tags_db:  # Update?
-                pass
-            else:
-                self.create({
+            data = {
                     'connector_id': connector.id,
                     'wp_id': wp_id,
                     'name': name,
                     'description': description
-                })
+                }
+            if name in tags_db:
+                tags_db[name].write(data)
+            else:
+                self.create(data)
 
     # -------------------------------------------------------------------------
     #                                   COLUMNS:
