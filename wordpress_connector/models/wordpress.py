@@ -407,17 +407,17 @@ class WPTag(models.Model):
 
         tags_db = {}
         for tag in tags:
-            tags_db[tag.name] = tag.id
+            tags_db[tag.name] = tag  # Use name for key (not wp_id)
 
         for record in wp_records:
             wp_id = record['id']
             name = record['name']
             description = record['description']
             data = {
-                    'connector_id': connector.id,
-                    'wp_id': wp_id,
-                    'name': name,
-                    'description': description
+                'connector_id': connector.id,
+                'wp_id': wp_id,
+                'name': name,
+                'description': description
                 }
             if name in tags_db:
                 tags_db[name].write(data)
