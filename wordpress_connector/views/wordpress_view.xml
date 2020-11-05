@@ -119,7 +119,7 @@
             <form string="Wordpress Category">
                 <sheet>
                     <group colspan="4" col="4">
-                        <field name="connector_id" />
+                        <field name="connector_id" domain="[('mode', '=', 'out')]"/>
                         <field name="wp_sequence" />
                         <field name="parent_id" />
                         <field name="name" />
