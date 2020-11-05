@@ -261,7 +261,6 @@ class ProductCategory(models.Model):
             for record in records:
                 wp_category[record['id']] = record
         _logger.info('Category found # %s' % len(wp_category))
-        pdb.set_trace()
 
         # ---------------------------------------------------------------------
         # Sort and create / update ODOO
