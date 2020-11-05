@@ -225,8 +225,10 @@ class ProductCategory(models.Model):
         """ Load category from Wordpress
         """
         # Load current category:
+        connector_id = connector.id
         cache_category = {}  # From WP to ODOO
-        for category in self.browse([]):
+        pdb.set_trace()
+        for category in self.search([('connector_id', '=', connector_id)]):
             cache_category[category.wp_id] = category
             # Used for parent_wp_id wp_id
 
