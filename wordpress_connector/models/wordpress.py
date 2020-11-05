@@ -234,7 +234,6 @@ class ProductCategory(models.Model):
         # Load category from WP
         # ---------------------------------------------------------------------
         wp_category = {}
-
         wcapi = connector.get_connector()
         params = {
             'per_page': 50,
@@ -259,6 +258,8 @@ class ProductCategory(models.Model):
                 break
             for record in records:
                 wp_category[record['id']] = record
+        _logger.info('Category found # %s' % len(wp_category))
+        pdb.set_trace()
 
         # ---------------------------------------------------------------------
         # Sort and create / update ODOO
