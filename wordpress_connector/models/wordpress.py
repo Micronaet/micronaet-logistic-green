@@ -457,8 +457,8 @@ class WPAttribute(models.Model):
         attributes_db = {}
         terms_db = {}
         for attribute in attributes:
-            attributes_db[attribute.name] = attribute.id
             wp_id = attribute.wp_id
+            attributes_db[wp_id] = attribute.id
             for term in attribute.term_ids:
                 terms_db[(wp_id, term.name)] = term.id
 
@@ -482,16 +482,18 @@ class WPAttribute(models.Model):
             for record in records:
                 wp_id = record['id']
                 name = record['name']
-                if name in attributes_db:  # TODO Update?
+                data = {
+                    'connector_id': connector.id,
+                    'wp_id': wp_id,
+                    'name': name,
+                    }
+                if wp_id in attributes_db:
                     _logger.info('Update: %s' % name)
-                    attribute_id = attributes_db[name]
+                    attributes_db[wp_id].write(data)
+                    attribute_id = attributes_db[wp_id]
                 else:
                     _logger.info('Create: %s' % name)
-                    attribute_id = self.create({
-                        'connector_id': connector.id,
-                        'wp_id': wp_id,
-                        'name': name,
-                    }).id
+                    attribute_id = self.create(data).id
 
                 # -------------------------------------------------------------
                 # Add terms for attributes:
@@ -519,6 +521,7 @@ class WPAttribute(models.Model):
                             })
                         _logger.info(' -- > %s' % term_name)
             break  # TODO problem with page to browse
+
     # -------------------------------------------------------------------------
     #                                   COLUMNS:
     # -------------------------------------------------------------------------
