@@ -933,6 +933,7 @@ class SaleOrder(models.Model):
         })
 
         print(data)
+        pdb.set_trace()
         reply = service.ShipmentRequest(data)
         error = order.check_reply_status(reply, undo_error=True)
 
