@@ -592,7 +592,6 @@ class SaleOrder(models.Model):
     def set_carrier_ok_yes(self):
         """ Override method for send carrier request
         """
-        pdb.set_trace()
         order = self
 
         # ---------------------------------------------------------------------
