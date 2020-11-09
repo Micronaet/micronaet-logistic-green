@@ -287,7 +287,7 @@ class SaleOrder(models.Model):
 
         return {
             'Name': (demo or partner.name)[:35],
-            'CompanyName': (demo or '')[:35],
+            'CompanyName': (demo or partner.name)[:35],
             'Nickname': (demo or '')[:100],
             'Address': (partner.street or '')[:100],
             'Address2': address2[:35],

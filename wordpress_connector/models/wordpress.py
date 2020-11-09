@@ -120,7 +120,8 @@ class WPConnector(models.Model):
         if self.mode == 'in':
             return self.env['product.category'].load_category(connector=self)
         else:
-            pass  # TODO
+            return self.env['product.category'].load_category_out(
+                connector=self)
 
     @api.multi
     def button_load_product_template_structure(self):
@@ -225,13 +226,13 @@ class ProductCategory(models.Model):
     def load_category_out(self, connector):
         """ Load category to Wordpress
         """
+        pdb.set_trace()
         # Load current category:
         connector_id = connector.id
         wcapi = connector.get_connector()
 
         odoo_category = {}
         # Parent category:
-        pdb.set_trace()
         for category in self.search([
                 ('connector_id', '=', connector_id),
                 ('parent_id', '=', False),
@@ -241,7 +242,7 @@ class ProductCategory(models.Model):
                 data = {
                     'name': category.name,
                     'parent': 0,
-                    'description': category.description,
+                    # 'description': category.description,
                 }
                 if wp_id:  # Update:
                     reply = wcapi.put('products/categories/%s' % wp_id, data)
