@@ -592,6 +592,7 @@ class SaleOrder(models.Model):
     def set_carrier_ok_yes(self):
         """ Override method for send carrier request
         """
+        pdb.set_trace()
         order = self
 
         # ---------------------------------------------------------------------
@@ -927,7 +928,6 @@ class SaleOrder(models.Model):
         # -----------------------------------------------------------------
         service = soap_connection.get_connection()
         data = order.get_request_container(customer=False, system=True)
-        pdb.set_trace()
         data.update({
             'Recipient': order.get_recipient_container(),
             'Shipment': order.get_shipment_container(),
