@@ -38,10 +38,16 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
             ('order_id.logistic_state', 'in', ('confirmed', )),  # Order conf.
             ])
 
+        # Counter on report:
+        title_counter = self.env['ir.sequence'].next_by_code(
+            'sale.order.excel.export.sequence')
+        company = self.env.user.company_id
+        company.write({'sale_export_ref': title_counter})
+
         title = (
-            'purchase',
+            title_counter,
             '',
-            _('Awaiting delivery'),
+            _('Awaiting delivery: %s' % title_counter),
             )
 
         header = (
@@ -182,10 +188,15 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
             raise exceptions.Warning(_('Cannot read XLS file'))
 
         ws = wb.sheet_by_index(0)
+
         # Check sheet mode:
         sheet_mode = ws.cell_value(0, 0)
-        if sheet_mode != 'purchase':
-            raise exceptions.Warning('Wrong Excel file mode')
+        company = self.env.user.company_id
+        title_counter = company.purchase_export_ref
+        if sheet_mode != title_counter:
+            raise exceptions.Warning(
+                'Wrong Excel file mode, expected: %s, got: %s' % (
+                    title_counter, sheet_mode))
 
         # ---------------------------------------------------------------------
         # Load parameters:

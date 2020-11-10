@@ -287,7 +287,6 @@ class SaleOrderExcelManageWizard(models.TransientModel):
         sheet_mode = ws.cell_value(0, 0)
         company = self.env.user.company_id
         title_counter = company.sale_export_ref
-        pdb.set_trace()
         if sheet_mode != title_counter:
             raise exceptions.Warning(
                 'Wrong Excel file mode, expected: %s, got: %s' % (
