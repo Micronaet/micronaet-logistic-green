@@ -72,7 +72,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             if suppinfo.name.ref == supplier_code:
                 use_this = suppinfo
 
-        if suppinfo:
+        if use_this:
             return (
                 suppinfo.name.id,
                 suppinfo.name.name,
