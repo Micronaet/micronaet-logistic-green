@@ -78,9 +78,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             """
             code_part = (product.default_code or '').split('-')
             if len(code_part) == 2:
-                pdb.set_trace()
                 supplier = code_part[-1]
-                _logger.warning('%s - %s' % (product.default_code, supplier))
             else:
                 supplier = ''
             return supplier, product.name
@@ -492,7 +490,6 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             }
             try:
                 quant_pool.create(data)
-                # pdb.set_trace()
                 line.write({'logistic_state': new_state})
             except:
                 raise exceptions.Warning('Cannot create quants!')
