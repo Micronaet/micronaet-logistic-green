@@ -290,7 +290,8 @@ class SaleOrderExcelManageWizard(models.TransientModel):
         pdb.set_trace()
         if sheet_mode != title_counter:
             raise exceptions.Warning(
-                'Wrong Excel file mode, expected: %s' % title_counter)
+                'Wrong Excel file mode, expected: %s, got: %s' % (
+                    title_counter, sheet_mode))
 
         # Parameters from company (for assign qty):
         company = self.env.user.company_id  # TODO read from order?
