@@ -531,7 +531,6 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             # -----------------------------------------------------------------
             # Update supplier info data:
             # -----------------------------------------------------------------
-            pdb.set_trace()
             if supplier:
                 suppinfo = False
                 for item in product.seller_ids:
