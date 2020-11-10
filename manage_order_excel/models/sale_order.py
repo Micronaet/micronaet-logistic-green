@@ -51,15 +51,37 @@ class SaleOrderExcelManageWizard(models.TransientModel):
 
     @api.model
     def get_suppinfo_supplier(self, product):
-        for supplier in product.seller_ids:
-            # First only:
+        """ Extract default supplier info
+        """
+        code_part = (product.default_code or '').split('-')
+        if len(code_part) == 2:
+            supplier_code = code_part[-1]
+            if not supplier_code[-1].isdigit():
+                supplier_code[:-1]
+        else:
+            supplier_code = False
+
+        use_this = False
+        for suppinfo in product.seller_ids:
+            if not use_this:
+                use_this = suppinfo  # Use first in not found
+            if not supplier_code:
+                break  # Take first
+
+            # Use default partner:
+            if suppinfo.name.ref == supplier_code:
+                use_this = suppinfo
+
+        if suppinfo:
             return (
-                supplier.name.id,
-                supplier.name.name,
-                supplier.name.ref,
-                supplier.price,
-            )
-        return False, '', '', 0
+                suppinfo.name.id,
+                suppinfo.name.name,
+                suppinfo.name.ref,
+                suppinfo.price,
+                suppinfo.supplier_stock_qty,
+                )
+        else:
+            return False, '', '', 0, 0
 
     @api.model
     def get_suppinfo_price(self, product):
@@ -205,8 +227,8 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             # qty available is used once (remember: grouped by product)
 
             # Readability:
-            supplier_id, supplier_name, supplier_code, supplier_price = \
-                self.get_suppinfo_supplier(product)
+            (supplier_id, supplier_name, supplier_code, supplier_price,
+             supplier_stock_qty) = self.get_suppinfo_supplier(product)
 
             # Category:
             # category = ', '.join(
@@ -245,7 +267,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                 (qty_covered, 'number_total'),
 
                 # Supplier:
-                (0 if supplier_id else '/', 'number'),
+                (supplier_stock_qty if supplier_id else '/', 'number'),
                 (0 if supplier_id else '', 'number_total'),
                 (supplier_code, 'text_total'),
                 (supplier_price, 'number_total'),
