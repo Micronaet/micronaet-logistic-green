@@ -36,10 +36,18 @@ class SaleOrderExcelManageWizard(models.TransientModel):
     _column_position = {
         'id': 0,
         'needed_qty': 5,
-        'internal_qty': 7,
-        'supplier_qty': 9,
-        'supplier_code': 10,
-        'supplier_price': 11,
+
+        'internal_hidden_qty': 6,
+        'internal_show_qty': 7,
+
+        'internal_qty': 8,
+
+        'supplier_available_hidden': 9,
+        'supplier_available_show': 10,
+
+        'supplier_qty': 11,
+        'supplier_code': 12,
+        'supplier_price': 13,
     }
 
     @api.model
@@ -65,6 +73,18 @@ class SaleOrderExcelManageWizard(models.TransientModel):
     def export_pending_order(self):
         """ Export XLSX file for select product
         """
+        def sorted_line(product):
+            """ Function for sort sales line
+            """
+            code_part = (product.default_code or '').split('-')
+            if len(code_part) == 2:
+                pdb.set_trace()
+                supplier = code_part[-1]
+                _logger.warning('%s - %s' % (product.default_code, supplier))
+            else:
+                supplier = ''
+            return supplier, product.name
+
         report_pool = self.env['excel.report']
         line_pool = self.env['sale.order.line']
         partner_pool = self.env['res.partner']
@@ -88,26 +108,30 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             )
 
         header = (
-            'ID',
-            _('Ordini'),
+            'ID', _('Ordini'),
             _('Codice'), _('Nome'),
+
             # _('Category'),
-            _('Fornitore pred.'),
-            _('Q. necess.'), _('Disp. magazz.'), _('Q. da mag.'),
+            _('Fornitore pred.'), _('Q. necess.'),
+            _('Disp. magazz. nasc.'), _('Disp. magazz.'),
+            _('Q. da mag.'),
 
-            _('Disp. forn.'), _('Q. ord. forn.'), _('Rif. forn.'),
-            _('Prezzo acq.'),
-
-            _('Status'),
+            _('Disp. forn. nasc.'), _('Disp. forn.'),
+            _('Q. ord. forn.'), _('Rif. forn.'),
+            _('Prezzo acq.'), _('Status'),
         )
         column_width = (
             1, 20,
             12, 48,
+
             # 25,
-            25,
-            10, 10, 10,
-            10, 10, 8, 10,
+            25, 10,
+            1, 10,
             10,
+
+            1, 10,
+            10, 8,
+            10, 10,
         )
         total_col = len(column_width)
 
@@ -141,6 +165,8 @@ class SaleOrderExcelManageWizard(models.TransientModel):
         # Title:
         report_pool.column_hidden(ws_name, [
             self._column_position['id'],
+            self._column_position['internal_hidden_qty'],
+            self._column_position['supplier_available_hidden'],
         ])  # Hide ID columns
         row = 0
         report_pool.write_xls_line(ws_name, row, title, style_code='title')
@@ -176,7 +202,8 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                     [line],  # List of lines
                     ]
 
-        for product in sorted(collect_data, key=lambda p: p.name):
+        # for product in sorted(collect_data, key=lambda p: p.name):
+        for product in sorted(collect_data, key=sorted_line):
             qty_available, order_qty, qty_needed, lines = \
                 collect_data[product]
             # qty available is used once (remember: grouped by product)
@@ -217,10 +244,12 @@ class SaleOrderExcelManageWizard(models.TransientModel):
 
                 # Internal:
                 (qty_needed, 'number_ok'),
+                (qty_available, 'number'),  # Hidden
                 (qty_available, 'number'),
                 (qty_covered, 'number_total'),
 
                 # Supplier:
+                (0 if supplier_id else '/', 'number'),  # Hidden
                 (0 if supplier_id else '/', 'number'),
                 (0 if supplier_id else '', 'number_total'),
                 (supplier_code, 'text_total'),
