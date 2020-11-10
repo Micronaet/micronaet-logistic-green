@@ -475,6 +475,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                                 supplier_price,
                             ))
                             supplier_qty -= remain_to_cover_qty  # Remain
+                            used_supplier_qty += remain_to_cover_qty  # Update
                         else:  # Partially covered
                             purchase_data.append((
                                 supplier,
@@ -484,7 +485,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                                 supplier_price,
                             ))
                             supplier_qty = 0  # Used all
-                        used_supplier_qty += supplier_qty  # To update stock
+                            used_supplier_qty += supplier_qty  # Update
 
                     # For final logistic state update TODO (use ID?!?)
                     line_touched_ids.append(line.id)  # Line (only purchased)
