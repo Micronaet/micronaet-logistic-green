@@ -40,7 +40,7 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
 
         # Counter on report:
         title_counter = self.env['ir.sequence'].next_by_code(
-            'sale.order.excel.export.sequence')
+            'purchase.order.excel.export.sequence')
         company = self.env.user.company_id
         company.write({'sale_export_ref': title_counter})
 
