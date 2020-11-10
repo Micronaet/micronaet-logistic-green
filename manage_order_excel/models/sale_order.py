@@ -346,6 +346,11 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                 continue
 
             # Extract needed data:
+            stock_qty = ws.cell_value(
+                row, self._column_position['internal_hidden_qty']) or 0.0
+            new_stock_qty = ws.cell_value(
+                row, self._column_position['internal_show_qty']) or 0.0
+
             internal_qty = ws.cell_value(
                 row, self._column_position['internal_qty']) or 0.0
             supplier_qty = ws.cell_value(
@@ -412,6 +417,25 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             if log['error']:
                 # TODO manage what to do
                 pass
+            pdb.set_trace()
+            if stock_qty != new_stock_qty:  # Update before unload:
+                product = lines[0].product_id  # Use first to extract product
+                current_qty = product.qty_available
+                gap_qty = new_stock_qty - current_qty
+                if new_stock_qty < current_qty:
+                    gap_qty = - gap_qty
+                if gap_qty:
+                    data = {
+                        'company_id': company.id,
+                        'in_date': now,
+                        'location_id': location_id,
+                        'product_id': product.id,
+                        'quantity': gap_qty,
+                    }
+                    try:
+                        quant_pool.create(data)
+                    except:
+                        raise exceptions.Warning('Cannot create quants!')
 
             for line in lines:
                 remain_to_cover_qty = line.logistic_remain_qty
