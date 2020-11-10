@@ -11,6 +11,21 @@ from odoo.tools.translate import _
 _logger = logging.getLogger(__name__)
 
 
+class ResCompany(models.Model):
+    """ Extra parameters
+    """
+    _inherit = 'res.company'
+
+    export_sale_ref = fields.Char(
+        'Sale export ref.',
+        help='Last file exported, used for check in import'
+    )
+    export_purchase_ref = fields.Char(
+        'Purchase export ref.',
+        help='Last file exported, used for check in import'
+    )
+
+
 class SaleOrderExcelManageWizard(models.TransientModel):
     """ Model name: Order wizard (import / export)
     """
@@ -65,7 +80,8 @@ class SaleOrderExcelManageWizard(models.TransientModel):
         pdb.set_trace()
         title_counter = self.env['ir.sequence'].next_by_code(
             'sale.order.excel.export.sequence')
-        self.company.write({'export_sale_ref': title_counter})
+        company = self.env.user.company_id
+        company.write({'export_sale_ref': title_counter})
 
         title = (
             title_counter,
@@ -270,7 +286,8 @@ class SaleOrderExcelManageWizard(models.TransientModel):
 
         # Check sheet mode:
         sheet_mode = ws.cell_value(0, 0)
-        title_counter = self.company.sale_export_ref
+        company = self.env.user.company_id
+        title_counter = company.sale_export_ref
         if sheet_mode != title_counter:
             raise exceptions.Warning(
                 'Wrong Excel file mode, expected: %s' % title_counter)
