@@ -78,6 +78,30 @@
                  </field>
              </field>
          </record>
+
+        <!--product.supplierinfo-->
+        <record model="ir.ui.view" id="view_product_supplierinfo_form">
+             <field name="name">product.supplierinfo.form</field>
+             <field name="model">product.supplierinfo</field>
+             <field name="inherit_id" ref="product.product_supplierinfo_form_view"/>
+             <field name="arch" type="xml">
+                 <field name="product_code" position="after">
+                    <field name="supplier_stock_qty"/>
+                 </field>
+             </field>
+        </record>
+        <record model="ir.ui.view" id="view_product_supplierinfo_tree">
+             <field name="name">product.supplierinfo.form</field>
+             <field name="model">product.supplierinfo</field>
+             <field name="inherit_id" ref="product.product_supplierinfo_tree_view"/>
+             <field name="arch" type="xml">
+                 <field name="price" position="after">
+                    <field name="supplier_stock_qty"/>
+                 </field>
+             </field>
+        </record>
+
+
          <!--stock.picking-->
          <record model="ir.ui.view" id="view_stock_picking_confirm_out_form">
              <field name="name">stock.picking.form</field>
