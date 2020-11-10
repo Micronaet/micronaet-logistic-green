@@ -351,6 +351,12 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             new_stock_qty = ws.cell_value(
                 row, self._column_position['internal_show_qty']) or 0.0
 
+            supplier_stock_qty = ws.cell_value(
+                row, self._column_position['supplier_available_hidden']) or 0.0
+            new_supplier_stock_qty = ws.cell_value(
+                row, self._column_position['supplier_available_show']) or 0.0
+
+
             internal_qty = ws.cell_value(
                 row, self._column_position['internal_qty']) or 0.0
             supplier_qty = ws.cell_value(
@@ -417,9 +423,12 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             if log['error']:
                 # TODO manage what to do
                 pass
-            pdb.set_trace()
-            if stock_qty != new_stock_qty:  # Update before unload:
-                product = lines[0].product_id  # Use first to extract product
+
+            # -----------------------------------------------------------------
+            # Update stock from Excel file (before unload):
+            # -----------------------------------------------------------------
+            product = lines[0].product_id  # Extract esternally once
+            if stock_qty != new_stock_qty:
                 current_qty = product.qty_available
                 gap_qty = new_stock_qty - current_qty
                 if new_stock_qty < current_qty:
@@ -437,9 +446,10 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                     except:
                         raise exceptions.Warning('Cannot create quants!')
 
+            used_supplier_qty = 0.0  # used for "supplier" browse partner
             for line in lines:
                 remain_to_cover_qty = line.logistic_remain_qty
-                product = line.product_id
+                # product = line.product_id << read externally
 
                 # 1. Assign management (Internal stock):
                 if remain_to_cover_qty <= internal_qty:
@@ -475,6 +485,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                                 supplier_price,
                             ))
                             supplier_qty = 0  # Used all
+                        used_supplier_qty += supplier_qty  # To update stock
 
                     # For final logistic state update TODO (use ID?!?)
                     line_touched_ids.append(line.id)  # Line (only purchased)
@@ -493,6 +504,16 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                     supplier_qty,
                     supplier_price,
                 ))
+                used_supplier_qty += supplier_qty  # To update suppl. stock
+
+            # -----------------------------------------------------------------
+            # TODO Update supplier info data:
+            # -----------------------------------------------------------------
+            if supplier:
+
+                supplier_stock_qty
+                new_supplier_stock_qty
+
 
         # ---------------------------------------------------------------------
         #                 Assign management (Internal stock):
