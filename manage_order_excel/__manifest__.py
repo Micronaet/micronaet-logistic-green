@@ -26,6 +26,8 @@
 
         'views/excel_order_view.xml',
         'views/excel_delivery_view.xml',
+
+        'data/sequence_data.xml',
         ],
     'external_dependencies': {},
     'application': False,

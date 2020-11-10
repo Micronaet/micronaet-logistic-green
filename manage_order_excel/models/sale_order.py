@@ -61,8 +61,14 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             ('product_id.is_expense', '=', False),  # No expense product
             ])
 
+        # Counter on report:
+        pdb.set_trace()
+        title_counter = self.env['ir.sequence'].next_by_code(
+            'sale.order.excel.export.sequence')
+        self.company.write({'export_sale_ref': title_counter})
+
         title = (
-            'sale',
+            title_counter,
             _('Sale order pending'),
             )
 
@@ -264,8 +270,10 @@ class SaleOrderExcelManageWizard(models.TransientModel):
 
         # Check sheet mode:
         sheet_mode = ws.cell_value(0, 0)
-        if sheet_mode != 'sale':
-            raise exceptions.Warning('Wrong Excel file mode')
+        sheet_counter = self.company.sale_export_ref
+        if sheet_mode != sheet_counter:
+            raise exceptions.Warning(
+                'Wrong Excel file mode, expected: %s' % sheet_counter)
 
         # Parameters from company (for assign qty):
         company = self.env.user.company_id  # TODO read from order?
