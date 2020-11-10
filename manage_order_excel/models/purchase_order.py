@@ -201,7 +201,7 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
             raise exceptions.Warning(
                 'Wrong Excel file mode, expected: %s, got: %s' % (
                     title_counter, sheet_mode))
-        company.sale_export_ref = False  # Clean when imported
+        company.purchase_export_ref = False  # Clean when imported
 
         # ---------------------------------------------------------------------
         # Load parameters:
