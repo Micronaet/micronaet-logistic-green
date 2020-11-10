@@ -77,7 +77,6 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             ])
 
         # Counter on report:
-        pdb.set_trace()
         title_counter = self.env['ir.sequence'].next_by_code(
             'sale.order.excel.export.sequence')
         company = self.env.user.company_id
@@ -85,7 +84,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
 
         title = (
             title_counter,
-            _('Sale order pending:%s' % title_counter),
+            _('Sale order pending: %s' % title_counter),
             )
 
         header = (
@@ -288,6 +287,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
         sheet_mode = ws.cell_value(0, 0)
         company = self.env.user.company_id
         title_counter = company.sale_export_ref
+        pdb.set_trace()
         if sheet_mode != title_counter:
             raise exceptions.Warning(
                 'Wrong Excel file mode, expected: %s' % title_counter)
