@@ -12,6 +12,15 @@ from odoo.tools.translate import _
 _logger = logging.getLogger(__name__)
 
 
+class ProductSuppinfo(models.Model):
+    """ Model name: Product supplier info
+    """
+
+    _inherit = 'product.supplierinfo'
+
+    supplier_stock_qty = fields.Float(string='Supplier stock')
+
+
 class ResCompany(models.Model):
     """ Model name: Res Company
     """
