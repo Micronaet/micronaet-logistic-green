@@ -286,6 +286,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
         po_line_pool = self.env['purchase.order.line']
         quant_pool = self.env['stock.quant']
         partner_pool = self.env['res.partner']
+        suppinfo_pool = self.env['product.supplierinfo']
 
         gap = 0.000001  # For approx quantity check
 
@@ -355,7 +356,6 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                 row, self._column_position['supplier_available_hidden']) or 0.0
             new_supplier_stock_qty = ws.cell_value(
                 row, self._column_position['supplier_available_show']) or 0.0
-
 
             internal_qty = ws.cell_value(
                 row, self._column_position['internal_qty']) or 0.0
@@ -507,13 +507,40 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                 used_supplier_qty += supplier_qty  # To update suppl. stock
 
             # -----------------------------------------------------------------
-            # TODO Update supplier info data:
+            # Update supplier info data:
             # -----------------------------------------------------------------
+            pdb.set_trace()
             if supplier:
+                suppinfo = False
+                for item in product.seller_ids:
+                    if product.name == supplier:
+                        suppinfo = item  # found!
+                        break
 
-                supplier_stock_qty
-                new_supplier_stock_qty
+                new_supplier_stock_qty -= used_supplier_qty  # Remove all used
+                if new_supplier_stock_qty < 0:
+                    new_supplier_stock_qty = 0
 
+                if suppinfo:
+                    suppinfo_data = {
+                        'supplier_stock_qty': new_supplier_stock_qty,
+                    }
+                    if supplier_price:
+                        suppinfo_data.update({
+                            'supplier_price': supplier_price,
+                            'date_start': now,
+                        })
+                    suppinfo.write(suppinfo_data)
+                else:
+                    suppinfo_pool.create({
+                        'name': supplier.id,
+                        'min_qty': 1,
+                        'price': supplier_price,
+                        'supplier_stock_qty': new_supplier_stock_qty,
+                        'product_tmpl_id': product.product_tmpl_id.id,
+                        'delay': 1,
+                        'date_start': now,
+                    })
 
         # ---------------------------------------------------------------------
         #                 Assign management (Internal stock):
