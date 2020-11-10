@@ -57,7 +57,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
         if len(code_part) == 2:
             supplier_code = code_part[-1]
             if not supplier_code[-1].isdigit():
-                supplier_code[:-1]
+                supplier_code = supplier_code[:-1]
         else:
             supplier_code = False
 
@@ -74,11 +74,11 @@ class SaleOrderExcelManageWizard(models.TransientModel):
 
         if use_this:
             return (
-                suppinfo.name.id,
-                suppinfo.name.name,
-                suppinfo.name.ref,
-                suppinfo.price,
-                suppinfo.supplier_stock_qty,
+                use_this.name.id,
+                use_this.name.name,
+                use_this.name.ref,
+                use_this.price,
+                use_this.supplier_stock_qty,
                 )
         else:
             return False, '', '', 0, 0
