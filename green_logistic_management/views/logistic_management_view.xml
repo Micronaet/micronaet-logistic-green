@@ -101,7 +101,6 @@
              </field>
         </record>
 
-
          <!--stock.picking-->
          <record model="ir.ui.view" id="view_stock_picking_confirm_out_form">
              <field name="name">stock.picking.form</field>
