@@ -549,7 +549,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                     }
                     if supplier_price:
                         suppinfo_data.update({
-                            'supplier_price': supplier_price,
+                            'price': supplier_price,
                             'date_start': now,
                         })
                     suppinfo.write(suppinfo_data)
