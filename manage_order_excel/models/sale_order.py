@@ -535,7 +535,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             if supplier:
                 suppinfo = False
                 for item in product.seller_ids:
-                    if product.name == supplier:
+                    if item.name == supplier:
                         suppinfo = item  # found!
                         break
 
