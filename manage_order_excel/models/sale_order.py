@@ -42,12 +42,11 @@ class SaleOrderExcelManageWizard(models.TransientModel):
 
         'internal_qty': 8,
 
-        'supplier_available_hidden': 9,
-        'supplier_available_show': 10,
+        'supplier_available_show': 9,
 
-        'supplier_qty': 11,
-        'supplier_code': 12,
-        'supplier_price': 13,
+        'supplier_qty': 10,
+        'supplier_code': 11,
+        'supplier_price': 12,
     }
 
     @api.model
@@ -114,7 +113,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             _('Disp. magazz. nasc.'), _('Disp. magazz.'),
             _('Q. da mag.'),
 
-            _('Disp. forn. nasc.'), _('Disp. forn.'),
+            _('Disp. forn.'),
             _('Q. ord. forn.'), _('Rif. forn.'),
             _('Prezzo acq.'), _('Status'),
         )
@@ -127,7 +126,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             1, 10,
             10,
 
-            1, 10,
+            10,
             10, 8,
             10, 10,
         )
@@ -164,7 +163,6 @@ class SaleOrderExcelManageWizard(models.TransientModel):
         report_pool.column_hidden(ws_name, [
             self._column_position['id'],
             self._column_position['internal_hidden_qty'],
-            self._column_position['supplier_available_hidden'],
         ])  # Hide ID columns
         row = 0
         report_pool.write_xls_line(ws_name, row, title, style_code='title')
@@ -247,7 +245,6 @@ class SaleOrderExcelManageWizard(models.TransientModel):
                 (qty_covered, 'number_total'),
 
                 # Supplier:
-                (0 if supplier_id else '/', 'number'),  # Hidden
                 (0 if supplier_id else '/', 'number'),
                 (0 if supplier_id else '', 'number_total'),
                 (supplier_code, 'text_total'),
@@ -352,8 +349,6 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             new_stock_qty = ws.cell_value(
                 row, self._column_position['internal_show_qty']) or 0.0
 
-            supplier_stock_qty = ws.cell_value(
-                row, self._column_position['supplier_available_hidden']) or 0.0
             new_supplier_stock_qty = ws.cell_value(
                 row, self._column_position['supplier_available_show']) or 0.0
 
