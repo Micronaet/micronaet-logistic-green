@@ -69,7 +69,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
 
         title = (
             title_counter,
-            _('Sale order pending'),
+            _('Sale order pending:%s' % title_counter),
             )
 
         header = (
@@ -270,10 +270,10 @@ class SaleOrderExcelManageWizard(models.TransientModel):
 
         # Check sheet mode:
         sheet_mode = ws.cell_value(0, 0)
-        sheet_counter = self.company.sale_export_ref
-        if sheet_mode != sheet_counter:
+        title_counter = self.company.sale_export_ref
+        if sheet_mode != title_counter:
             raise exceptions.Warning(
-                'Wrong Excel file mode, expected: %s' % sheet_counter)
+                'Wrong Excel file mode, expected: %s' % title_counter)
 
         # Parameters from company (for assign qty):
         company = self.env.user.company_id  # TODO read from order?
