@@ -312,10 +312,14 @@ class SaleOrderExcelManageWizard(models.TransientModel):
         sheet_mode = ws.cell_value(0, 0)
         company = self.env.user.company_id
         title_counter = company.sale_export_ref
+        if not title_counter:
+            raise exceptions.Warning(
+                'Wrong Excel file mode, last was yet imported')
         if sheet_mode != title_counter:
             raise exceptions.Warning(
                 'Wrong Excel file mode, expected: %s, got: %s' % (
                     title_counter, sheet_mode))
+        company.sale_export_ref = False  # Clean when imported
 
         # Parameters from company (for assign qty):
         company = self.env.user.company_id  # TODO read from order?
@@ -422,7 +426,7 @@ class SaleOrderExcelManageWizard(models.TransientModel):
             # -----------------------------------------------------------------
             # Update stock from Excel file (before unload):
             # -----------------------------------------------------------------
-            product = lines[0].product_id  # Extract esternally once
+            product = lines[0].product_id  # Extract externally once
             if stock_qty != new_stock_qty:
                 current_qty = product.qty_available
                 gap_qty = new_stock_qty - current_qty
