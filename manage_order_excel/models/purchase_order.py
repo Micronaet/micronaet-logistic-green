@@ -104,7 +104,7 @@ class PurchaseOrderExcelManageWizard(models.TransientModel):
             collect_data[key][0] += waiting_qty
             collect_data[key][1].append(line)
 
-        for key in collect_data:
+        for key in sorted(collect_data, key=lambda k: k[0].name):
             waiting_qty, lines = collect_data[key]
             supplier, product = key
             first_line = lines[0]
