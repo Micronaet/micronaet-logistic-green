@@ -98,7 +98,7 @@ class PurchaseOrder(models.Model):
         filename = filename + '.pdf'
         fullname = os.path.join(folder, filename)
 
-        REPORT_ID = 'purchase.report_purchaseorder'
+        REPORT_ID = 'purchase.action_report_purchase_order'  # report_purchaseorder
         # REPORT_ID = 'purchase.report_purchasequotation'
         pdf = self.env.ref(REPORT_ID).render_qweb_pdf(self.ids)
         f_pdf = open(fullname, 'wb')
