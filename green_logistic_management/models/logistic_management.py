@@ -83,6 +83,27 @@ class PurchaseOrder(models.Model):
     # -------------------------------------------------------------------------
     #                           UTILITY:
     # -------------------------------------------------------------------------
+    @api.multi
+    def extract_purchase_order_report(self):
+        """ Extract PDF report
+        """
+        folder = os.path.expanduser(
+            '~/.local/share/Odoo/filestore/LeGeorgiche/Data/document/purchase')
+
+        # TODO Sanitize file name:
+        filename = (self.name or self.id).replace('/', '_')
+        filename = filename + '.pdf'
+        fullname = os.path.join(folder, filename)
+
+        REPORT_ID = 'purchase.report_purchaseorder'
+        # REPORT_ID = 'purchase.report_purchasequotation'
+        pdf = self.env.ref(REPORT_ID).render_qweb_pdf(self.ids)
+        f_pdf = open(fullname, 'wb')
+        f_pdf.write(pdf[0])
+        f_pdf.close()
+        _logger.info('Extract purchase order: %s' % fullname)
+        return fullname
+
     @api.model
     def return_purchase_order_list_view(self, purchase_ids):
         """ Return purchase order tree from ids
@@ -164,6 +185,7 @@ class PurchaseOrder(models.Model):
         # self.export_purchase_order()
         now = fields.Datetime.now()
 
+        fullname = self.extract_purchase_order_report()
         return self.write({
             'logistic_state': 'confirmed',
             'date_planned': now,
