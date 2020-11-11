@@ -187,6 +187,12 @@ class PurchaseOrderLine(models.Model):
 
     _inherit = 'purchase.order.line'
 
+    @api.multi
+    def unlink_for_undo(self):
+        """ Launch procedure for sale order
+        """
+        return self.logistic_sale_id.unlink_for_undo()
+
     # COLUMNS:
     logistic_sale_id = fields.Many2one(
         'sale.order.line', 'Link to generator',
