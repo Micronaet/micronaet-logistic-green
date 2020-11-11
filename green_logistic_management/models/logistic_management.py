@@ -87,8 +87,11 @@ class PurchaseOrder(models.Model):
     def extract_purchase_order_report(self):
         """ Extract PDF report
         """
+        pdb.set_trace()
         folder = os.path.expanduser(
-            '~/.local/share/Odoo/filestore/LeGeorgiche/Data/document/purchase')
+            '~/.local/share/Odoo/filestore/%s/Data/document/purchase' %
+            self.env.cr.dbname)
+        os.system('mkdir -p %s' % folder)
 
         # TODO Sanitize file name:
         filename = (self.name or self.id).replace('/', '_')
