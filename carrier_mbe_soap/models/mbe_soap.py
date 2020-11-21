@@ -84,6 +84,16 @@ class CarrierSupplier(models.Model):
         string='SOAP Connection')
 
 
+class CarrierSupplierMode(models.Model):
+    """ Model name: Parcels supplier mode
+    """
+
+    _inherit = 'carrier.supplier.mode'
+
+    cups_printer_id = fields.Many2one(
+        'cups.printer', 'CUPS printer', help='Label order print with this')
+
+
 class CarrierParcelTemplate(models.Model):
     """ Model name: Parcels template
     """

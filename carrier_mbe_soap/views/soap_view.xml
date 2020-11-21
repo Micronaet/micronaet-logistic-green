@@ -283,6 +283,17 @@
         <field name="view_mode">tree,form</field>
     </record>
 
+    <record model="ir.ui.view" id="view_carrier_supplier_mode_print_tree">
+        <field name="name">carrier.supplier.mode.print.tree</field>
+        <field name="model">carrier.supplier.mode</field>
+        <field name="inherit_id" ref="green_logistic_carrier.view_carrier_supplier_mode_tree"/>
+        <field name="arch" type="xml">
+            <field name="account_ref" position="before">
+                <field name="cups_printer_id" />
+            </field>
+        </field>
+    </record>
+
     <!--carrier.supplier-->
     <record model="ir.ui.view" id="view_carrier_supplier_tree">
         <field name="name">carrier.supplier.tree</field>
