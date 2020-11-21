@@ -166,7 +166,10 @@ class SaleOrder(models.Model):
         label_path = self.get_folder_root_path('label', root_path=path)
         filename = '%s.1.PDF' % self.id
         fullname = os.path.join(label_path, filename)
-        printer_code = self.soap_connection_id.cups_printer_id.code
+        printer_code = \
+            self.carrier_mode_id.cups_printer_id.code or \
+            self.soap_connection_id.cups_printer_id.code
+
         return self.send_report_to_cups_printer(fullname, printer_code)
 
     @api.multi
