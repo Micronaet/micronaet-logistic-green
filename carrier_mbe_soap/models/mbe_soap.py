@@ -433,7 +433,13 @@ class SaleOrder(models.Model):
         """ Update order courier fields with reply SOAP
         """
         order = self
+        # Filter parameters:
         carrier_mode_search = order.carrier_mode_id.account_ref
+
+        # Courier:
+        courier_supplier_id = order.courier_supplier_id.account_ref
+        courier_mode_id = order.courier_mode_id.account_ref
+
         supplier_pool = self.env['carrier.supplier']
         service_pool = self.env['carrier.supplier.mode']
         better = {}

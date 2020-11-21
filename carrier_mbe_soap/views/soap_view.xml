@@ -117,10 +117,10 @@
                 <field name="carrier_cost_lossy" invisible="1"/>
 
                 <field name="carrier_supplier_id"/>
-                <field name="carrier_mode_id" domain="[('supplier_id', '=', carrier_supplier_id)]"/>
+                <field name="carrier_mode_id" />
                 <button name="carrier_get_better_option" type="object" string="Get better option" icon="fa-hand-o-right fa-2x" />
-                <field name="courier_supplier_id" readonly="1"/>
-                <field name="courier_mode_id" readonly="1"/>
+                <field name="courier_supplier_id" /> <!--readonly="1"-->
+                <field name="courier_mode_id" domain="[('supplier_id', '=', 'courier_supplier_id')]"/> <!--readonly="1"-->
                 <field name="master_tracking_id" readonly="1"/>
                 <field name="carrier_track_id" readonly="1"/>
                 <field name="carrier_cost" readonly="1"/>

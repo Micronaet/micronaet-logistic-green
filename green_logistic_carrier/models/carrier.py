@@ -406,12 +406,14 @@ class SaleOrder(models.Model):
         'Carrier OK',
         help='Carrier must be confirmed when done!')
 
-    # Carrier:
+    # Master Carrier:
     carrier_supplier_id = fields.Many2one(
         'carrier.supplier', 'Carrier',
         domain="[('mode', '=', 'carrier')]")
     carrier_mode_id = fields.Many2one(
-        'carrier.supplier.mode', 'Carrier service')
+        'carrier.supplier.mode', 'Carrier service',
+        domain="[('supplier_id', '=', carrier_supplier_id)]",
+    )
 
     courier_supplier_id = fields.Many2one(
         'carrier.supplier', 'Courier',
