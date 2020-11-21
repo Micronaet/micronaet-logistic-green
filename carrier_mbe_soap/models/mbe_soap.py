@@ -437,8 +437,8 @@ class SaleOrder(models.Model):
         carrier_mode_search = order.carrier_mode_id.account_ref
 
         # Courier:
-        courier_supplier_id = order.courier_supplier_id.account_ref
-        courier_mode_id = order.courier_mode_id.account_ref
+        courier_supplier_search = order.courier_supplier_id.account_ref
+        courier_mode_search = order.courier_mode_id.account_ref
 
         supplier_pool = self.env['carrier.supplier']
         service_pool = self.env['carrier.supplier.mode']
@@ -453,10 +453,13 @@ class SaleOrder(models.Model):
                 _logger.error('No shipping option for better quotation')
                 continue
 
-            _logger.warning('Quotation founds: %s [Mode search: %s]' % (
-                len(quotations),
-                carrier_mode_search or 'disabled',
-            ))
+            _logger.warning(
+                'Quotation founds: %s [Mode search: %s, %s, %s]' % (
+                    len(quotations),
+                    carrier_mode_search or 'no carrier mode',
+                    courier_supplier_search or 'no courier supplier',
+                    courier_mode_search or 'no courier mode',
+                    ))
             for quotation in quotations:
                 quotation_list.append((connection, quotation))
 
@@ -464,13 +467,28 @@ class SaleOrder(models.Model):
         for record in quotation_list:
             connection, quotation = record
             try:
-                # Check carrier if selected in request:
+                # -------------------------------------------------------------
+                # Filter:
+                # -------------------------------------------------------------
+                # 1. Check carrier if selected in request:
                 carrier_code = quotation['Service']
                 if (carrier_mode_search and carrier_mode_search !=
                         carrier_code):
                     continue
 
-                # Check and save best quotation:
+                # 2. Check courier if requested:
+                courier_code = quotation['Courier']
+                if (courier_supplier_search and courier_supplier_search !=
+                        courier_code):
+                    continue
+
+                # 3. Check courier mode if requested:
+                mode_code = quotation['CourierService']
+                if (courier_mode_search and courier_mode_search !=
+                        mode_code):
+                    continue
+
+                # 4. Check and save best quotation:
                 if not better or (quotation['NetShipmentTotalPrice'] <
                                   better[1]['NetShipmentTotalPrice']):
                     better = record
@@ -478,6 +496,7 @@ class SaleOrder(models.Model):
                 _logger.error('Error on quotation: %s' % (
                     sys.exc_info(), ))
 
+        # TODO no need to create 21 nov. 2020?!?:
         # Update order with better quotation:
         data = False
         if better:

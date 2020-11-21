@@ -36,7 +36,7 @@ class CarrierSupplier(models.Model):
         ], required=True, default='carrier')
     mode_id = fields.Many2one(
         'carrier.supplier.mode', 'Carrier mode',
-        domain="[('mode', '=', 'carrier')]",
+        domain="[('supplier_id.mode', '=', 'carrier')]",
         help='Courier of this carrier mode')
 
 
@@ -424,7 +424,7 @@ class SaleOrder(models.Model):
         domain="[('mode', '=', 'courier'), ('mode_id', '=', carrier_mode_id)]")
     courier_mode_id = fields.Many2one(
         'carrier.supplier.mode', 'Courier service',
-        domain="[('courier_id', '=', courier_supplier_id)]",
+        domain="[('supplier_id', '=', courier_supplier_id)]",
     )
 
     carrier_parcel_template_id = fields.Many2one(
