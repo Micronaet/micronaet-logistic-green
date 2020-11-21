@@ -50,6 +50,12 @@ class CarrierSupplierMode(models.Model):
     name = fields.Char('Name', required=True)
     account_ref = fields.Char('Account ref.')
     supplier_id = fields.Many2one('carrier.supplier', 'Carrier', required=True)
+    courier_id = fields.Many2one(
+        'carrier.supplier', 'Courier', help='Sub-service or this courier')
+    mode_id = fields.Many2one(
+        'carrier.supplier.mode', 'Carrier mode',
+        domain="[('supplier_id.mode', '=', 'carrier')]",
+        help='Courier of this carrier mode')
 
 
 class CarrierParcelTemplate(models.Model):
@@ -417,9 +423,11 @@ class SaleOrder(models.Model):
 
     courier_supplier_id = fields.Many2one(
         'carrier.supplier', 'Courier',
-        domain="[('mode', '=', 'courier')]")
+        domain="[('mode', '=', 'courier'), ('mode_id', '=', carrier_mode_id)]")
     courier_mode_id = fields.Many2one(
-        'carrier.supplier.mode', 'Courier service')
+        'carrier.supplier.mode', 'Courier service',
+        domain="[('courier_id', '=', courier_supplier_id)]",
+    )
 
     carrier_parcel_template_id = fields.Many2one(
         'carrier.parcel.template', 'Parcel template')
