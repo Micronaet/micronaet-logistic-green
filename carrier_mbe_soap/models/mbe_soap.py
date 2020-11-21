@@ -464,6 +464,7 @@ class SaleOrder(models.Model):
                 quotation_list.append((connection, quotation))
 
         # Choose better quotation:
+        pdb.set_trace()
         for record in quotation_list:
             connection, quotation = record
             try:
@@ -471,21 +472,18 @@ class SaleOrder(models.Model):
                 # Filter:
                 # -------------------------------------------------------------
                 # 1. Check carrier if selected in request:
-                carrier_code = quotation['Service']
                 if (carrier_mode_search and carrier_mode_search !=
-                        carrier_code):
+                        quotation['Service']):
                     continue
 
                 # 2. Check courier if requested:
-                courier_code = quotation['Courier']
                 if (courier_supplier_search and courier_supplier_search !=
-                        courier_code):
+                        quotation['Courier']):
                     continue
 
                 # 3. Check courier mode if requested:
-                mode_code = quotation['CourierService']
                 if (courier_mode_search and courier_mode_search !=
-                        mode_code):
+                        quotation['CourierService']):
                     continue
 
                 # 4. Check and save best quotation:
@@ -567,6 +565,7 @@ class SaleOrder(models.Model):
                     'courier_supplier_id': supplier_id,
                     'courier_mode_id': service_id,
                     'carrier_mode_id': carrier_mode_id,
+                    'soap_last_error': False,  # Clean error when write
                 })
 
                 # 'IdSubzone': 125,
