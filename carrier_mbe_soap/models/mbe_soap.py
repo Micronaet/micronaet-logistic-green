@@ -464,7 +464,6 @@ class SaleOrder(models.Model):
                 quotation_list.append((connection, quotation))
 
         # Choose better quotation:
-        pdb.set_trace()
         for record in quotation_list:
             connection, quotation = record
             try:
