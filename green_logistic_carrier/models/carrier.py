@@ -34,6 +34,10 @@ class CarrierSupplier(models.Model):
             ('carrier', 'Carrier'),
             ('courier', 'Courier'),
         ], required=True, default='carrier')
+    mode_id = fields.Many2one(
+        'carrier.supplier.mode', 'Carrier mode',
+        domain="[('mode', '=', 'carrier')]",
+        help='Courier of this carrier mode')
 
 
 class CarrierSupplierMode(models.Model):
@@ -50,12 +54,6 @@ class CarrierSupplierMode(models.Model):
     name = fields.Char('Name', required=True)
     account_ref = fields.Char('Account ref.')
     supplier_id = fields.Many2one('carrier.supplier', 'Carrier', required=True)
-    courier_id = fields.Many2one(
-        'carrier.supplier', 'Courier', help='Sub-service or this courier')
-    mode_id = fields.Many2one(
-        'carrier.supplier.mode', 'Carrier mode',
-        domain="[('supplier_id.mode', '=', 'carrier')]",
-        help='Courier of this carrier mode')
 
 
 class CarrierParcelTemplate(models.Model):

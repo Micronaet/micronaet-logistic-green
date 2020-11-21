@@ -128,7 +128,7 @@
             <field name="model">carrier.supplier</field>
             <field name="arch" type="xml">
                 <tree string="Carrier supplier" editable="bottom">
-                    <field name="mode" />
+                    <field name="mode_id" />
                     <field name="name" />
                     <field name="account_ref" />
                 </tree>
@@ -150,9 +150,7 @@
             <field name="model">carrier.supplier.mode</field>
             <field name="arch" type="xml">
                 <tree string="Carrier supplier mode" editable="bottom">
-                    <field name="mode_id" />
                     <field name="supplier_id" />
-                    <field name="courier_id" />
                     <field name="name" />
                     <field name="account_ref" />
                 </tree>
