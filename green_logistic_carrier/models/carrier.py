@@ -424,12 +424,12 @@ class SaleOrder(models.Model):
 
     courier_supplier_id = fields.Many2one(
         'carrier.supplier', 'Courier',
-        domain="[('hidden', '=', True), "
+        domain="[('hidden', '=', False), "
                "('mode', '=', 'courier'),"
                "('mode_id', '=', carrier_mode_id)]")
     courier_mode_id = fields.Many2one(
         'carrier.supplier.mode', 'Courier service',
-        domain="[('hidden', '=', True), "
+        domain="[('hidden', '=', False), "
                "('supplier_id', '=', courier_supplier_id)]",
     )
 
