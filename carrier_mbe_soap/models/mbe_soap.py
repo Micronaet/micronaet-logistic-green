@@ -1052,7 +1052,6 @@ class SaleOrder(models.Model):
         order = self
 
         # Carrier connection (B)
-        pdb.set_trace()
         soap_connection = order.carrier_supplier_id.soap_connection_id
         if not soap_connection:
             return 'Order %s has carrier without SOAP ref.!' % order.name
@@ -1066,9 +1065,10 @@ class SaleOrder(models.Model):
         # SOAP insert call:
         # ---------------------------------------------------------------------
         # A. Economy request:
-        all_services = [
-            item.soap_connection_id for item in self.parcel_ids
-            if item.soap_connection_id]
+        all_services = []
+        # TODO no more use parcel connection (removed from list):
+        #    item.soap_connection_id for item in self.parcel_ids
+        #    if item.soap_connection_id]
 
         # B. Standard request:
         if not all_services:
