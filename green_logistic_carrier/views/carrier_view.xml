@@ -150,6 +150,7 @@
             <field name="model">carrier.supplier.mode</field>
             <field name="arch" type="xml">
                 <tree string="Carrier supplier mode" editable="bottom">
+                    <field name="is_active" />
                     <field name="supplier_id" />
                     <field name="name" />
                     <field name="account_ref" />
@@ -173,7 +174,7 @@
             <field name="arch" type="xml">
                 <tree string="Parcel template" editable="bottom" decoration-primary="carrier_supplier_id==False">
                     <field name="carrier_supplier_id" />
-                    <field name="is_active" />
+                    <field name="is_active" invisible="1"/>
 
                     <field name="name" />
                     <field name="length" />
@@ -192,7 +193,7 @@
                     <sheet>
                         <group colspan="4" col="6">
                             <field name="carrier_supplier_id" />
-                            <field name="is_active" />
+                            <field name="is_active" invisible="1"/>
 
                             <field name="name" />
                             <field name="weight" />

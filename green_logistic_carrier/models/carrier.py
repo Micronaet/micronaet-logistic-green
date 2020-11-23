@@ -54,6 +54,7 @@ class CarrierSupplierMode(models.Model):
     name = fields.Char('Name', required=True)
     account_ref = fields.Char('Account ref.')
     supplier_id = fields.Many2one('carrier.supplier', 'Carrier', required=True)
+    is_active = fields.Boolean('Attivo')
 
 
 class CarrierParcelTemplate(models.Model):
