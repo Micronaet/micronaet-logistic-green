@@ -119,6 +119,16 @@ class SaleOrder(models.Model):
     """
     _inherit = 'sale.order'
 
+    @api.onchange('carrier_parcel_template_id')
+    def onchange_carrier_parcel_template_id(self):
+        """ Setup package mode in order
+        """
+        self.ensure_one()
+        package_type = self.carrier_parcel_template_id.package_type
+        if package_type:
+            _logger.warning('Force change of package: %s' % package_type)
+            self.package_type = package_type
+
     @api.multi
     def soap_comment_last_error(self):
         """ Last error comment pop up

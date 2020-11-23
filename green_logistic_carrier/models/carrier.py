@@ -406,6 +406,7 @@ class SaleOrder(models.Model):
                            if item.product_id.default_code == 'shipment'])
             order.carrier_cost_lossy = payed > request
 
+
     # -------------------------------------------------------------------------
     #                                   COLUMNS:
     # -------------------------------------------------------------------------
