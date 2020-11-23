@@ -334,7 +334,7 @@ class SaleOrder(models.Model):
             'Service': order.carrier_mode_id.account_ref or '',
             'Courier': order.courier_supplier_id.account_ref or '',
             'CourierService': order.courier_mode_id.account_ref or '',
-            'PackageType': '',  # TODO order.package_type, <<<<<<<<<<<<<<<<<<<<
+            'PackageType': order.package_type,
             'Referring': order.name,  # * 30
             'InternalNotes': '',  # TODO * string
             'Notes': note,
@@ -388,7 +388,7 @@ class SaleOrder(models.Model):
                 'idSubzone': '',  # * int
                 },
             'ShipType': order.ship_type or '',
-            'PackageType': '',  # TODO  order.package_type or '', <<<<<<<<<<<<<
+            'PackageType': order.package_type or '',
             # order.carrier_mode_id.account_ref
             'Service': '',  # Empty for now * string
             'Courier': '',  # Empty for now * string
