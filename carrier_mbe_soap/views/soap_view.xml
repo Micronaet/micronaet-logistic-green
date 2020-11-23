@@ -57,6 +57,7 @@
             <field name="arch" type="xml">
                 <field name="carrier_supplier_id" position="after">
                     <field name="soap_connection_id" />
+                    <field name="package_type" />
                 </field>
             </field>
         </record>
@@ -67,6 +68,7 @@
             <field name="arch" type="xml">
                 <field name="carrier_supplier_id" position="after">
                     <field name="soap_connection_id" />
+                    <field name="package_type" />
                 </field>
             </field>
         </record>

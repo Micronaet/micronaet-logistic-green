@@ -105,6 +105,14 @@ class CarrierParcelTemplate(models.Model):
         string='SOAP Connection',
         help='Force SOAP connection for small package')
 
+    package_type = fields.Selection(
+        string='Package type', default='GENERIC', required=True,
+        selection=[
+            ('GENERIC', 'Generic'),
+            ('ENVELOPE', 'Envelope'),
+            ('DOCUMENTS', 'Documents'),
+        ])
+
 
 class SaleOrder(models.Model):
     """ Model name: Sale order
