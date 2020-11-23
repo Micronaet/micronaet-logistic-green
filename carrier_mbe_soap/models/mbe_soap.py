@@ -1087,6 +1087,7 @@ class SaleOrder(models.Model):
                 get_shipment_parameters_container()
 
             service = connection.get_connection()
+            pdb.set_trace()
             reply = service.ShippingOptionsRequest(data)
             _logger.warning('\n%s\n\n%s\n' % (data, reply))
             error += order.check_reply_status(reply)
