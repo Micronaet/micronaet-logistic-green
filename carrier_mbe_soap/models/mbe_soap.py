@@ -106,7 +106,7 @@ class CarrierParcelTemplate(models.Model):
         help='Force SOAP connection for small package')
 
     package_type = fields.Selection(
-        string='Package type', default='GENERIC', required=True,
+        string='Package type',
         selection=[
             ('GENERIC', 'Generic'),
             ('ENVELOPE', 'Envelope'),
