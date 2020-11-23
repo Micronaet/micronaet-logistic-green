@@ -75,6 +75,7 @@ class CarrierParcelTemplate(models.Model):
     # -------------------------------------------------------------------------
     #                                   COLUMNS:
     # -------------------------------------------------------------------------
+    is_active = fields.Boolean('Attivo')
     name = fields.Char('Name')
     no_label = fields.Boolean('No label')
     carrier_supplier_id = fields.Many2one('carrier.supplier', 'Carrier')

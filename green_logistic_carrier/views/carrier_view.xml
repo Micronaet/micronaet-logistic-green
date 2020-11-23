@@ -173,6 +173,7 @@
             <field name="arch" type="xml">
                 <tree string="Parcel template" editable="bottom" decoration-primary="carrier_supplier_id==False">
                     <field name="carrier_supplier_id" />
+                    <field name="is_active" />
 
                     <field name="name" />
                     <field name="length" />
@@ -191,6 +192,7 @@
                     <sheet>
                         <group colspan="4" col="6">
                             <field name="carrier_supplier_id" />
+                            <field name="is_active" />
 
                             <field name="name" />
                             <field name="weight" />
