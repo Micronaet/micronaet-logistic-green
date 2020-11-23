@@ -115,7 +115,7 @@
                 <field name="parcel_detail" readonly="1"/>
                 <field name="parcel_ids" invisible="1"/>
                 <field name="ship_type" invisible="1"/>
-                <field name="package_type" />
+                <field name="package_type" invisible="1"/>
                 <field name="carrier_cost_lossy" invisible="1"/>
 
                 <field name="carrier_supplier_id"/>
