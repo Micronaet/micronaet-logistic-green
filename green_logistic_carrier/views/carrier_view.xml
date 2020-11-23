@@ -150,7 +150,7 @@
             <field name="model">carrier.supplier.mode</field>
             <field name="arch" type="xml">
                 <tree string="Carrier supplier mode" editable="bottom">
-                    <field name="is_active" />
+                    <field name="hidden" />
                     <field name="supplier_id" />
                     <field name="name" />
                     <field name="account_ref" />

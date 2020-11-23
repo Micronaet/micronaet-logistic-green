@@ -54,7 +54,7 @@ class CarrierSupplierMode(models.Model):
     name = fields.Char('Name', required=True)
     account_ref = fields.Char('Account ref.')
     supplier_id = fields.Many2one('carrier.supplier', 'Carrier', required=True)
-    is_active = fields.Boolean('Attivo')
+    hidden = fields.Boolean('Nascosto')
 
 
 class CarrierParcelTemplate(models.Model):
@@ -426,7 +426,8 @@ class SaleOrder(models.Model):
         domain="[('mode', '=', 'courier'), ('mode_id', '=', carrier_mode_id)]")
     courier_mode_id = fields.Many2one(
         'carrier.supplier.mode', 'Courier service',
-        domain="[('supplier_id', '=', courier_supplier_id)]",
+        domain="[('hidden', '=', True), "
+               "('supplier_id', '=', courier_supplier_id)]",
     )
 
     carrier_parcel_template_id = fields.Many2one(
