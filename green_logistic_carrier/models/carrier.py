@@ -26,6 +26,7 @@ class CarrierSupplier(models.Model):
     # -------------------------------------------------------------------------
     #                                   COLUMNS:
     # -------------------------------------------------------------------------
+    hidden = fields.Boolean('Nascosto')
     name = fields.Char('Name')
     account_ref = fields.Char('Account ref.')
     mode = fields.Selection(
@@ -423,7 +424,9 @@ class SaleOrder(models.Model):
 
     courier_supplier_id = fields.Many2one(
         'carrier.supplier', 'Courier',
-        domain="[('mode', '=', 'courier'), ('mode_id', '=', carrier_mode_id)]")
+        domain="[('hidden', '=', True), "
+               "('mode', '=', 'courier'),"
+               "('mode_id', '=', carrier_mode_id)]")
     courier_mode_id = fields.Many2one(
         'carrier.supplier.mode', 'Courier service',
         domain="[('hidden', '=', True), "
