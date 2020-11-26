@@ -810,7 +810,7 @@ class ProductTemplate(models.Model):
     wp_scientific_name = fields.Char(string='Scientific name', size=50)
     # famiglia marchio
     # genere collezione
-    wp_species = fields.Char(string='Species', size=50)
+    wp_specie = fields.Char(string='Species', size=50)
     wp_variety = fields.Char(string='Variety', size=50)
     wp_origin = fields.Char(string='Origin', size=50)
     wp_ancestor = fields.Char(string='Ancestors', size=50)
