@@ -200,9 +200,15 @@ class WPConnector(models.Model):
         # Email is the key:
         name = odoo_data['billing']['name']
         email = odoo_data['billing']['email']
+        street = odoo_data['billing']['street']
+        city = odoo_data['billing']['city']
         partners = partner_pool.search([
             ('email', '=ilike', email),
             ('name', '=ilike', name),
+
+            # Change partner if new street or city:
+            ('street', '=ilike', street),
+            ('city', '=ilike', city),
             ])
 
         if partners:
