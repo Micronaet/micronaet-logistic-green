@@ -806,32 +806,32 @@ class ProductTemplate(models.Model):
     # Fields for web:
     # -------------------------------------------------------------------------
     # Tassonomy:
-    wp_vulgar_name = fields.Char(string='Vulgar name', size=60)
-    wp_scientific_name = fields.Char(string='Scientific name', size=60)
+    wp_vulgar_name = fields.Char(string='Vulgar name', size=50)
+    wp_scientific_name = fields.Char(string='Scientific name', size=50)
     # famiglia marchio
     # genere collezione
-    wp_species = fields.Char(string='Species', size=60)
-    wp_variety = fields.Char(string='Variety', size=60)
-    wp_origin = fields.Char(string='Origin', size=60)
-    wp_ancestor = fields.Char(string='Ancestors', size=60)
-    wp_description = fields.Char(string='Description', size=60)
+    wp_species = fields.Char(string='Species', size=50)
+    wp_variety = fields.Char(string='Variety', size=50)
+    wp_origin = fields.Char(string='Origin', size=50)
+    wp_ancestor = fields.Char(string='Ancestors', size=50)
+    wp_description = fields.Char(string='Description', size=50)
     # FOTO
 
     # -------------------------------------------------------------------------
     # Sale characteristic:
-    wp_jar = fields.Char(string='Jar / Packaging', size=60)
+    wp_jar = fields.Char(string='Jar / Packaging', size=30)
     # Prezzo
-    wp_sale_width = fields.Char(string='Sale width', size=30)
-    wp_sale_height = fields.Char(string='Sale height', size=30)
-    wp_sale_trunk = fields.Char(string='Sale trunk', size=60)
-    wp_graph_holder = fields.Char(string='Graph holder', size=60)
-    wp_color = fields.Char(string='Color', size=60)
-    wp_finish = fields.Char(string='Finish', size=60)
+    wp_sale_width = fields.Char(string='Sale width', size=20)
+    wp_sale_height = fields.Char(string='Sale height', size=20)
+    wp_sale_trunk = fields.Char(string='Sale trunk', size=50)
+    wp_graph_holder = fields.Char(string='Graph holder', size=50)
+    wp_color = fields.Char(string='Color', size=50)
+    wp_finish = fields.Char(string='Finish', size=50)
 
     # -------------------------------------------------------------------------
     # Botanic / Tech:
-    wp_botanic_group = fields.Char(string='Botanic group', size=60)
-    wp_bearing = fields.Char(string='Bearing', size=60)
+    wp_botanic_group = fields.Char(string='Botanic group', size=50)
+    wp_bearing = fields.Char(string='Bearing', size=50)
     wp_flower_dimension = fields.Char(string='Flower dimension', size=20)
     wp_scent = fields.Char(string='Scent', size=50)
     wp_scent_note = fields.Char(string='Scent note', size=50)
