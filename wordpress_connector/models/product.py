@@ -802,6 +802,65 @@ class ProductTemplate(models.Model):
          compute='_get_wp_image_file',
          help='Load image from folder for connector', string='WP Image')
 
+    # -------------------------------------------------------------------------
+    # Fields for web:
+    # -------------------------------------------------------------------------
+    # Tassonomy:
+    wp_vulgar_name = fields.Char(string='Vulgar name', size=60)
+    wp_scientific_name = fields.Char(string='Scientific name', size=60)
+    # famiglia marchio
+    # genere collezione
+    wp_species = fields.Char(string='Species', size=60)
+    wp_variety = fields.Char(string='Variety', size=60)
+    wp_origin = fields.Char(string='Origin', size=60)
+    wp_ancestor = fields.Char(string='Ancestors', size=60)
+    wp_description = fields.Char(string='Description', size=60)
+    # FOTO
+
+    # -------------------------------------------------------------------------
+    # Sale characteristic:
+    wp_jar = fields.Char(string='Jar / Packaging', size=60)
+    # Prezzo
+    wp_sale_width = fields.Char(string='Sale width', size=30)
+    wp_sale_height = fields.Char(string='Sale height', size=30)
+    wp_sale_trunk = fields.Char(string='Sale trunk', size=60)
+    wp_graph_holder = fields.Char(string='Graph holder', size=60)
+    wp_color = fields.Char(string='Color', size=60)
+    wp_finish = fields.Char(string='Finish', size=60)
+
+    # -------------------------------------------------------------------------
+    # Botanic / Tech:
+    wp_botanic_group = fields.Char(string='Botanic group', size=60)
+    wp_bearing = fields.Char(string='Bearing', size=60)
+    wp_flower_dimension = fields.Char(string='Flower dimension', size=20)
+    wp_scent = fields.Char(string='Scent', size=50)
+    wp_scent_note = fields.Char(string='Scent note', size=50)
+    wp_leaf_type = fields.Char(string='Leaf type', size=50)
+    wp_leaf_color = fields.Char(string='Leaf color', size=50)
+    wp_leaf_persistence = fields.Char(string='Leaf persistence', size=50)
+    wp_flowering_type = fields.Char(string='Flowering type', size=50)
+    wp_flowering_color = fields.Char(string='Flowering color', size=50)
+    wp_flowering_period = fields.Char(string='Flowering period', size=50)
+    wp_flowering_height = fields.Char(string='Flowering height', size=50)
+    wp_time_transplant = fields.Char(string='Time transplant', size=50)
+    wp_time_sowing = fields.Char(string='Time sowing', size=50)
+    wp_time_roundup = fields.Char(string='Time round up', size=50)
+    # dimesione larghezza
+    # dimesione altezza
+    wp_exposition = fields.Char(string='Exposition', size=50)
+    wp_frost_resistance = fields.Char(string='Frost resistance', size=50)
+    wp_rusticity = fields.Char(string='Rusticity', size=50)
+    wp_use = fields.Char(string='Use', size=50)
+    wp_biologic = fields.Char(string='Pet friendly / Biologic', size=50)
+    wp_adversity = fields.Char(string='Adversity', size=50)
+
+    # -------------------------------------------------------------------------
+    # Care and cultivation
+    wp_pruning = fields.Char(string='Pruning', size=50)
+    wp_care = fields.Char(string='Care and cultivation', size=50)
+    wp_propagation = fields.Char(string='Propagation', size=50)
+    wp_disease = fields.Char(string='Parasite and disease', size=50)
+
 
 class ProductTemplateRelation(models.Model):
     """ Model name: Product Template
