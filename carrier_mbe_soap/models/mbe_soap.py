@@ -347,7 +347,7 @@ class SaleOrder(models.Model):
         data = {
             'ShipperType': order.shipper_type,
             'Description': order.check_size(
-                order.carrier_description, 100, dotted=True),
+                order.name, 100, dotted=True),  # or order.carrier_description
             'MethodPayment': order.carrier_pay_mode,
             'Service': order.carrier_mode_id.account_ref or '',
             'Courier': order.courier_supplier_id.account_ref or '',
