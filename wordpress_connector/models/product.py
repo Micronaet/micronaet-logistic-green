@@ -808,8 +808,13 @@ class ProductTemplate(models.Model):
     # Tassonomy:
     wp_vulgar_name = fields.Char(string='Vulgar name', size=50)
     wp_scientific_name = fields.Char(string='Scientific name', size=50)
-    # famiglia marchio
-    # genere collezione
+    wp_family = fields.Char(
+        string='Family', size=50,
+        help='Relation family, used ID.ID for link Tag Wiki of Wordpress')
+    wp_genre = fields.Char(
+        string='Genre', size=50,
+        help='Relation genre, used ID.ID for link Tag Wiki of Wordpress')
+    # marchio collezione
     wp_specie = fields.Char(string='Species', size=50)
     wp_variety = fields.Char(string='Variety', size=50)
     wp_origin = fields.Char(string='Origin', size=50)
@@ -819,7 +824,11 @@ class ProductTemplate(models.Model):
 
     # -------------------------------------------------------------------------
     # Sale characteristic:
-    wp_jar = fields.Char(string='Jar / Packaging', size=30)
+    wp_jar_id = fields.Many2one(
+        comodel_name='wp.attribute.term',
+        string='Jar / Packaging',
+        domain="[('attribute_id.filter', '=', 'vaso')]",
+    )
     # Prezzo
     wp_sale_width = fields.Char(string='Sale width', size=20)
     wp_sale_height = fields.Char(string='Sale height', size=20)
@@ -831,35 +840,84 @@ class ProductTemplate(models.Model):
     # -------------------------------------------------------------------------
     # Botanic / Tech:
     wp_botanic_group = fields.Char(string='Botanic group', size=50)
-    wp_bearing = fields.Char(string='Bearing', size=50)
+    wp_bearing_id = fields.Many2one(
+        comodel_name='wp.attribute.term',
+        string='Bearing',
+        domain="[('attribute_id.filter', '=', 'portamento')]",
+    )
     wp_flower_dimension = fields.Char(string='Flower dimension', size=20)
-    wp_scent = fields.Char(string='Scent', size=50)
+    wp_scent_id = fields.Many2one(
+        comodel_name='wp.attribute.term',
+        string='Scent',
+        domain="[('attribute_id.filter', '=', 'profumo')]",
+    )
     wp_scent_note = fields.Char(string='Scent note', size=50)
-    wp_leaf_type = fields.Char(string='Leaf type', size=50)
-    wp_leaf_color = fields.Char(string='Leaf color', size=50)
+    wp_leaf_type_id = fields.Many2one(
+        comodel_name='wp.attribute.term',
+        string='Leaf type',
+        domain="[('attribute_id.filter', '=', 'tipologia_foglia')]",
+    )
+    wp_leaf_color_id = fields.Many2one(
+        comodel_name='wp.attribute.term',
+        string='Leaf color',
+        domain="[('attribute_id.filter', '=', 'colore_foglia')]",
+    )
     wp_leaf_persistence = fields.Char(string='Leaf persistence', size=50)
     wp_flowering_type = fields.Char(string='Flowering type', size=50)
-    wp_flowering_color = fields.Char(string='Flowering color', size=50)
+    wp_flowering_color_id = fields.Many2one(
+        comodel_name='wp.attribute.term',
+        string='Flowering color',
+        domain="[('attribute_id.filter', '=', 'colore_fioritura')]",
+    )
     wp_flowering_period = fields.Char(string='Flowering period', size=50)
     wp_flowering_height = fields.Char(string='Flowering height', size=50)
     wp_time_transplant = fields.Char(string='Time transplant', size=50)
     wp_time_sowing = fields.Char(string='Time sowing', size=50)
     wp_time_roundup = fields.Char(string='Time round up', size=50)
-    # dimesione larghezza
-    # dimesione altezza
-    wp_exposition = fields.Char(string='Exposition', size=50)
+    wp_dimension_width = fields.Char(string='Dimension width', size=30)
+    wp_dimension_height_id = fields.Many2one(
+        comodel_name='wp.attribute.term',
+        string='Dimension height',
+        domain="[('attribute_id.filter', '=', 'altezza')]",
+    )
+    wp_exposition_id = fields.Many2one(
+        comodel_name='wp.attribute.term',
+        string='Exposition',
+        domain="[('attribute_id.filter', '=', 'esposizione')]",
+    )
     wp_frost_resistance = fields.Char(string='Frost resistance', size=50)
+    # wp_frost_resistance_id = fields.Many2one(
+    #    comodel_name='wp.attribute.term',
+    #    string='Frost resistance',
+    #    domain="[('attribute_id.filter', '=', 'gelo')]",
+    # )
     wp_rusticity = fields.Char(string='Rusticity', size=50)
-    wp_use = fields.Char(string='Use', size=50)
+    wp_use_id = fields.Many2one(
+        comodel_name='wp.attribute.term',
+        string='Use',
+        domain="[('attribute_id.filter', '=', 'utilizzo')]",
+    )
     wp_biologic = fields.Char(string='Pet friendly / Biologic', size=50)
     wp_adversity = fields.Char(string='Adversity', size=50)
 
     # -------------------------------------------------------------------------
     # Care and cultivation
-    wp_pruning = fields.Char(string='Pruning', size=50)
-    wp_care = fields.Char(string='Care and cultivation', size=50)
-    wp_propagation = fields.Char(string='Propagation', size=50)
-    wp_disease = fields.Char(string='Parasite and disease', size=50)
+    wp_pruning = fields.Char(
+        string='Pruning', size=50,
+        help='Relation pruning, used ID.ID for link Tag Wiki of Wordpress',
+    )
+    wp_care = fields.Char(
+        string='Care and cultivation', size=50,
+        help='Relation cultivation, used ID.ID for link Tag Wiki of Wordpress'
+    )
+    wp_propagation = fields.Char(
+        string='Propagation', size=50,
+        help='Relation propagation, used ID.ID for link Tag Wiki of Wordpress'
+    )
+    wp_disease = fields.Char(
+        string='Parasite and disease', size=50,
+        help='Relation disease, used ID.ID for link Tag Wiki of Wordpress'
+    )
 
 
 class ProductTemplateRelation(models.Model):

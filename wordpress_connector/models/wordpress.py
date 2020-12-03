@@ -568,7 +568,7 @@ class WPAttribute(models.Model):
     # -------------------------------------------------------------------------
     name = fields.Char('Name', size=64, required=True)
     filter = fields.Char(
-        'Filter Name', size=30,
+        'Filter Name', size=30, index=True,
         help='Used for filter terms for fields in product',
     )
     connector_id = fields.Many2one('wp.connector', 'Connector')

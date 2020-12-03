@@ -309,10 +309,8 @@
                             <group colspan="4" col="4">
                                 <field name="wp_vulgar_name"/>
                                 <field name="wp_scientific_name"/>
-                                <!--
-                                Family  / Brand
-                                Genre / Collection
-                                -->
+                                <field name="wp_family"/>
+                                <field name="wp_genre"/>
                                 <field name="wp_specie"/>
                                 <field name="wp_variety"/>
                                 <field name="wp_origin"/>
@@ -323,7 +321,7 @@
                         </page>
                         <page name="web_description_sale" string="Sale characteristic">
                             <group colspan="4" col="4">
-                                <field name="wp_jar"/>
+                                <field name="wp_jar_id"/>
                                 <!--Sale price-->
                                 <field name="wp_sale_width"/>
                                 <field name="wp_sale_height"/>
@@ -336,17 +334,17 @@
                         <page name="web_description_botanic" string="Botanic / Tech">
                             <group colspan="4" col="4">
                                 <field name="wp_botanic_group"/>
-                                <field name="wp_bearing"/>
+                                <field name="wp_bearing_id"/>
                                 <field name="wp_flower_dimension"/>
-                                <field name="wp_scent"/>
+                                <field name="wp_scent_id"/>
                                 <field name="wp_scent_note"/>
-                                <field name="wp_leaf_type"/>
-                                <field name="wp_leaf_color"/>
+                                <field name="wp_leaf_type_id"/>
+                                <field name="wp_leaf_color_id"/>
                                 <field name="wp_leaf_persistence"/>
                                 <field name="wp_flowering_type"/>
-                                <field name="wp_flowering_color"/>
+                                <field name="wp_flowering_color_id"/>
                                 <field name="wp_flowering_period"/>
-                                <field name="wp_flowering_height"/>
+                                <field name="wp_flowering_height_id"/>
                                 <field name="wp_time_transplant"/>
                                 <field name="wp_time_sowing"/>
                                 <field name="wp_time_roundup"/>
@@ -354,10 +352,10 @@
                                 Width
                                 Height
                                 -->
-                                <field name="wp_exposition"/>
+                                <field name="wp_exposition_id"/>
                                 <field name="wp_frost_resistance"/>
                                 <field name="wp_rusticity"/>
-                                <field name="wp_use"/>
+                                <field name="wp_use_id"/>
                                 <field name="wp_biologic"/>
                                 <field name="wp_adversity"/>
                             </group>
