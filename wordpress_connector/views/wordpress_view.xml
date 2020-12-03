@@ -226,6 +226,7 @@
                 <field name="connector_id"/>
                 <field name="wp_id"/>
                 <field name="name"/>
+                <field name="filter"/>
             </tree>
         </field>
     </record>
@@ -236,6 +237,7 @@
             <form string="Wordpress Attribute">
                 <group colspan="4" col="4">
                     <field name="name"/>
+                    <field name="filter"/>
                     <field name="connector_id"/>
                     <field name="wp_id"/>
                     <separator string="Terms:" colspan="4"/>
