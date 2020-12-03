@@ -828,6 +828,7 @@ class ProductTemplate(models.Model):
         comodel_name='wp.attribute.term',
         string='Jar / Packaging',
         domain="[('attribute_id.filter', '=', 'vaso')]",
+        help='Show attribute terms with filter: vaso',
     )
     # Prezzo
     wp_sale_width = fields.Char(string='Sale width', size=20)
@@ -844,23 +845,27 @@ class ProductTemplate(models.Model):
         comodel_name='wp.attribute.term',
         string='Bearing',
         domain="[('attribute_id.filter', '=', 'portamento')]",
+        help='Show attribute terms with filter: portamento',
     )
     wp_flower_dimension = fields.Char(string='Flower dimension', size=20)
     wp_scent_id = fields.Many2one(
         comodel_name='wp.attribute.term',
         string='Scent',
         domain="[('attribute_id.filter', '=', 'profumo')]",
+        help='Show attribute terms with filter: profumo',
     )
     wp_scent_note = fields.Char(string='Scent note', size=50)
     wp_leaf_type_id = fields.Many2one(
         comodel_name='wp.attribute.term',
         string='Leaf type',
         domain="[('attribute_id.filter', '=', 'tipologia_foglia')]",
+        help='Show attribute terms with filter: tipologia_foglia',
     )
     wp_leaf_color_id = fields.Many2one(
         comodel_name='wp.attribute.term',
         string='Leaf color',
         domain="[('attribute_id.filter', '=', 'colore_foglia')]",
+        help='Show attribute terms with filter: colore_foglia',
     )
     wp_leaf_persistence = fields.Char(string='Leaf persistence', size=50)
     wp_flowering_type = fields.Char(string='Flowering type', size=50)
@@ -868,6 +873,7 @@ class ProductTemplate(models.Model):
         comodel_name='wp.attribute.term',
         string='Flowering color',
         domain="[('attribute_id.filter', '=', 'colore_fioritura')]",
+        help='Show attribute terms with filter: colore_fioritura',
     )
     wp_flowering_period = fields.Char(string='Flowering period', size=50)
     wp_flowering_height = fields.Char(string='Flowering height', size=50)
@@ -879,23 +885,27 @@ class ProductTemplate(models.Model):
         comodel_name='wp.attribute.term',
         string='Dimension height',
         domain="[('attribute_id.filter', '=', 'altezza')]",
+        help='Show attribute terms with filter: altezza',
     )
     wp_exposition_id = fields.Many2one(
         comodel_name='wp.attribute.term',
         string='Exposition',
         domain="[('attribute_id.filter', '=', 'esposizione')]",
+        help='Show attribute terms with filter: esposizione',
     )
     wp_frost_resistance = fields.Char(string='Frost resistance', size=50)
     # wp_frost_resistance_id = fields.Many2one(
     #    comodel_name='wp.attribute.term',
     #    string='Frost resistance',
     #    domain="[('attribute_id.filter', '=', 'gelo')]",
+    #    help = 'Show attribute terms with filter: gelo',
     # )
     wp_rusticity = fields.Char(string='Rusticity', size=50)
     wp_use_id = fields.Many2one(
         comodel_name='wp.attribute.term',
         string='Use',
         domain="[('attribute_id.filter', '=', 'utilizzo')]",
+        help='Show attribute terms with filter: utilizzo',
     )
     wp_biologic = fields.Char(string='Pet friendly / Biologic', size=50)
     wp_adversity = fields.Char(string='Adversity', size=50)

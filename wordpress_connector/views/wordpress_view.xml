@@ -344,10 +344,12 @@
                                 <field name="wp_flowering_type"/>
                                 <field name="wp_flowering_color_id"/>
                                 <field name="wp_flowering_period"/>
-                                <field name="wp_flowering_height_id"/>
+                                <field name="wp_flowering_height"/>
                                 <field name="wp_time_transplant"/>
                                 <field name="wp_time_sowing"/>
                                 <field name="wp_time_roundup"/>
+                                <field name="wp_dimension_width"/>
+                                <field name="wp_dimension_height_id"/>
                                 <!--
                                 Width
                                 Height
