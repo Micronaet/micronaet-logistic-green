@@ -163,6 +163,8 @@
         <field name="arch" type="xml">
             <tree string="Wordpress tags">
                 <field name="connector_id"/>
+                <field name="wp_id"/>
+                <field name="wp_out_id"/>
                 <field name="unused" />
                 <field name="name"/>
                 <field name="description"/>
@@ -179,6 +181,7 @@
                         <field name="unused"/>
                         <field name="connector_id"/>
                         <field name="wp_id" />
+                        <field name="wp_out_id" />
                         <field name="name"/>
                         <field name="description"/>
                     </group>
@@ -199,8 +202,9 @@
         <field name="model">wp.attribute.term</field>
         <field name="arch" type="xml">
             <tree string="Wordpress Attribute Term" editable="bottom">
-                <field name="wp_id" />
                 <field name="name" />
+                <field name="wp_id" />
+                <field name="wp_out_id" />
             </tree>
         </field>
     </record>
@@ -211,6 +215,7 @@
             <form string="Wordpress Attribute Term">
                 <group colspan="4" col="4">
                     <field name="wp_id" />
+                    <field name="wp_out_id" />
                     <field name="name" />
                 </group>
             </form>
@@ -222,9 +227,10 @@
         <field name="name">wp_attribute_view_tree</field>
         <field name="model">wp.attribute</field>
         <field name="arch" type="xml">
-            <tree string="Wordpress Attribute">
+            <tree string="Wordpress Attribute" decoration-primary="filter!=False">
                 <field name="connector_id"/>
                 <field name="wp_id"/>
+                <field name="wp_out_id"/>
                 <field name="name"/>
                 <field name="filter"/>
             </tree>
@@ -240,6 +246,7 @@
                     <field name="filter"/>
                     <field name="connector_id"/>
                     <field name="wp_id"/>
+                    <field name="wp_out_id"/>
                     <separator string="Terms:" colspan="4"/>
                     <field name="term_ids" colspan="4" nolabel="1"/>
                 </group>
@@ -570,6 +577,4 @@
             <menuitem id="wordpress_configuration_attribute" name="Attribute" parent="wordpress_configuration_root" action="wp_attribute_action" sequence="20"/>
             <menuitem id="wordpress_configuration_tags" name="Tags" parent="wordpress_configuration_root" action="wp_tag_action" sequence="30"/>
             <menuitem id="wordpress_configuration_category" name="Category" parent="wordpress_configuration_root" action="wp_product_category_parent_action" sequence="40"/>
-
-
 </odoo>

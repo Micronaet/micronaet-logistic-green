@@ -471,7 +471,7 @@ class WPTag(models.Model):
     name = fields.Char('Tag name', size=64, required=True)
     description = fields.Char('Description', size=80)
     wp_id = fields.Integer(string='Wp ID in', readonly=True)
-    # wp_out_id = fields.Integer(string='Wp ID out', readonly=True)
+    wp_out_id = fields.Integer(string='Wp ID out', readonly=True)
     connector_id = fields.Many2one('wp.connector', 'Connector')
     unused = fields.Boolean('Removed', help='No more present on WP')
 
@@ -573,7 +573,7 @@ class WPAttribute(models.Model):
     )
     connector_id = fields.Many2one('wp.connector', 'Connector')
     wp_id = fields.Integer(string='Wp ID in', readonly=True)
-    # wp_out_id = fields.Integer(string='Wp ID out', readonly=True)
+    wp_out_id = fields.Integer(string='Wp ID out', readonly=True)
     # is_variation = fields.Boolean('Is variation')
     # is_visible = fields.Boolean('Is visible')
     unused = fields.Boolean('Removed', help='No more present on WP')
@@ -594,7 +594,7 @@ class WPAttributeTerm(models.Model):
     # -------------------------------------------------------------------------
     name = fields.Char('Name', size=64, required=True)
     wp_id = fields.Integer(string='Wp ID in', readonly=True)
-    # wp_out_id = fields.Integer(string='Wp ID out', readonly=True)
+    wp_out_id = fields.Integer(string='Wp ID out', readonly=True)
     attribute_id = fields.Many2one('wp.attribute', 'Attribute')
     connector_id = fields.Many2one(
         'wp.connector', 'Connector',
