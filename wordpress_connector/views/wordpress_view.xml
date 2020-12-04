@@ -163,6 +163,7 @@
         <field name="arch" type="xml">
             <tree string="Wordpress tags">
                 <field name="connector_id"/>
+                <field name="connector_out_id"/>
                 <field name="wp_id"/>
                 <field name="wp_out_id"/>
                 <field name="unused" />
@@ -180,6 +181,7 @@
                     <group colspan="4" col="4">
                         <field name="unused"/>
                         <field name="connector_id"/>
+                        <field name="connector_out_id"/>
                         <field name="wp_id" />
                         <field name="wp_out_id" />
                         <field name="name"/>

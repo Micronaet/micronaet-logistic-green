@@ -578,7 +578,8 @@ class WPAttribute(models.Model):
         'Filter Name', size=30, index=True,
         help='Used for filter terms for fields in product',
     )
-    connector_id = fields.Many2one('wp.connector', 'Connector')
+    connector_id = fields.Many2one('wp.connector', 'Connector in')
+    connector_out_id = fields.Many2one('wp.connector', 'Connector out')
     wp_id = fields.Integer(string='Wp ID in', readonly=True)
     wp_out_id = fields.Integer(string='Wp ID out', readonly=True)
     # is_variation = fields.Boolean('Is variation')
@@ -606,6 +607,9 @@ class WPAttributeTerm(models.Model):
     connector_id = fields.Many2one(
         'wp.connector', 'Connector',
         related='attribute_id.connector_id')
+    connector_out_id = fields.Many2one(
+        'wp.connector', 'Connector',
+        related='attribute_id.connector_out_id')
 
 
 class WPAttributeRelations(models.Model):
