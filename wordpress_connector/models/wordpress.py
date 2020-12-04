@@ -403,9 +403,9 @@ class WPTag(models.Model):
     def publish_tags(self, connector):
         """ Publish tags from Wordpress (out)
         """
+        pdb.set_trace()
         tags, wp_records = self.get_odoo_wp_data(connector, mode='out')
         wcapi = connector.get_connector()
-        pdb.set_trace()
 
         command_data = {
             'create': [],
