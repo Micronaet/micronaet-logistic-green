@@ -362,14 +362,19 @@ class WPTag(models.Model):
     _order = 'name'
 
     @api.model
-    def get_odoo_wp_data(self, connector):
+    def get_odoo_wp_data(self, connector, mode='in'):
         """ Prepare data for sync operation
             tags = ODOO tag records
             records_db = WP tag records
         """
+        if mode == 'in':
+            connector_field = 'connector_id'
+        else:  # out
+            connector_field = 'connector_out_id'
+
         # Load current tags:
         tags = self.search([
-            ('connector_id', '=', connector.id),
+            (connector_field, '=', connector.id),
             ])
 
         wp_records = []
@@ -398,8 +403,9 @@ class WPTag(models.Model):
     def publish_tags(self, connector):
         """ Publish tags from Wordpress (out)
         """
-        tags, wp_records = self.get_odoo_wp_data(connector)
+        tags, wp_records = self.get_odoo_wp_data(connector, mode='out')
         wcapi = connector.get_connector()
+        pdb.set_trace()
 
         command_data = {
             'create': [],
@@ -412,7 +418,7 @@ class WPTag(models.Model):
             data = {
                 'name': key,
                 }
-            wp_id = tag.wp_id
+            wp_id = tag.wp_out_id
             if wp_id in wp_ids:  # Update tag name (if necessary)
                 wp_ids.remove(wp_id)
                 data['id'] = wp_id
@@ -443,7 +449,7 @@ class WPTag(models.Model):
     def load_tags(self, connector):
         """ Load tags from Wordpress (in)
         """
-        tags, wp_records = self.get_odoo_wp_data(connector)
+        tags, wp_records = self.get_odoo_wp_data(connector, mode='in')
         # tags.write({'removed': True})
 
         tags_db = {}
