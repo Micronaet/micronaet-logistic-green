@@ -99,6 +99,7 @@ class WPConnector(models.Model):
     def button_load_tags(self):
         """ Load all tags from website
         """
+        pdb.set_trace()
         if self.mode == 'in':
             return self.env['wp.tag'].load_tags(connector=self)
         else:
