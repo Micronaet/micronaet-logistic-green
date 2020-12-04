@@ -99,7 +99,6 @@ class WPConnector(models.Model):
     def button_load_tags(self):
         """ Load all tags from website
         """
-        pdb.set_trace()
         if self.mode == 'in':
             return self.env['wp.tag'].load_tags(connector=self)
         else:
@@ -479,7 +478,8 @@ class WPTag(models.Model):
     description = fields.Char('Description', size=80)
     wp_id = fields.Integer(string='Wp ID in', readonly=True)
     wp_out_id = fields.Integer(string='Wp ID out', readonly=True)
-    connector_id = fields.Many2one('wp.connector', 'Connector')
+    connector_id = fields.Many2one('wp.connector', 'Connector in')
+    connector_out_id = fields.Many2one('wp.connector', 'Connector out')
     unused = fields.Boolean('Removed', help='No more present on WP')
 
 
