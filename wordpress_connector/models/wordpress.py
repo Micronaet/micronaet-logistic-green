@@ -438,10 +438,15 @@ class WPTag(models.Model):
                 if not tag:
                     _logger.error('Tag %s in WP but no ref. in odoo' % key)
                 # Update ODOO with new ID
-                wp_id = record['wp_id']
-                tag.write({
-                    'wp_out_id': wp_id,
-                    })
+                try:
+                    tag.write({
+                        'wp_out_id': record['id'],
+                        })
+                except:
+                    _logger.error('Error update odoo %s with WP %s' % (
+                        tag.id,
+                        record['id']
+                    ))
         except:
             _logger.error('Error updating Tags in Wordpress')
 
