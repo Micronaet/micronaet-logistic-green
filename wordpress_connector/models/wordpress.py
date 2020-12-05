@@ -434,6 +434,10 @@ class WPTag(models.Model):
             try:
                 # Create block with limit:
                 pdb.set_trace()
+                if any(batch_data.values()):
+                    _logger.warning('End of batch data, exit.')
+                    break
+
                 block_data = {}
                 for key in batch_data:
                     block_data[key] = batch_data[key][:max_block]
@@ -457,7 +461,9 @@ class WPTag(models.Model):
                             record['id']
                         ))
             except:
-                _logger.error('Error updating Tags in Wordpress')
+                _logger.error('Error updating Tags in Wordpress:\n' % (
+                    sys.exc_info(),
+                ))
 
     @api.model
     def load_tags(self, connector):
