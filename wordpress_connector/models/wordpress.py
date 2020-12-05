@@ -461,6 +461,7 @@ class WPTag(models.Model):
                             record['id']
                         ))
             except:
+                pdb.set_trace()
                 _logger.error('Error updating Tags in Wordpress:\n%s' % (
                     sys.exc_info(),
                 ))
