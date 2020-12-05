@@ -434,7 +434,7 @@ class WPTag(models.Model):
             try:
                 # Create block with limit:
                 pdb.set_trace()
-                if any(batch_data.values()):
+                if not any(batch_data.values()):
                     _logger.warning('End of batch data, exit.')
                     break
 
