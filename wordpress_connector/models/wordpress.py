@@ -406,7 +406,7 @@ class WPTag(models.Model):
         tags, wp_records = self.get_odoo_wp_data(connector, mode='out')
         wcapi = connector.get_connector()
 
-        command_data = {
+        batch_data = {
             'create': [],
             'update': [],
             }
@@ -421,35 +421,43 @@ class WPTag(models.Model):
             if wp_id in wp_ids:  # Update tag name (if necessary)
                 wp_ids.remove(wp_id)
                 data['id'] = wp_id
-                command_data['update'].append(data)
+                batch_data['update'].append(data)
             else:
-                command_data['create'].append(data)
+                batch_data['create'].append(data)
                 created_tags[key] = tag
-        command_data['delete'] = wp_ids
+        batch_data['delete'] = wp_ids
         # TODO Search remain to delete if has name present and no ID
 
-        # Call Wordpress
-        try:
-            pdb.set_trace()
-            reply = wcapi.post('products/tags/batch', command_data).json()
-            # Update created ID:
-            for record in reply.get('create', []):
-                key = record['name']
-                tag = created_tags.get(key)
-                if not tag:
-                    _logger.error('Tag %s in WP but no ref. in odoo' % key)
-                # Update ODOO with new ID
-                try:
-                    tag.write({
-                        'wp_out_id': record['id'],
-                        })
-                except:
-                    _logger.error('Error update odoo %s with WP %s' % (
-                        tag.id,
-                        record['id']
-                    ))
-        except:
-            _logger.error('Error updating Tags in Wordpress')
+        # Call Wordpress (block of N records)
+        max_block = 100
+        while True:
+            try:
+                # Create block with limit:
+                pdb.set_trace()
+                block_data = {}
+                for key in batch_data:
+                    block_data[key] = batch_data[key][:max_block]
+                    batch_data[key] = batch_data[key[max_block:]]
+
+                reply = wcapi.post('products/tags/batch', batch_data).json()
+                # Update created ID:
+                for record in reply.get('create', []):
+                    key = record['name']
+                    tag = created_tags.get(key)
+                    if not tag:
+                        _logger.error('Tag %s in WP but no ref. in odoo' % key)
+                    # Update ODOO with new ID
+                    try:
+                        tag.write({
+                            'wp_out_id': record['id'],
+                            })
+                    except:
+                        _logger.error('Error update odoo %s with WP %s' % (
+                            tag.id,
+                            record['id']
+                        ))
+            except:
+                _logger.error('Error updating Tags in Wordpress')
 
     @api.model
     def load_tags(self, connector):
