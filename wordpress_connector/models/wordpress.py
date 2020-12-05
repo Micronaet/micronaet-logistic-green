@@ -437,7 +437,7 @@ class WPTag(models.Model):
                 block_data = {}
                 for key in batch_data:
                     block_data[key] = batch_data[key][:max_block]
-                    batch_data[key] = batch_data[key[max_block:]]
+                    batch_data[key] = batch_data[key][max_block:]
 
                 reply = wcapi.post('products/tags/batch', batch_data).json()
                 # Update created ID:
