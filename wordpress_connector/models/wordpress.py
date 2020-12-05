@@ -410,7 +410,6 @@ class WPTag(models.Model):
             'create': [],
             'update': [],
             }
-        pdb.set_trace()
         wp_ids = [record['id'] for record in wp_records]
         created_tags = {}  # Used for link wp create ID to ODOO
         for tag in tags:
@@ -427,9 +426,11 @@ class WPTag(models.Model):
                 command_data['create'].append(data)
                 created_tags[key] = tag
         command_data['delete'] = wp_ids
+        # TODO Search remain to delete if has name present and no ID
 
         # Call Wordpress
         try:
+            pdb.set_trace()
             reply = wcapi.post('products/tags/batch', command_data).json()
             # Update created ID:
             for record in reply.get('create', []):
