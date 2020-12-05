@@ -429,7 +429,7 @@ class WPTag(models.Model):
         # TODO Search remain to delete if has name present and no ID
 
         # Call Wordpress (block of N records)
-        max_block = 100
+        max_block = 70
         while True:
             try:
                 # Create block with limit:
