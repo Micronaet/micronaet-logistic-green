@@ -403,7 +403,6 @@ class WPTag(models.Model):
     def publish_tags(self, connector):
         """ Publish tags from Wordpress (out)
         """
-        pdb.set_trace()
         tags, wp_records = self.get_odoo_wp_data(connector, mode='out')
         wcapi = connector.get_connector()
 
@@ -411,7 +410,8 @@ class WPTag(models.Model):
             'create': [],
             'update': [],
             }
-        wp_ids = [record.id for record in wp_records]
+        pdb.set_trace()
+        wp_ids = [record['id'] for record in wp_records]
         created_tags = {}  # Used for link wp create ID to ODOO
         for tag in tags:
             key = tag.name
