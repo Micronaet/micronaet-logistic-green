@@ -429,7 +429,7 @@ class WPTag(models.Model):
         # TODO Search remain to delete if has name present and no ID
 
         # Call Wordpress (block of N records)
-        max_block = 70
+        max_block = 100
         while True:
             try:
                 # Create block with limit:
@@ -439,7 +439,7 @@ class WPTag(models.Model):
                     block_data[key] = batch_data[key][:max_block]
                     batch_data[key] = batch_data[key][max_block:]
 
-                reply = wcapi.post('products/tags/batch', batch_data).json()
+                reply = wcapi.post('products/tags/batch', block_data).json()
                 # Update created ID:
                 for record in reply.get('create', []):
                     key = record['name']
