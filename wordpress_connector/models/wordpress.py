@@ -433,7 +433,6 @@ class WPTag(models.Model):
         while True:
             try:
                 # Create block with limit:
-                pdb.set_trace()
                 if not any(batch_data.values()):
                     _logger.warning('End of batch data, exit.')
                     break
@@ -444,7 +443,8 @@ class WPTag(models.Model):
                     batch_data[key] = batch_data[key][max_block:]
 
                 reply = wcapi.post('products/tags/batch', block_data).json()
-                # Update created ID:
+
+                # Update ODOO with created ID:
                 for record in reply.get('create', []):
                     key = record['name']
                     tag = created_tags.get(key)
