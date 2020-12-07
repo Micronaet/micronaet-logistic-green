@@ -405,9 +405,9 @@ class ProductCategory(models.Model):
 
         pdb.set_trace()
         self.publish_category_recursive(connector, wordpress, False)
+        pdb.set_trace()
         wp_delete_ids = wordpress['id']  # Remain untouched
         # TODO check done_ids for delete
-
 
     @api.model
     def load_category(self, connector):
