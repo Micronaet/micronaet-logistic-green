@@ -390,7 +390,6 @@ class ProductCategory(models.Model):
     def publish_category(self, connector):
         """ Publish category batch data
         """
-        pdb.set_trace()
         # ---------------------------------------------------------------------
         # Wordpress Read current situation:
         # ---------------------------------------------------------------------
@@ -403,11 +402,20 @@ class ProductCategory(models.Model):
             wordpress['name'][key] = record
             wordpress['id'][record['id']] = record
 
-        pdb.set_trace()
         self.publish_category_recursive(connector, wordpress, False)
+        wp_delete_ids = wordpress['id'].keys()  # Remain untouched
         pdb.set_trace()
-        wp_delete_ids = wordpress['id']  # Remain untouched
-        # TODO check done_ids for delete
+        if not wp_delete_ids:
+            return True
+
+        try:
+            connector.wordpress_batch_operation(
+                {'delete': [item.id for item in wp_delete_ids]},
+                'products/categories/batch',
+                max_block=100)
+        except:
+            pass  # No error in deletion
+        return True
 
     @api.model
     def load_category(self, connector):
