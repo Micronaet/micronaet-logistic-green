@@ -128,7 +128,7 @@
                         <separator string="Description" colspan="4"/>
                         <field name="wp_description" widget="html" colspan="4" nolabel="1"/>
                         <separator string="Child" colspan="4"/>
-                        <field name="wp_child_ids" colspan="4" nolabel="1" context="{'tree_view_ref': 'wordpress_connector.view_wordpress_category_tree', 'form_view_ref': 'wordpress_connector.view_wordpress_category_form'}"/>
+                        <field name="wp_child_ids" colspan="4" nolabel="1" context="{'default_connector_id': connector_id, 'tree_view_ref': 'wordpress_connector.view_wordpress_category_tree', 'form_view_ref': 'wordpress_connector.view_wordpress_category_form'}"/>
                     </group>
                 </sheet>
             </form>
