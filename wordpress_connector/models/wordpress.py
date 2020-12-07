@@ -346,7 +346,7 @@ class ProductCategory(models.Model):
                         (parent_wp_id, category_name))
 
                 if wp_id in wordpress['id']:  # Update tag name (if necessary)
-                    wordpress['id'].remove(wp_id)
+                    del wordpress['id'][wp_id]
                     data['id'] = wp_id
                     batch_data['update'].append(data)
                 else:
