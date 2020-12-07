@@ -406,6 +406,7 @@ class ProductCategory(models.Model):
         self.publish_category_recursive(connector, wordpress, False)
         wp_delete_ids = wordpress['id']
         if not wp_delete_ids:
+            _logger.info('No deletion on WP')
             return True
 
         try:
@@ -417,6 +418,7 @@ class ProductCategory(models.Model):
             _logger.error('Delete reply: %s' % (wp_reply, ))
         except:
             pass  # No error in deletion
+        _logger.info('#%s deletion on WP' % len(wp_delete_ids))
         return True
 
     @api.model
