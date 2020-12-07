@@ -347,7 +347,7 @@ class ProductCategory(models.Model):
                         (parent_wp_id, category_name))
 
                 if wp_id in wordpress['id']:  # Update tag name (if necessary)
-                    del wordpress['id'][wp_id]
+                    wordpress['id'].remove(wp_id)
                     data['id'] = wp_id
                     batch_data['update'].append(data)
                 else:
@@ -395,17 +395,17 @@ class ProductCategory(models.Model):
         # ---------------------------------------------------------------------
         # Wordpress Read current situation:
         # ---------------------------------------------------------------------
-        wordpress = {'name': {}, 'id': {}}  # Use to get WP record by ID / name
+        wordpress = {'name': {}, 'id': []}  # Use to get WP record by ID / name
 
         # Populate 2 database for sync operation:
         for record in connector.wordpress_read_all(
                 'products/categories', per_page=50):
             key = (record['parent'], record['name'])
             wordpress['name'][key] = record['id']
-            wordpress['id'][record['id']] = record  # change in list?
+            wordpress['id'].append(record['id'])
 
         self.publish_category_recursive(connector, wordpress, False)
-        wp_delete_ids = [item_id for item_id in wordpress['id']]
+        wp_delete_ids = wordpress['id']
         if not wp_delete_ids:
             return True
 
@@ -415,7 +415,7 @@ class ProductCategory(models.Model):
                 'products/categories/batch',
                 max_block=100)
             # TODO check reply?
-            _logger('Delete reply: %s' % (wp_reply, ))
+            _logger.error('Delete reply: %s' % (wp_reply, ))
         except:
             pass  # No error in deletion
         return True
