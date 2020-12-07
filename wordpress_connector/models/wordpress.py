@@ -21,6 +21,37 @@ class WPConnector(models.Model):
     # Utility:
     # -------------------------------------------------------------------------
     @api.model
+    def wordpress_read_all(self, endpoint, per_page=50):
+        """ Read all table in Wordpress
+            endpoint: url to get data
+            per_page: Item per page limit
+            @return: List of wordpress record
+        """
+        wp_records = []  # Returned list
+
+        wcapi = self.get_connector()
+        start_page = 1
+        params = {'per_page': per_page, 'page': start_page}
+        while True:
+            _logger.info('Reading WP %s from %s [Record %s-%s]' % (
+                endpoint,
+                self.name,
+                params['per_page'] * (params['page'] - 1),
+                params['per_page'] * params['page'],
+                ))
+            reply = wcapi.get(endpoint, params=params)
+            params['page'] += 1
+            if not reply.ok:
+                _logger.error('Error: %s' % reply.text)
+                break
+
+            records = reply.json()
+            if not records:
+                break
+            wp_records.extend(records)
+        return wp_records
+
+    @api.model
     def wordpress_batch_operation(self, batch_data, endpoint, max_block=100):
         """ Write in safe mode data on database with the limitation of batch
             operation.
@@ -54,8 +85,7 @@ class WPConnector(models.Model):
                 # Generate return data:
                 try:
                     reply = wcapi.post(endpoint, block_data).json()
-                except:
-                    # TODO Manage here post error?
+                except:  # TODO Manage here post error?
                     _logger.error('Wordpress connect error: %s' % (
                         sys.exc_info(), ))
                     continue
@@ -77,19 +107,13 @@ class WPConnector(models.Model):
         """
         connector = self[0]
         _logger.info('>>> Connecting: %s%s API: %s, timeout=%s' % (
-            connector.url,
-            connector.version,
-            connector.api,
-            connector.timeout,
+            connector.url, connector.version, connector.api, connector.timeout,
             ))
         try:
             return woocommerce.API(
-                url=connector.url,
-                consumer_key=connector.key,
-                consumer_secret=connector.secret,
-                wp_api=connector.api,
-                version=connector.version,
-                timeout=connector.timeout,
+                url=connector.url, consumer_key=connector.key,
+                consumer_secret=connector.secret, wp_api=connector.api,
+                version=connector.version, timeout=connector.timeout,
                 query_string_auth=True,
                 )
         except:
@@ -171,7 +195,7 @@ class WPConnector(models.Model):
         if self.mode == 'in':
             return self.env['product.category'].load_category(connector=self)
         else:
-            return self.env['product.category'].load_category_out(
+            return self.env['product.category'].publish_category(
                 connector=self)
 
     @api.multi
@@ -274,43 +298,116 @@ class ProductCategory(models.Model):
     _order = 'wp_sequence'  # Force sort
 
     @api.model
-    def load_category_out(self, connector):
-        """ Load category to Wordpress
+    def publish_category_recursive(self, connector, wordpress, parent_ids):
+        """ Recursive function for batch load category
+            connector:
+            parent_ids: list of parent ID
+            done_ids: list of all record created (for final delete operation)
         """
-        pdb.set_trace()
-        # Load current category:
-        connector_id = connector.id
-        wcapi = connector.get_connector()
+        # ---------------------------------------------------------------------
+        # Load current category level:
+        # ---------------------------------------------------------------------
+        if parent_ids:
+            category_block = self.search([
+                    ('connector_id', '=', connector.id),
+                    ('parent_id', 'in', parent_ids),
+                    ])
+        else:
+            category_block = self.search([
+                    ('connector_id', '=', connector.id),
+                    ('parent_id', '=', False),
+                    ])
 
-        odoo_category = {}
-        # Parent category:
-        for category in self.search([
-                ('connector_id', '=', connector_id),
-                ('parent_id', '=', False),
-                ]):
+        if not category_block:
+            return False  # End of recursion
+
+        # ---------------------------------------------------------------------
+        # Prepare Batch data for this level
+        # ---------------------------------------------------------------------
+        created_in_wp = {}  # New record created in this block
+        batch_data = {'update': [], 'create': [], 'delete': []}
+        parent_ids = []  # For next call recursion
+        for category in category_block:
             try:
+                parent_ids.append(category.id)  # For next recursion
+                category_name = category.name
                 wp_id = category.wp_id
+                parent_wp_id = category.parent_id.wp_id or 0
+
                 data = {
-                    'name': category.name,
-                    'parent': 0,
+                    'name': category_name,
+                    'parent': parent_wp_id,
                     # 'description': category.description,
                 }
-                if wp_id:  # Update:
-                    reply = wcapi.put('products/categories/%s' % wp_id, data)
-                    if not reply.ok:
-                        _logger.error('Not updated with: %s' % (data, ))
+
+                if not wp_id:  # Try to relink category:
+                    wp_id = wordpress['name'].get(
+                        (parent_wp_id, category_name))
+
+                if wp_id in wordpress['id']:  # Update tag name (if necessary)
+                    wordpress['id'].remove(wp_id)
+                    data['id'] = wp_id
+                    batch_data['update'].append(data)
                 else:
-                    reply = wcapi.post('products/categories', data)
-                    if not reply.ok:
-                        _logger.error('Error: %s' % reply.text)
-                        continue
-                    wp_id = reply.json()['id']
-                    category.write({
-                        'wp_id': wp_id,
-                    })
+                    batch_data['create'].append(data)
+                    created_in_wp[parent_wp_id, category_name] = category
             except:
-                _logger.error('Error with wordpress:\n%s' % (sys.exc_info(), ))
+                _logger.error('Error with wordpress:\n%s' % (
+                    sys.exc_info(), ))
                 continue
+
+        # ---------------------------------------------------------------------
+        # Write batch data in block on Wordpress:
+        # ---------------------------------------------------------------------
+        wp_reply = connector.wordpress_batch_operation(
+            batch_data, 'products/categories/batch', max_block=100)
+
+        # ---------------------------------------------------------------------
+        # Update ODOO with created ID:
+        # ---------------------------------------------------------------------
+        for record in wp_reply.get('create', []):
+            category_name = record['name']
+            parent_id = record['parent']
+            wp_id = record['id']
+
+            category = created_in_wp.get((parent_id, category_name))
+            if not category:  # Never happen!
+                pdb.set_trace()
+                _logger.error(
+                    'Tag %s in WP but no ref. in odoo' % category_name)
+
+            # Update ODOO with new ID
+            try:
+                category.write({'wp_id': wp_id})
+            except:
+                _logger.error('Error update odoo %s with WP %s' % (
+                    category.id, wp_id))
+        _logger.info('Category created # %s' % len(wp_reply.get('create', [])))
+        return self.publish_category_recursive(
+            connector, wordpress, parent_ids)
+
+    @api.model
+    def publish_category(self, connector):
+        """ Publish category batch data
+        """
+        pdb.set_trace()
+        # ---------------------------------------------------------------------
+        # Wordpress Read current situation:
+        # ---------------------------------------------------------------------
+        wordpress = {'name': {}, 'id': {}}  # Use to get WP record by ID / name
+
+        # Populate 2 database for sync operation:
+        for record in connector.wordpress_read_all(
+                'products/categories', per_page=50):
+            key = record['parent'], record['id']
+            wordpress['name'][key] = record
+            wordpress['id'][record['id']] = record
+
+        pdb.set_trace()
+        self.publish_category_recursive(connector, wordpress, False)
+        wp_delete_ids = wordpress['id']  # Remain untouched
+        # TODO check done_ids for delete
+
 
     @api.model
     def load_category(self, connector):
@@ -326,6 +423,7 @@ class ProductCategory(models.Model):
         # ---------------------------------------------------------------------
         # Load category from WP
         # ---------------------------------------------------------------------
+        # TODO change with: wordpress_read_all(self, endpoint, per_page=50)
         wp_category = {}
         wcapi = connector.get_connector()
         params = {
@@ -428,26 +526,7 @@ class WPTag(models.Model):
             (connector_field, '=', connector.id),
             ])
 
-        wp_records = []
-        wcapi = connector.get_connector()
-        start_page = 1
-        params = {'per_page': 50, 'page': start_page}
-        while True:
-            _logger.info('Reading tags from %s [Record %s-%s]' % (
-                connector.name,
-                params['per_page'] * (params['page'] - 1),
-                params['per_page'] * params['page'],
-                ))
-            reply = wcapi.get('products/tags', params=params)
-            params['page'] += 1
-            if not reply.ok:
-                _logger.error('Error: %s' % reply.text)
-                break
-
-            records = reply.json()
-            if not records:
-                break
-            wp_records.extend(records)
+        wp_records = connector.wordpress_read_all('products/tags')
         return tags, wp_records
 
     @api.model
@@ -515,7 +594,6 @@ class WPTag(models.Model):
         """ Load tags from Wordpress (in)
         """
         tags, wp_records = self.get_odoo_wp_data(connector, mode='in')
-        # tags.write({'removed': True})
 
         tags_db = {}
         for tag in tags:
