@@ -508,6 +508,7 @@ class WPTag(models.Model):
             except:
                 _logger.error('Error update odoo %s with WP %s' % (
                     tag.id, record['id']))
+        _logger.info('Tags created # %s' % len(wp_reply.get('create', [])))
 
     @api.model
     def load_tags(self, connector):
