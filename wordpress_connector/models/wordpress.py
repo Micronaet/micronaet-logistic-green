@@ -342,6 +342,7 @@ class ProductCategory(models.Model):
                 }
 
                 if not wp_id:  # Try to relink category:
+                    pdb.set_trace()
                     wp_id = wordpress['name'].get(
                         (parent_wp_id, category_name))
 
@@ -399,7 +400,7 @@ class ProductCategory(models.Model):
         # Populate 2 database for sync operation:
         for record in connector.wordpress_read_all(
                 'products/categories', per_page=50):
-            key = record['parent'], record['name']
+            key = (record['parent'], record['name'])
             wordpress['name'][key] = record
             wordpress['id'][record['id']] = record
 
