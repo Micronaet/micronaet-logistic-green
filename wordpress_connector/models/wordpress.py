@@ -318,7 +318,6 @@ class ProductCategory(models.Model):
                     ('parent_id', '=', False),
                     ])
 
-        pdb.set_trace()
         if not category_block:
             return False  # End of recursion
 
@@ -415,7 +414,7 @@ class ProductCategory(models.Model):
                 'products/categories/batch',
                 max_block=100)
             # TODO check reply?
-            pdb.set_trace()
+            _logger('Delete reply: %s' % (wp_reply, ))
         except:
             pass  # No error in deletion
         return True
