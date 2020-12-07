@@ -28,8 +28,11 @@ class WPConnector(models.Model):
         """
         wcapi = self.get_connector()
         wp_reply = {}
+        counter = 0
         while True:
+            counter += 1
             try:
+                _logger.info('Start publish batch block #%s' % counter)
                 # Exit check:
                 if not any(batch_data.values()):
                     _logger.warning('End of batch data, exit.')
