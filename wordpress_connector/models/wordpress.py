@@ -397,8 +397,10 @@ class ProductCategory(models.Model):
         wordpress = {'name': {}, 'id': []}  # Use to get WP record by ID / name
 
         # Populate 2 database for sync operation:
-        for record in connector.wordpress_read_all(
-                'products/categories', per_page=50):
+        all_category = connector.wordpress_read_all(
+            'products/categories', per_page=50)
+        _logger.info('Worpress current category: # %s' % len(all_category))
+        for record in all_category:
             key = (record['parent'], record['name'])
             wordpress['name'][key] = record['id']
             wordpress['id'].append(record['id'])
