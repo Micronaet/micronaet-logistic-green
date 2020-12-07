@@ -342,7 +342,6 @@ class ProductCategory(models.Model):
                 }
 
                 if not wp_id:  # Try to relink category:
-                    pdb.set_trace()
                     wp_id = wordpress['name'].get(
                         (parent_wp_id, category_name))
 
