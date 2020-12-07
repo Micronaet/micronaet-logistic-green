@@ -26,6 +26,7 @@ class WPConnector(models.Model):
             operation.
             @return the list of record generated
         """
+        pdb.set_trace()
         wcapi = self.get_connector()
         wp_reply = {}
         while True:
