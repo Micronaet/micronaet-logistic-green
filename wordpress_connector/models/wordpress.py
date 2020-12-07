@@ -401,8 +401,8 @@ class ProductCategory(models.Model):
         for record in connector.wordpress_read_all(
                 'products/categories', per_page=50):
             key = (record['parent'], record['name'])
-            wordpress['name'][key] = record
-            wordpress['id'][record['id']] = record
+            wordpress['name'][key] = record['id']
+            wordpress['id'][record['id']] = record  # change in list?
 
         self.publish_category_recursive(connector, wordpress, False)
         wp_delete_ids = [item_id for item_id in wordpress['id']]
