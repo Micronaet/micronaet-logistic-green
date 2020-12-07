@@ -344,6 +344,7 @@ class ProductCategory(models.Model):
                 if not wp_id:  # Try to relink category:
                     wp_id = wordpress['name'].get(
                         (parent_wp_id, category_name))
+                    category.write({'wp_id': wp_id})  # Update for next time
 
                 if wp_id in wordpress['id']:  # Update tag name (if necessary)
                     wordpress['id'].remove(wp_id)
@@ -567,6 +568,7 @@ class WPTag(models.Model):
             wp_id = tag.wp_out_id
             # if no ID check also name for error during creation
             if not wp_id and tag_name in wp_name:
+                tag.write({'wp_out_id': wp_id})  # Update for next time
                 wp_id = wp_name[tag_name]  # Created but not referenced in ODOO
 
             if wp_id in wp_ids:  # Update tag name (if necessary)
