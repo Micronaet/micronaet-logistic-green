@@ -26,7 +26,6 @@ class WPConnector(models.Model):
             operation.
             @return the list of record generated
         """
-        pdb.set_trace()
         wcapi = self.get_connector()
         wp_reply = {}
         while True:
@@ -49,6 +48,7 @@ class WPConnector(models.Model):
                     # TODO Manage here post error?
                     _logger.error('Wordpress connect error: %s' % (
                         sys.exc_info(), ))
+                    continue
 
                 for key in reply:
                     if key not in wp_reply:
@@ -484,6 +484,7 @@ class WPTag(models.Model):
         # ---------------------------------------------------------------------
         # Update ODOO with created ID:
         # ---------------------------------------------------------------------
+        pdb.set_trace()
         for record in wp_reply.get('create', []):
             tag_name = record['name']
             tag = created_tags.get(tag_name)
