@@ -338,7 +338,8 @@ class ProductCategory(models.Model):
                 data = {
                     'name': category_name,
                     'parent': parent_wp_id,
-                    # 'description': category.description,
+                    'description': category.wp_description,
+                    'sequence': category.wp_sequence,
                 }
 
                 if not wp_id:  # Try to relink category:
@@ -405,15 +406,15 @@ class ProductCategory(models.Model):
 
         self.publish_category_recursive(connector, wordpress, False)
         wp_delete_ids = wordpress['id'].keys()  # Remain untouched
-        pdb.set_trace()
         if not wp_delete_ids:
             return True
 
         try:
-            connector.wordpress_batch_operation(
+            wp_reply = connector.wordpress_batch_operation(
                 {'delete': [item_id for item_id in wp_delete_ids]},
                 'products/categories/batch',
                 max_block=100)
+            # TODO check reply?
         except:
             pass  # No error in deletion
         return True
