@@ -21,6 +21,46 @@ class WPConnector(models.Model):
     # Utility:
     # -------------------------------------------------------------------------
     @api.model
+    def wordpress_batch_operation(self, batch_data, endpoint, max_block=100):
+        """ Write in safe mode data on database with the limitation of batch
+            operation.
+            @return the list of record generated
+        """
+        wcapi = self.get_connector()
+        wp_reply = {}
+        while True:
+            try:
+                # Exit check:
+                if not any(batch_data.values()):
+                    _logger.warning('End of batch data, exit.')
+                    break
+
+                # Create block with limit:
+                block_data = {}
+                for key in batch_data:
+                    block_data[key] = batch_data[key][:max_block]
+                    batch_data[key] = batch_data[key][max_block:]
+
+                # Generate return data:
+                try:
+                    reply = wcapi.post(endpoint, block_data).json()
+                except:
+                    # TODO Manage here post error?
+                    _logger.error('Wordpress connect error: %s' % (
+                        sys.exc_info(), ))
+
+                for key in reply:
+                    if key not in wp_reply:
+                        wp_reply[key] = []
+                    wp_reply[key].extend(reply.get(key, []))
+            except:
+                _logger.error('Unmanaged error updating Wordpress:\n%s' % (
+                    sys.exc_info(),
+                ))
+                pdb.set_trace()
+        return wp_reply
+
+    @api.model
     def get_connector(self):
         """ Connect with Word Press API management
         """
@@ -403,8 +443,10 @@ class WPTag(models.Model):
     def publish_tags(self, connector):
         """ Publish tags from Wordpress (out)
         """
+        # ---------------------------------------------------------------------
+        # Prepare batch call:
+        # ---------------------------------------------------------------------
         tags, wp_records = self.get_odoo_wp_data(connector, mode='out')
-        wcapi = connector.get_connector()
 
         batch_data = {
             'create': [],
@@ -435,45 +477,28 @@ class WPTag(models.Model):
         # ---------------------------------------------------------------------
         # Call Wordpress (block of N records)
         # ---------------------------------------------------------------------
-        max_block = 100  # TODO parameter
-        while True:
-            try:
-                # Create block with limit:
-                if not any(batch_data.values()):
-                    _logger.warning('End of batch data, exit.')
-                    break
+        wp_reply = connector.wordpress_batch_operation(
+            batch_data, 'products/tags/batch', max_block=100)
 
-                block_data = {}
-                for key in batch_data:
-                    block_data[key] = batch_data[key][:max_block]
-                    batch_data[key] = batch_data[key][max_block:]
-
-                # TODO Manage here post error?
-                reply = wcapi.post('products/tags/batch', block_data).json()
-
-                # Update ODOO with created ID:
-                for record in reply.get('create', []):
-                    tag_name = record['name']
-                    tag = created_tags.get(tag_name)
-                    if not tag:  # Never happen!
-                        _logger.error(
-                            'Tag %s in WP but no ref. in odoo' % tag_name)
-
-                    # Update ODOO with new ID
-                    try:
-                        tag.write({
-                            'wp_out_id': record['id'],
-                            })
-                    except:
-                        _logger.error('Error update odoo %s with WP %s' % (
-                            tag.id,
-                            record['id']
-                        ))
-            except:
-                _logger.error('Error updating Tags in Wordpress:\n%s' % (
-                    sys.exc_info(),
-                ))
+        # Update ODOO with created ID:
+        for record in wp_reply.get('create', []):
+            tag_name = record['name']
+            tag = created_tags.get(tag_name)
+            if not tag:  # Never happen!
                 pdb.set_trace()
+                _logger.error(
+                    'Tag %s in WP but no ref. in odoo' % tag_name)
+
+            # Update ODOO with new ID
+            try:
+                tag.write({
+                    'wp_out_id': record['id'],
+                })
+            except:
+                _logger.error('Error update odoo %s with WP %s' % (
+                    tag.id,
+                    record['id']
+                ))
 
     @api.model
     def load_tags(self, connector):
