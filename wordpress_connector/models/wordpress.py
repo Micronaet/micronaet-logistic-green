@@ -399,7 +399,7 @@ class ProductCategory(models.Model):
         # Populate 2 database for sync operation:
         for record in connector.wordpress_read_all(
                 'products/categories', per_page=50):
-            key = record['parent'], record['id']
+            key = record['parent'], record['name']
             wordpress['name'][key] = record
             wordpress['id'][record['id']] = record
 
