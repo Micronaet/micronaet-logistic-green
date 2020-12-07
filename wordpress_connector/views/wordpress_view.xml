@@ -106,6 +106,7 @@
                 <field name="wp_sequence" />
                 <field name="connector_id" />
                 <field name="parent_id" />
+                <field name="wp_id" />
                 <field name="name" />
                 <field name="wp_description" />
             </tree>
@@ -123,6 +124,7 @@
                         <field name="wp_sequence" />
                         <field name="parent_id" domain="[('connector_id', '=', connector_id)]"/>
                         <field name="name" />
+                        <field name="wp_id" />
                         <separator string="Description" colspan="4"/>
                         <field name="wp_description" widget="html" colspan="4" nolabel="1"/>
                         <separator string="Child" colspan="4"/>
