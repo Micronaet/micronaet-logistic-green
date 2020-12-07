@@ -480,7 +480,9 @@ class WPTag(models.Model):
         wp_reply = connector.wordpress_batch_operation(
             batch_data, 'products/tags/batch', max_block=100)
 
+        # ---------------------------------------------------------------------
         # Update ODOO with created ID:
+        # ---------------------------------------------------------------------
         for record in wp_reply.get('create', []):
             tag_name = record['name']
             tag = created_tags.get(tag_name)
