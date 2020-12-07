@@ -405,16 +405,17 @@ class ProductCategory(models.Model):
             wordpress['id'][record['id']] = record
 
         self.publish_category_recursive(connector, wordpress, False)
-        wp_delete_ids = wordpress['id'].keys()  # Remain untouched
+        wp_delete_ids = [item_id for item_id in wordpress['id']]
         if not wp_delete_ids:
             return True
 
         try:
             wp_reply = connector.wordpress_batch_operation(
-                {'delete': [item_id for item_id in wp_delete_ids]},
+                {'delete': wp_delete_ids},
                 'products/categories/batch',
                 max_block=100)
             # TODO check reply?
+            pdb.set_trace()
         except:
             pass  # No error in deletion
         return True
