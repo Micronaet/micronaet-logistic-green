@@ -318,6 +318,7 @@ class ProductCategory(models.Model):
                     ('parent_id', '=', False),
                     ])
 
+        pdb.set_trace()
         if not category_block:
             return False  # End of recursion
 
@@ -410,7 +411,7 @@ class ProductCategory(models.Model):
 
         try:
             connector.wordpress_batch_operation(
-                {'delete': [item.id for item in wp_delete_ids]},
+                {'delete': [item_id for item_id in wp_delete_ids]},
                 'products/categories/batch',
                 max_block=100)
         except:
