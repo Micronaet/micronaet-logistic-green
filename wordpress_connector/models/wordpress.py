@@ -491,14 +491,10 @@ class WPTag(models.Model):
 
             # Update ODOO with new ID
             try:
-                tag.write({
-                    'wp_out_id': record['id'],
-                })
+                tag.write({'wp_out_id': record['id']})
             except:
                 _logger.error('Error update odoo %s with WP %s' % (
-                    tag.id,
-                    record['id']
-                ))
+                    tag.id, record['id']))
 
     @api.model
     def load_tags(self, connector):
