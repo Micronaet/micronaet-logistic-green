@@ -417,9 +417,9 @@ class ProductCategory(models.Model):
                 'products/categories/batch',
                 max_block=100)
             # TODO check reply?
-            _logger.error('Delete reply: %s' % (wp_reply, ))
+            _logger.info('Delete reply: %s' % (wp_reply, ))
         except:
-            pass  # No error in deletion
+            _logger.error('Delete reply: %s' % (wp_reply, ))
         _logger.info('#%s deletion on WP' % len(wp_delete_ids))
         return True
 
