@@ -338,7 +338,7 @@ class ProductCategory(models.Model):
                     'name': category_name,
                     'parent': parent_wp_id,
                     'description': category.wp_description,
-                    'sequence': category.wp_sequence,
+                    'menu_order': category.wp_sequence,
                 }
 
                 if not wp_id:  # Try to relink category:
