@@ -481,13 +481,14 @@ class WPTag(models.Model):
         # ---------------------------------------------------------------------
         # Call Wordpress (block of N records)
         # ---------------------------------------------------------------------
+        pdb.set_trace()
         wp_reply = connector.wordpress_batch_operation(
             batch_data, 'products/tags/batch', max_block=100)
+        pdb.set_trace()
 
         # ---------------------------------------------------------------------
         # Update ODOO with created ID:
         # ---------------------------------------------------------------------
-        pdb.set_trace()
         for record in wp_reply.get('create', []):
             tag_name = record['name']
             tag = created_tags.get(tag_name)
