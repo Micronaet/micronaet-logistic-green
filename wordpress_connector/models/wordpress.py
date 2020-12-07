@@ -31,8 +31,8 @@ class WPConnector(models.Model):
         counter = 0
         while True:
             counter += 1
+            limit = max_block
             try:
-                _logger.info('Start publish batch block #%s' % counter)
                 # Exit check:
                 if not any(batch_data.values()):
                     _logger.warning('End of batch data, exit.')
@@ -41,8 +41,15 @@ class WPConnector(models.Model):
                 # Create block with limit:
                 block_data = {}
                 for key in batch_data:
-                    block_data[key] = batch_data[key][:max_block]
-                    batch_data[key] = batch_data[key][max_block:]
+                    if limit <= 0:
+                        continue  # End max data updatable
+                    block_data[key] = batch_data[key][:limit]
+                    batch_data[key] = batch_data[key][limit:]
+
+                    update_block = len(block_data[key])
+                    limit -= update_block  # This block update counter
+                    _logger.info('Block #%s >> %s, records: %s' % (
+                        counter, key, update_block))
 
                 # Generate return data:
                 try:
