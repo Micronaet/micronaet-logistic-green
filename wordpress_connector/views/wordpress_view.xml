@@ -233,8 +233,8 @@
         <field name="arch" type="xml">
             <tree string="Wordpress Attribute" decoration-primary="filter!=False">
                 <field name="connector_id"/>
-                <field name="connector_out_id"/>
                 <field name="wp_id"/>
+                <field name="connector_out_id"/>
                 <field name="wp_out_id"/>
                 <field name="name"/>
                 <field name="filter"/>
@@ -250,8 +250,8 @@
                     <field name="name"/>
                     <field name="filter"/>
                     <field name="connector_id"/>
-                    <field name="connector_out_id"/>
                     <field name="wp_id"/>
+                    <field name="connector_out_id"/>
                     <field name="wp_out_id"/>
                     <separator string="Terms:" colspan="4"/>
                     <field name="term_ids" colspan="4" nolabel="1"/>

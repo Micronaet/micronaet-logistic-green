@@ -21,6 +21,19 @@ class WPConnector(models.Model):
     # Utility:
     # -------------------------------------------------------------------------
     @api.model
+    def slugify(self, string):
+        """ Slugify function
+        """
+        import unicodedata
+        import re
+
+        slug = unicodedata.normalize('NFKD', string)
+        slug = slug.encode('ascii', 'ignore').lower()
+        slug = re.sub(r'[^a-z0-9]+', '-', slug).strip('-')
+        slug = re.sub(r'[-]+', '-', slug)
+        return slug
+
+    @api.model
     def wordpress_read_all(self, endpoint, per_page=50):
         """ Read all table in Wordpress
             endpoint: url to get data
@@ -46,7 +59,8 @@ class WPConnector(models.Model):
                 break
 
             records = reply.json()
-            if not records:
+            # Add extra text for Wordpress problem:
+            if not records or records[-1] in wp_records:
                 break
             wp_records.extend(records)
         return wp_records
@@ -186,7 +200,7 @@ class WPConnector(models.Model):
         if self.mode == 'in':
             return self.env['wp.attribute'].load_attributes(connector=self)
         else:
-            pass  # TODO
+            return self.env['wp.attribute'].publish_attributes(connector=self)
 
     @api.multi
     def button_load_category(self):
@@ -648,6 +662,83 @@ class WPAttribute(models.Model):
     _name = 'wp.attribute'
     _description = 'Wordpress Attribute'
     _order = 'name'
+
+    @api.model
+    def publish_attributes(self, connector):
+        """ Publish attributes from Wordpress
+        """
+        # ---------------------------------------------------------------------
+        # Wordpress Read current situation:
+        # ---------------------------------------------------------------------
+        wordpress = {'name': {}, 'id': []}  # Use to get WP record by ID / name
+        # Populate 2 database for sync operation:
+        all_attributes = connector.wordpress_read_all(
+            'products/attributes', per_page=50)
+        _logger.info('Worpress current attributes: # %s' % len(all_attributes))
+        for record in all_attributes:
+            wordpress['name'][record['name']] = record['id']
+            wordpress['id'].append(record['id'])
+
+        # Publish operation:
+        batch_data = {
+            'create': [],
+            'update': [],
+            }
+
+        attributes = self.search([('connector_out_id', '=', connector.id)])
+
+        created_attributes = {}  # Used for link wp create ID to ODOO
+        pdb.set_trace()
+        for attribute in attributes:  # Attribute name must be unique
+            attribute_name = attribute.name
+            data = {
+                'name': attribute_name,
+                'slug': connector.slugify(attribute_name),
+            }
+            wp_id = attribute.wp_out_id
+
+            # if no ID check also name for error during creation
+            if not wp_id and attribute_name in wordpress['name']:
+                wp_id = wordpress['name'][attribute_name]
+                attribute.write({'wp_out_id': wp_id})  # Update for next time
+
+            if wp_id in wordpress['id']:  # Update tag name (if necessary)
+                wordpress['id'].remove(wp_id)
+                data['id'] = wp_id
+                batch_data['update'].append(data)
+            else:
+                batch_data['create'].append(data)
+                created_attributes[attribute_name] = attribute
+        batch_data['delete'] = wordpress['id']
+
+        # ---------------------------------------------------------------------
+        # Call Wordpress (block of N records)
+        # ---------------------------------------------------------------------
+        wp_reply = connector.wordpress_batch_operation(
+            batch_data, 'products/tags/batch', max_block=100)
+
+        # ---------------------------------------------------------------------
+        # Update ODOO with created ID:
+        # ---------------------------------------------------------------------
+        for record in wp_reply.get('create', []):
+            if 'name' not in record:
+                _logger.error('Attribute not created: %s' % (record, ))
+                continue
+            attribute_name = record['name']
+            attribute = created_attributes.get(attribute_name)
+            if not attribute:  # Never happen!
+                pdb.set_trace()
+                _logger.error(
+                    'Tag %s in WP but no ref. in odoo' % attribute_name)
+
+            # Update ODOO with new ID
+            try:
+                attribute.write({'wp_out_id': record['id']})
+            except:
+                _logger.error('Error update odoo %s with WP %s' % (
+                    attribute.id, record['id']))
+        _logger.info('Tags created # %s' % len(wp_reply.get('create', [])))
+        return True
 
     @api.model
     def load_attributes(self, connector):
