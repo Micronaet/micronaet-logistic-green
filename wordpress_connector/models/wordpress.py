@@ -694,6 +694,9 @@ class WPAttribute(models.Model):
             data = {
                 'name': attribute_name,
                 'slug': 'pa_%s' % connector.slugify(attribute_name),
+                'type': 'select',
+                'order_by': 'menu_order',
+                'has_archives': False,
             }
             wp_id = attribute.wp_out_id
 
