@@ -694,7 +694,6 @@ class WPAttribute(models.Model):
 
         attributes = self.search([('connector_out_id', '=', connector.id)])
 
-        pdb.set_trace()
         created_attributes = {}  # Used for link wp create ID to ODOO
         for attribute in attributes:  # Attribute name must be unique
             attribute_name = attribute.name
@@ -785,7 +784,8 @@ class WPAttribute(models.Model):
                 }
 
             created_terms = {}  # Used for link wp create ID to ODOO
-            for term in attribute.terms_ids:  # Terms name must be unique
+            pdb.set_trace()
+            for term in attribute.term_ids:  # Terms name must be unique
                 term_name = term.name
                 data = {
                     'name': term_name,
@@ -812,9 +812,9 @@ class WPAttribute(models.Model):
                     created_terms[term_name] = term
             batch_data['delete'] = wordpress['id']
 
-            # ---------------------------------------------------------------------
+            # -----------------------------------------------------------------
             # Call Wordpress (block of N records)
-            # ---------------------------------------------------------------------
+            # -----------------------------------------------------------------
             wp_reply = connector.wordpress_batch_operation(
                 batch_data,
                 'products/attributes/%s/terms/batch' % wp_attribute_id,
@@ -841,7 +841,7 @@ class WPAttribute(models.Model):
                     _logger.error('Error update odoo %s with WP %s' % (
                         term.id, record['id']))
             _logger.info('Term created # %s' % len(wp_reply.get('create', [])))
-            return True
+        return True
 
 
     @api.model
