@@ -129,6 +129,11 @@ class ProductTemplate(models.Model):
         return record['sku'] or 'id_%s' % record['id']
 
     @api.model
+    def get_odoo_sku(self, record):
+        """ """
+        return record.sku_out or record.sku_in or ('id_%s' % record.id)
+
+    @api.model
     def publish_product_template(self, connector):
         """ Publish all product on out WP
         """
@@ -156,7 +161,7 @@ class ProductTemplate(models.Model):
 
         created_products = {}  # Used for link wp create ID to ODOO
         for product in products:  # Attribute name must be unique
-            product_sku = product.sku_out or product.sku_in  # <<<<<<<<<<<<<<<<
+            product_sku = self.get_odoo_sku(product)
             data = {
                 'sku': product_sku,
                 'name': product.name,
@@ -246,7 +251,7 @@ class ProductTemplate(models.Model):
             created_terms = {}  # Used for link wp create ID to ODOO
             # Attribute name must be unique
             for variation in master.wp_slave_ids:
-                variation_sku = variation.sku_out or variation.sku_in  # <<<<<<
+                variation_sku = self.get_odoo_sku(variation)
                 data = {
                     'sku': variation_sku,
                     # 'description': term.description,
