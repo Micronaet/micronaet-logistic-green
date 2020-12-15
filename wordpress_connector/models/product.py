@@ -151,7 +151,7 @@ class ProductTemplate(models.Model):
             'update': [],
             }
 
-        products = self.search([('connector_out_id', '=', connector.id)])
+        products = self.search([('wp_connector_out_id', '=', connector.id)])
 
         products = products[0:4]  # TODO Demo
 
@@ -219,7 +219,7 @@ class ProductTemplate(models.Model):
         # Loop on every attribute sync (before)
         connector_out_id = connector.id
         masters = self.search([
-            ('connector_out_id', '=', connector_out_id),
+            ('wp_connector_out_id', '=', connector_out_id),
             ('wp_master', '=', True),
         ])
         masters = masters[0:2]  # TODO Demo
