@@ -156,7 +156,7 @@ class ProductTemplate(models.Model):
 
         created_products = {}  # Used for link wp create ID to ODOO
         for product in products:  # Attribute name must be unique
-            product_sku = product.sku
+            product_sku = product.sku_out or product.sku_in  # <<<<<<<<<<<<<<<<
             data = {
                 'sku': product_sku,
                 'name': product.name,
@@ -246,7 +246,7 @@ class ProductTemplate(models.Model):
             created_terms = {}  # Used for link wp create ID to ODOO
             # Attribute name must be unique
             for variation in master.wp_slave_ids:
-                variation_sku = variation.sku
+                variation_sku = variation.sku_out or variation.sku_in  # <<<<<<
                 data = {
                     'sku': variation_sku,
                     # 'description': term.description,
