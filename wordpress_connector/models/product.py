@@ -132,7 +132,6 @@ class ProductTemplate(models.Model):
     def publish_product_template(self, connector):
         """ Publish all product on out WP
         """
-        pdb.set_trace()
         # ---------------------------------------------------------------------
         # Wordpress Read current situation:
         # ---------------------------------------------------------------------
@@ -152,8 +151,8 @@ class ProductTemplate(models.Model):
             }
 
         products = self.search([('wp_connector_out_id', '=', connector.id)])
-
         products = products[0:4]  # TODO Demo
+        pdb.set_trace()
 
         created_products = {}  # Used for link wp create ID to ODOO
         for product in products:  # Attribute name must be unique
