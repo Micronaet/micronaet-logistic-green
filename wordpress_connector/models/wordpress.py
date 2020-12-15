@@ -571,8 +571,10 @@ class WPTag(models.Model):
             'create': [],
             'update': [],
             }
-        wp_ids = [record['id'] for record in wp_records]
-        wp_name = [record['name'] for record in wp_records]
+        wordpress = {
+            'id': [record['id'] for record in wp_records],
+            'name': [record['name'] for record in wp_records],
+        }
         created_tags = {}  # Used for link wp create ID to ODOO
         for tag in tags:  # Tag name must be unique
             tag_name = tag.name
@@ -580,19 +582,24 @@ class WPTag(models.Model):
                 'name': tag_name,
                 }
             wp_id = tag.wp_out_id
-            # if no ID check also name for error during creation
-            if not wp_id and tag_name in wp_name:
-                tag.write({'wp_out_id': wp_id})  # Update for next time
-                wp_id = wp_name[tag_name]  # Created but not referenced in ODOO
 
-            if wp_id in wp_ids:  # Update tag name (if necessary)
-                wp_ids.remove(wp_id)
+            # if no ID check also name for error during creation
+            if wp_id not in wordpress['id']:  # Update tag name (if necessary)
+                wp_id = 0
+
+            if not wp_id and tag_name in wordpress['name']:
+                tag.write({'wp_out_id': wp_id})  # Update for next time
+                # Created but not referenced in ODOO
+                wp_id = wordpress['name'][tag_name]
+
+            if wp_id in wordpress['id']:  # Update tag name (if necessary)
+                wordpress['id'].remove(wp_id)
                 data['id'] = wp_id
                 batch_data['update'].append(data)
             else:
                 batch_data['create'].append(data)
                 created_tags[tag_name] = tag
-        batch_data['delete'] = wp_ids
+        batch_data['delete'] = wordpress['id']
 
         # ---------------------------------------------------------------------
         # Call Wordpress (block of N records)
@@ -687,20 +694,23 @@ class WPAttribute(models.Model):
 
         attributes = self.search([('connector_out_id', '=', connector.id)])
 
-        created_attributes = {}  # Used for link wp create ID to ODOO
         pdb.set_trace()
+        created_attributes = {}  # Used for link wp create ID to ODOO
         for attribute in attributes:  # Attribute name must be unique
             attribute_name = attribute.name
             data = {
                 'name': attribute_name,
-                'slug': 'pa_%s' % connector.slugify(attribute_name),
-                'type': 'select',
-                'order_by': 'menu_order',
-                'has_archives': False,
+                # 'slug': 'pa_%s' % connector.slugify(attribute_name),
+                # 'type': 'select',
+                # 'order_by': 'menu_order',
+                # 'has_archives': False,
             }
             wp_id = attribute.wp_out_id
 
             # if no ID check also name for error during creation
+            if wp_id not in wordpress['id']:  # Update tag name (if necessary)
+                wp_id = 0
+
             if not wp_id and attribute_name in wordpress['name']:
                 wp_id = wordpress['name'][attribute_name]
                 attribute.write({'wp_out_id': wp_id})  # Update for next time
@@ -718,7 +728,7 @@ class WPAttribute(models.Model):
         # Call Wordpress (block of N records)
         # ---------------------------------------------------------------------
         wp_reply = connector.wordpress_batch_operation(
-            batch_data, 'products/tags/batch', max_block=100)
+            batch_data, 'products/attributes/batch', max_block=100)
 
         # ---------------------------------------------------------------------
         # Update ODOO with created ID:
@@ -732,7 +742,7 @@ class WPAttribute(models.Model):
             if not attribute:  # Never happen!
                 pdb.set_trace()
                 _logger.error(
-                    'Tag %s in WP but no ref. in odoo' % attribute_name)
+                    'Attribute %s in WP but no ref. in odoo' % attribute_name)
 
             # Update ODOO with new ID
             try:
@@ -741,7 +751,99 @@ class WPAttribute(models.Model):
                 _logger.error('Error update odoo %s with WP %s' % (
                     attribute.id, record['id']))
         _logger.info('Tags created # %s' % len(wp_reply.get('create', [])))
-        return True
+
+        # Update terms for attributes yet sync:
+        return self.publish_attribute_terms(connector)
+
+    @api.model
+    def publish_attribute_terms(self, connector):
+        """ Publish attributes terms from Wordpress
+            Sync before attributes with publish_attribute
+        """
+        term_pool = self.env['wp.attribute.term']
+        # Loop on every attribute sync (before)
+        connector_out_id = connector.id
+        attributes = self.search([('connector_out_id', '=', connector_out_id)])
+        for attribute in attributes:
+            wp_attribute_id = attribute.wp_out_id
+
+            # -----------------------------------------------------------------
+            # Wordpress Read current situation:
+            # -----------------------------------------------------------------
+            wordpress = {'name': {}, 'id': []}  # Use to get WP record ID/name
+            # Populate 2 database for sync operation:
+            all_terms = connector.wordpress_read_all(
+                'products/attributes/%s/terms' % wp_attribute_id, per_page=50)
+            _logger.info('Worpress current terms: # %s' % len(all_terms))
+            for record in all_terms:
+                wordpress['name'][record['name']] = record['id']
+                wordpress['id'].append(record['id'])
+
+            # Publish operation:
+            batch_data = {
+                'create': [],
+                'update': [],
+                }
+
+            created_terms = {}  # Used for link wp create ID to ODOO
+            for term in attribute.terms_ids:  # Terms name must be unique
+                term_name = term.name
+                data = {
+                    'name': term_name,
+                    # 'description': term.description,
+                    # 'slug': 'pa_%s' % connector.slugify(attribute_name),
+                    # 'menu_order',
+                }
+                wp_id = term.wp_out_id
+
+                # if no ID check also name for error during creation
+                if wp_id not in wordpress['id']:  # Check if exist
+                    wp_id = 0
+
+                if not wp_id and term_name in wordpress['name']:
+                    wp_id = wordpress['name'][term_name]
+                    term.write({'wp_out_id': wp_id})  # For next time
+
+                if wp_id in wordpress['id']:  # Update tag name (if necessary)
+                    wordpress['id'].remove(wp_id)
+                    data['id'] = wp_id
+                    batch_data['update'].append(data)
+                else:
+                    batch_data['create'].append(data)
+                    created_terms[term_name] = term
+            batch_data['delete'] = wordpress['id']
+
+            # ---------------------------------------------------------------------
+            # Call Wordpress (block of N records)
+            # ---------------------------------------------------------------------
+            wp_reply = connector.wordpress_batch_operation(
+                batch_data,
+                'products/attributes/%s/terms/batch' % wp_attribute_id,
+                max_block=100)
+
+            # -----------------------------------------------------------------
+            # Update ODOO with created ID:
+            # -----------------------------------------------------------------
+            for record in wp_reply.get('create', []):
+                if 'name' not in record:
+                    _logger.error('Term not created: %s' % (record, ))
+                    continue
+                term_name = record['name']
+                term = created_terms.get(term_name)
+                if not term:  # Never happen!
+                    pdb.set_trace()
+                    _logger.error(
+                        'Tag %s in WP but no ref. in odoo' % term_name)
+
+                # Update ODOO with new ID
+                try:
+                    term.write({'wp_out_id': record['id']})
+                except:
+                    _logger.error('Error update odoo %s with WP %s' % (
+                        term.id, record['id']))
+            _logger.info('Term created # %s' % len(wp_reply.get('create', [])))
+            return True
+
 
     @api.model
     def load_attributes(self, connector):
@@ -860,9 +962,9 @@ class WPAttributeTerm(models.Model):
     connector_id = fields.Many2one(
         'wp.connector', 'Connector',
         related='attribute_id.connector_id')
-    connector_out_id = fields.Many2one(
-        'wp.connector', 'Connector',
-        related='attribute_id.connector_out_id')
+    # connector_out_id = fields.Many2one(
+    #     'wp.connector', 'Connector',
+    #     related='attribute_id.connector_out_id')
 
 
 class WPAttributeRelations(models.Model):
