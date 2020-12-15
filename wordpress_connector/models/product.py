@@ -171,6 +171,12 @@ class ProductTemplate(models.Model):
                 'sku': product_sku,
                 'name': product.name,
                 # TODO:
+
+                # TODO image
+
+                # TODO Linked product
+
+                # TODO Extra description
             }
             wp_id = product.wp_id_out
 
@@ -230,6 +236,7 @@ class ProductTemplate(models.Model):
         masters = self.search([
             ('wp_connector_out_id', '=', connector_out_id),
             ('wp_master', '=', True),
+            ('wp_type', '=', 'variable'),
         ])
         masters = masters[0:2]  # TODO Demo
         for master in masters:
