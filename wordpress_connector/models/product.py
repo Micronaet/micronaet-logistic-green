@@ -155,9 +155,14 @@ class ProductTemplate(models.Model):
             'update': [],
             }
 
-        products = self.search([('wp_connector_out_id', '=', connector.id)])
+        products = self.search([
+            '&',
+            ('wp_connector_out_id', '=', connector.id),
+            '|',
+            ('wp_master', '=', True),  # variable - master
+            ('wp_type', '=', 'simple'),  # simple
+        ])
         products = products[0:4]  # TODO Demo
-        pdb.set_trace()
 
         created_products = {}  # Used for link wp create ID to ODOO
         for product in products:  # Attribute name must be unique
@@ -184,14 +189,14 @@ class ProductTemplate(models.Model):
             else:
                 batch_data['create'].append(data)
                 created_products[product_sku] = product
-        batch_data['delete'] = wordpress['id']
+        # TODO batch_data['delete'] = wordpress['id']
 
         # ---------------------------------------------------------------------
         # Call Wordpress (block of N records)
         # ---------------------------------------------------------------------
         wp_reply = connector.wordpress_batch_operation(
             batch_data, 'products/batch', max_block=100)
-
+        pdb.set_trace()
         # ---------------------------------------------------------------------
         # Update ODOO with created ID:
         # ---------------------------------------------------------------------
