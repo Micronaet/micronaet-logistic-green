@@ -52,7 +52,7 @@ class WPConnector(models.Model):
                 params['per_page'] * (params['page'] - 1),
                 params['per_page'] * params['page'],
                 ))
-            reply = wcapi.get(endpoint, params=params)
+            reply = wcapi.get(endpoint, params=params)  # TODO put in a loop!!!
             params['page'] += 1
             if not reply.ok:
                 _logger.error('Error: %s' % reply.text)
@@ -760,7 +760,6 @@ class WPAttribute(models.Model):
         """ Publish attributes terms from Wordpress
             Sync before attributes with publish_attribute
         """
-        term_pool = self.env['wp.attribute.term']
         # Loop on every attribute sync (before)
         connector_out_id = connector.id
         attributes = self.search([('connector_out_id', '=', connector_out_id)])
