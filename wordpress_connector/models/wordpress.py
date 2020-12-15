@@ -29,7 +29,7 @@ class WPConnector(models.Model):
 
         slug = unicodedata.normalize('NFKD', string)
         slug = slug.encode('ascii', 'ignore').lower()
-        slug = re.sub(r'[^a-z0-9]+', '-', slug).strip('-')
+        slug = re.sub(r'[^a-z0-9]+', '-', slug.decode('utf-8')).strip('-')
         slug = re.sub(r'[-]+', '-', slug)
         return slug
 
@@ -693,7 +693,7 @@ class WPAttribute(models.Model):
             attribute_name = attribute.name
             data = {
                 'name': attribute_name,
-                'slug': connector.slugify(attribute_name),
+                'slug': 'pa_%s' % connector.slugify(attribute_name),
             }
             wp_id = attribute.wp_out_id
 
