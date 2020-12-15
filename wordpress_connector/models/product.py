@@ -124,6 +124,11 @@ class ProductTemplate(models.Model):
         })
 
     @api.model
+    def get_sku(self, record):
+        """ """
+        return record['sku'] or 'id_%s' % record['id']
+
+    @api.model
     def publish_product_template(self, connector):
         """ Publish all product on out WP
         """
@@ -137,7 +142,7 @@ class ProductTemplate(models.Model):
             'products', per_page=50)
         _logger.info('Worpress current product: # %s' % len(all_products))
         for record in all_products:
-            wordpress['sku'][record['sku']] = record['id']
+            wordpress['sku'][self.get_sku(record)] = record['id']
             wordpress['id'].append(record['id'])
 
         # Publish operation:
@@ -147,8 +152,8 @@ class ProductTemplate(models.Model):
             }
 
         products = self.search([('connector_out_id', '=', connector.id)])
-        # TODO Demo:
-        products = products[0:4]
+
+        products = products[0:4]  # TODO Demo
 
         created_products = {}  # Used for link wp create ID to ODOO
         for product in products:  # Attribute name must be unique
@@ -217,6 +222,7 @@ class ProductTemplate(models.Model):
             ('connector_out_id', '=', connector_out_id),
             ('wp_master', '=', True),
         ])
+        masters = masters[0:2]  # TODO Demo
         for master in masters:
             wp_master_id = master.wp_id_out
 
@@ -229,7 +235,7 @@ class ProductTemplate(models.Model):
                 'products/products/%s/variations' % wp_master_id, per_page=50)
             _logger.info('Worpress current variants: # %s' % len(all_variants))
             for record in all_variants:
-                wordpress['sku'][record['sku']] = record['id']
+                wordpress['sku'][self.get_sku(record)] = record['id']
                 wordpress['id'].append(record['id'])
 
             # Publish operation:
