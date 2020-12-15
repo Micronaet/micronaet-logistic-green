@@ -784,7 +784,6 @@ class WPAttribute(models.Model):
                 }
 
             created_terms = {}  # Used for link wp create ID to ODOO
-            pdb.set_trace()
             for term in attribute.term_ids:  # Terms name must be unique
                 term_name = term.name
                 data = {
