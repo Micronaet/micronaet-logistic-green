@@ -124,6 +124,187 @@ class ProductTemplate(models.Model):
         })
 
     @api.model
+    def publish_product_template(self, connector):
+        """ Publish all product on out WP
+        """
+        pdb.set_trace()
+        # ---------------------------------------------------------------------
+        # Wordpress Read current situation:
+        # ---------------------------------------------------------------------
+        wordpress = {'sku': {}, 'id': []}  # Use to get WP record by ID / name
+        # Populate 2 database for sync operation:
+        all_products = connector.wordpress_read_all(
+            'products', per_page=50)
+        _logger.info('Worpress current product: # %s' % len(all_products))
+        for record in all_products:
+            wordpress['sku'][record['sku']] = record['id']
+            wordpress['id'].append(record['id'])
+
+        # Publish operation:
+        batch_data = {
+            'create': [],
+            'update': [],
+            }
+
+        products = self.search([('connector_out_id', '=', connector.id)])
+        # TODO Demo:
+        products = products[0:4]
+
+        created_products = {}  # Used for link wp create ID to ODOO
+        for product in products:  # Attribute name must be unique
+            product_sku = product.sku
+            data = {
+                'sku': product_sku,
+                'name': product.name,
+                # TODO:
+            }
+            wp_id = product.wp_id_out
+
+            # if no ID check also name for error during creation
+            if wp_id not in wordpress['id']:  # Update tag name (if necessary)
+                wp_id = 0
+
+            if not wp_id and product_sku in wordpress['sku']:
+                wp_id = wordpress['sku'][product_sku]
+                products.write({'wp_id_out': wp_id})  # Update for next time
+
+            if wp_id in wordpress['id']:  # Update tag name (if necessary)
+                wordpress['id'].remove(wp_id)
+                data['id'] = wp_id
+                batch_data['update'].append(data)
+            else:
+                batch_data['create'].append(data)
+                created_products[product_sku] = product
+        batch_data['delete'] = wordpress['id']
+
+        # ---------------------------------------------------------------------
+        # Call Wordpress (block of N records)
+        # ---------------------------------------------------------------------
+        wp_reply = connector.wordpress_batch_operation(
+            batch_data, 'products/batch', max_block=100)
+
+        # ---------------------------------------------------------------------
+        # Update ODOO with created ID:
+        # ---------------------------------------------------------------------
+        for record in wp_reply.get('create', []):
+            if 'sku' not in record:
+                _logger.error('Product not created: %s' % (record, ))
+                continue
+            product_sku = record['sku']
+            product = created_products.get(product_sku)
+            if not product:  # Never happen!
+                pdb.set_trace()
+                _logger.error(
+                    'Product %s in WP but no ref. in odoo' % product_sku)
+
+            # Update ODOO with new ID
+            try:
+                product.write({'wp_id_out': record['id']})
+            except:
+                _logger.error('Error update odoo %s with WP %s' % (
+                    product.id, record['id']))
+        _logger.info('Product created # %s' % len(wp_reply.get('create', [])))
+
+        return self.publish_product_variant(connector)
+
+    @api.model
+    def publish_product_variant(self, connector):
+        """ Publish product variant from Wordpress
+        """
+        # Loop on every attribute sync (before)
+        connector_out_id = connector.id
+        masters = self.search([
+            ('connector_out_id', '=', connector_out_id),
+            ('wp_master', '=', True),
+        ])
+        for master in masters:
+            wp_master_id = master.wp_id_out
+
+            # -----------------------------------------------------------------
+            # Wordpress Read current situation:
+            # -----------------------------------------------------------------
+            wordpress = {'sku': {}, 'id': []}  # Use to get WP record ID/name
+            # Populate 2 database for sync operation:
+            all_variants = connector.wordpress_read_all(
+                'products/products/%s/variations' % wp_master_id, per_page=50)
+            _logger.info('Worpress current variants: # %s' % len(all_variants))
+            for record in all_variants:
+                wordpress['sku'][record['sku']] = record['id']
+                wordpress['id'].append(record['id'])
+
+            # Publish operation:
+            batch_data = {
+                'create': [],
+                'update': [],
+                }
+
+            created_terms = {}  # Used for link wp create ID to ODOO
+            # Attribute name must be unique
+            for variation in master.wp_slave_ids:
+                variation_sku = variation.sku
+                data = {
+                    'sku': variation_sku,
+                    # 'description': term.description,
+                    # 'slug': 'pa_%s' % connector.slugify(attribute_name),
+                    # 'menu_order',
+                    # TODO
+                }
+                wp_id = variation.wp_id_out
+
+                # if no ID check also name for error during creation
+                if wp_id not in wordpress['id']:  # Check if exist
+                    wp_id = 0
+
+                if not wp_id and variation_sku in wordpress['sku']:
+                    wp_id = wordpress['sku'][variation_sku]
+                    variation.write({'wp_id_out': wp_id})  # For next time
+
+                if wp_id in wordpress['id']:  # Update tag name (if necessary)
+                    wordpress['id'].remove(wp_id)
+                    data['id'] = wp_id
+                    batch_data['update'].append(data)
+                else:
+                    batch_data['create'].append(data)
+                    created_terms[variation_sku] = variation
+            batch_data['delete'] = wordpress['id']
+
+            # -----------------------------------------------------------------
+            # Call Wordpress (block of N records)
+            # -----------------------------------------------------------------
+            # TODO update attribute for variation:
+
+            wp_reply = connector.wordpress_batch_operation(
+                batch_data,
+                'products/%s/variations/batch' % wp_master_id,
+                max_block=100)
+
+            # TODO update default variation for product (if need)
+
+            # -----------------------------------------------------------------
+            # Update ODOO with created ID:
+            # -----------------------------------------------------------------
+            for record in wp_reply.get('create', []):
+                if 'sku' not in record:
+                    _logger.error('Variation not created: %s' % (record, ))
+                    continue
+                variation_sku = record['sku']
+                variation = created_terms.get(variation_sku)
+                if not variation:  # Never happen!
+                    pdb.set_trace()
+                    _logger.error(
+                        'Variation %s in WP but no ref. odoo' % variation_sku)
+
+                # Update ODOO with new ID
+                try:
+                    variation.write({'wp_id_out': record['id']})
+                except:
+                    _logger.error('Error update odoo %s with WP %s' % (
+                        variation.id, record['id']))
+            _logger.info('Variation created # %s' % len(
+                wp_reply.get('create', [])))
+        return True
+
+    @api.model
     def load_product_template_structure(self, connector):
         """ Load product template from Wordpress
             (procedure launch from connector button for now)

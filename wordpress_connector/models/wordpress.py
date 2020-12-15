@@ -220,8 +220,8 @@ class WPConnector(models.Model):
             return self.env['product.template'].\
                 load_product_template_structure(connector=self)
         else:
-            # TODO Manage export out data
-            raise exceptions.Warning('Output not managed for now only input!')
+            return self.env['product.template'].\
+                publish_product_template(connector=self)
 
     # -------------------------------------------------------------------------
     #                               COLUMNS:
@@ -841,7 +841,6 @@ class WPAttribute(models.Model):
                         term.id, record['id']))
             _logger.info('Term created # %s' % len(wp_reply.get('create', [])))
         return True
-
 
     @api.model
     def load_attributes(self, connector):
