@@ -313,12 +313,15 @@ class SaleOrder(models.Model):
         def format_error(field):
             return '<font color="red"><b> [%s] </b></font>' % field
 
-        def get_partner_data(partner):
+        def get_partner_data(partner, check_dimension=False):
             """ Embedded function to check partner data
             """
+            name = partner.name or ''
+            street = partner.street or ''
+            street2 = partner.street2 or ''
             error_check = not all((
-                partner.name,
-                partner.street,
+                name,
+                street,
                 partner.zip,
                 partner.city,
                 partner.state_id,
@@ -326,13 +329,20 @@ class SaleOrder(models.Model):
                 partner.phone,  # mandatory for carrier?
                 # partner.property_account_position_id,
             ))
+            if check_dimension:
+                if len(name) > check_dimension:
+                    name = format_error(name)
+                if len(street) > check_dimension:
+                    street = format_error(street)
+                if len(street2) > check_dimension:
+                    street2 = format_error(street2)
 
             return (
                 error_check,
                 '%s %s %s - %s %s [%s %s] %s - %s<br/>' % (
-                    partner.name or '',
-                    partner.street or format_error(_('Address')),
-                    partner.street2 or '',
+                    name,
+                    street or format_error(_('Address')),
+                    street2 or '',
                     partner.zip or format_error(_('ZIP')),
                     partner.city or format_error(_('City')),
                     partner.state_id.name or format_error(_('State')),
@@ -355,9 +365,12 @@ class SaleOrder(models.Model):
                 check_fiscal = ''
 
             mask = _('%s<b>ORD.:</b> %s\n<b>INV.:</b> %s\n<b>DELIV.:</b> %s')
-            error1, partner1_text = get_partner_data(order.partner_id)
-            error2, partner2_text = get_partner_data(partner)
-            error3, partner3_text = get_partner_data(order.partner_shipping_id)
+            error1, partner1_text = get_partner_data(
+                order.partner_id)
+            error2, partner2_text = get_partner_data(
+                partner)
+            error3, partner3_text = get_partner_data(
+                order.partner_shipping_id, check_dimension=34)
             order.carrier_check = mask % (
                 check_fiscal,
                 partner1_text,
