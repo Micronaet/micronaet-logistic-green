@@ -370,7 +370,7 @@ class SaleOrder(models.Model):
             error2, partner2_text = get_partner_data(
                 partner)
             error3, partner3_text = get_partner_data(
-                order.partner_shipping_id)  #, check_dimension=34)
+                order.partner_shipping_id)  # check_dimension=34)
             order.carrier_check = mask % (
                 check_fiscal,
                 partner1_text,

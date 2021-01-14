@@ -721,7 +721,7 @@ class WPAttribute(models.Model):
             else:
                 batch_data['create'].append(data)
                 created_attributes[attribute_name] = attribute
-        batch_data['delete'] = wordpress['id']
+        # TODO uncomment: batch_data['delete'] = wordpress['id']
 
         # ---------------------------------------------------------------------
         # Call Wordpress (block of N records)
