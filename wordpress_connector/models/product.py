@@ -194,7 +194,8 @@ class ProductTemplate(models.Model):
                         attribute_id = line.attribute_id.wp_out_id
                         attribute_name = line.attribute_id.name
                         key = \
-                            attribute_id, attribute_name, line.used_in_variant
+                            attribute_id, attribute_name, line.used_in_variant,
+                            line.show_product_page
 
                         if not attribute_id:
                             _logger.error(
@@ -222,13 +223,13 @@ class ProductTemplate(models.Model):
                 if options:
                     attributes = []
                     for key in options:
-                        attribute_id, name, used_in_variant = key
+                        attribute_id, name, used_in_variant, show = key
                         attributes.append({
                             'id': attribute_id,
                             'name': name,
                             'position': 0,
-                            'visible': used_in_variant,
-                            'variation': True,
+                            'visible': show,
+                            'variation': used_in_variant,
                             'options': options[key],
                         })
                     data['attributes'] = attributes
