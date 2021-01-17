@@ -193,9 +193,8 @@ class ProductTemplate(models.Model):
                     for line in variant.wp_attribute_ids:
                         attribute_id = line.attribute_id.wp_out_id
                         attribute_name = line.attribute_id.name
-                        key = \
-                            attribute_id, attribute_name, line.used_in_variant,
-                            line.show_product_page
+                        key = (attribute_id, attribute_name,
+                               line.used_in_variant, line.show_product_page)
 
                         if not attribute_id:
                             _logger.error(
@@ -206,10 +205,10 @@ class ProductTemplate(models.Model):
                         #    continue  # Attribute not used for variant
 
                         terms = line.term_ids
-                        if line.used_in_variant and len(terms) != 1:
-                            _logger.error(
-                                'More than one terms for variant attributes')
-                            continue
+                        # if line.used_in_variant and len(terms) != 1:
+                        #    _logger.error(
+                        #        'More than one terms for variant attributes')
+                        #    continue
 
                         # Append options for this attribute (once)
                         if key not in options:
@@ -350,10 +349,10 @@ class ProductTemplate(models.Model):
                     # visible management?
 
                     terms = line.term_ids
-                    if line.used_in_variant and len(terms) != 1:
-                        _logger.error(
-                            'More than one terms for variant attributes')
-                        continue
+                    # if line.used_in_variant and len(terms) != 1:
+                    #    _logger.error(
+                    #        'More than one terms for variant attributes')
+                    #    continue
 
                     for term in terms:
                         attributes.append({
