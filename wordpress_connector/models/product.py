@@ -189,7 +189,6 @@ class ProductTemplate(models.Model):
                 for variant in product.wp_slave_ids:
                     for line in variant.wp_attribute_ids:
                         attribute_id = line.attribute_id.wp_out_id
-                        pdb.set_trace()
                         if not line.used_in_variant:
                             continue  # Attribute not used for variant
 
@@ -211,6 +210,7 @@ class ProductTemplate(models.Model):
                         if attribute_data not in attributes:
                             attributes.append(attribute_data)
                 if attributes:
+                    pdb.set_trace()
                     data['attributes'] = attributes
 
             wp_id = product.wp_id_out

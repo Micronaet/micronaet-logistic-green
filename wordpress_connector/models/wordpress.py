@@ -788,6 +788,7 @@ class WPAttribute(models.Model):
                 term_name = term.name
                 data = {
                     'name': term_name,
+                    'type': 'select',
                     # 'description': term.description,
                     # 'slug': 'pa_%s' % connector.slugify(attribute_name),
                     # 'menu_order',
