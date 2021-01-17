@@ -215,15 +215,15 @@ class ProductTemplate(models.Model):
                             options[attribute_id].append(term_name)
 
                 if options:
-                    attributes = {}
+                    attributes = []
                     for attribute_id in options:
-                        attributes[attribute_id] = {
+                        attributes.append({
                             'id': attribute_id,
                             'position': 0,
                             'visible': True,
                             'variation': True,
-                            'option': options[attribute_id],
-                        }
+                            'options': options[attribute_id],
+                        })
                     data['attributes'] = attributes
                     print(data)
                     pdb.set_trace()
