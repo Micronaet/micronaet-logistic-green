@@ -133,8 +133,19 @@ class ProductTemplate(models.Model):
         """ """
         return record.sku_out or record.sku_in or ('id_%s' % record.id)
 
+    @api.multi
+    def button_publish_product_template(self):
+        """ Button publish only one
+        """
+        connector = self.wp_connector_out_id
+        if not connector:
+            return False
+        return self.publish_product_template(
+            connector, only_ids=[self.id])
+
+
     @api.model
-    def publish_product_template(self, connector):
+    def publish_product_template(self, connector, only_ids=False):
         """ Publish all product on out WP
         """
         # ---------------------------------------------------------------------
@@ -143,7 +154,7 @@ class ProductTemplate(models.Model):
         wordpress = {'sku': {}, 'id': []}  # Use to get WP record by ID / name
         # Populate 2 database for sync operation:
         all_products = connector.wordpress_read_all('products', per_page=50)
-        _logger.info('Worpress current product: # %s' % len(all_products))
+        _logger.info('Wordpress current product: # %s' % len(all_products))
         for record in all_products:
             wordpress['sku'][self.get_sku(record)] = record['id']
             wordpress['id'].append(record['id'])
@@ -154,49 +165,48 @@ class ProductTemplate(models.Model):
             'update': [],
             }
 
-        # =====================================================================
-        # TODO: Test mode:
-        # products = self.search([
-        #    '&',
-        #    ('wp_connector_out_id', '=', connector.id),
-        #    '|',
-        #    ('wp_master', '=', True),  # variable - master
-        #    ('wp_type', '=', 'simple'),  # simple
-        # ])
-        products = self.browse([22567, 18218])  # TODO Test mode master, simple
-        # =====================================================================
+        # ---------------------------------------------------------------------
+        # Domain filter composition:
+        # ---------------------------------------------------------------------
+        # Standard:
+        domain = [
+            '&',
+            ('wp_connector_out_id', '=', connector.id),
+            '|',
+            ('wp_master', '=', True),  # variable - master
+            ('wp_type', '=', 'simple'),  # simple
+        ]
+
+        # Single publish:
+        if only_ids:
+            domain.append(
+                ('id', 'in', only_ids)
+            )
+        products = self.search(domain)
 
         created_products = {}  # Used for link wp create ID to ODOO
         for product in products:  # Attribute name must be unique
             product_sku = self.get_odoo_sku(product)
+
+            # 0. Default data:
             data = {
                 'sku': product_sku,
                 'name': product.name,
                 'type': product.wp_type,
                 'status': product.wp_status,
-                # TODO:
 
-                # TODO image
-                # 'images': [],
-
-                # TODO Linked product
-                # 'cross_sell_ids': [],
-                # 'upsell_ids': [],
-                # 'related_ids': []
-
-                # TODO Extra description
+                # Extra description:
                 'sale_height': product.wp_sale_height or '',
                 'sale_width': product.wp_sale_width or '',
-                # 'purchase_note': product.purchase_note or '',
                 'perfume_notes': product.wp_scent_note or '',
+                # 'purchase_note': product.purchase_note or '',
                 # 'variety_cultivar': product.variety_cultivar or '',
                 # 'short_description': product.short_description or '',
-                # 'pruning': [''], wp_prining
+                # 'sale_price': product.short_description or '',
+                # 'menu_order': 0,
 
                 'name_scientific': product.wp_scientific_name or '',
                 'description': product.wp_description or '',
-                # 'sale_price': product.short_description or '',
-                # 'menu_order': 0,
                 'origin': product.wp_origin or '',
                 'flowering_height': product.wp_flowering_height or '',
                 # 'price': product.short_description or '',
@@ -206,32 +216,31 @@ class ProductTemplate(models.Model):
                 #    'width': product.short_description or ''
                 # },
                 # 'size_flower': product.wp_flowering_height or '',
-                # 'grouped_products': [],
-                # 'default_attributes': [],
                 'weight': product.weight or '',
                 'regular_price': '%s' % product.list_price,
                 'cultivation_care': product.wp_care or '',
                 'stock_quantity': product.qty_available,
-                'propagation': product.propagation or '',
+                'propagation': product.wp_propagation or '',
                 'manage_stock': True,
 
                 'species': product.wp_specie or '',
                 'genre': product.wp_genre or '',
                 'family': product.wp_family or '',
-                # 'catalog_visibility': 'visible',
-                # 'size_width': product.short_description or '',
                 'pests_diseases': product.wp_biologic or '',
-                # 'price_html': product.short_description or '',
                 'name_vulgar': product.wp_vulgar_name or '',
                 'flowering_type': product.wp_flowering_type or '',
                 'sale_trunk': product.wp_sale_trunk or '',
-                # 'shipping_class': product.short_description or '',
                 'rusticity': product.wp_rusticity or ''
-            }
-            # 'downloads': [],
-            # 'tags': [],
 
-            # Category:
+                # 'catalog_visibility': 'visible',
+                # 'size_width': product.short_description or '',
+                # 'price_html': product.short_description or '',
+                # 'shipping_class': product.short_description or '',
+
+                # 'pruning': [''], wp_pruning
+            }
+
+            # 1. Category:
             categories = []
             for category in product.wp_category_ids:
                 categories.append({
@@ -240,11 +249,29 @@ class ProductTemplate(models.Model):
             if categories:
                 data['categories'] = categories
 
+            # 2. Linked product:
+            # 'cross_sell_ids': [],
+            # 'upsell_ids': [],
+            # 'related_ids': []
+
+            # 3. image
+            # 'images': [],
+
+            # 4. Tags:
+            # 'tags': [],
+
+            # 5. Default:
+            # 'default_attributes': [],
+
+            # Remain:
+            # 'downloads': [],
+            # 'grouped_products': [],
+
             # -----------------------------------------------------------------
             # Product Variant extra data:
             # -----------------------------------------------------------------
             if product.wp_type:
-                # 1. Attributes:
+                # V1. Attributes:
                 options = {}
                 for variant in product.wp_slave_ids:
                     for line in variant.wp_attribute_ids:
@@ -281,7 +308,7 @@ class ProductTemplate(models.Model):
                         })
                     data['attributes'] = attributes
 
-                # 2. Default attributes
+                # V2. Default attributes
 
             wp_id = product.wp_id_out
 
