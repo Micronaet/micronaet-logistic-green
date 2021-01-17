@@ -193,18 +193,19 @@ class ProductTemplate(models.Model):
                     for line in variant.wp_attribute_ids:
                         attribute_id = line.attribute_id.wp_out_id
                         attribute_name = line.attribute_id.name
-                        key = attribute_id, attribute_name
-
-                        if not line.used_in_variant:
-                            continue  # Attribute not used for variant
+                        key = \
+                            attribute_id, attribute_name, line.used_in_variant
 
                         if not attribute_id:
                             _logger.error(
                                 'Need update attribute before product!')
                             break
 
+                        # if not line.used_in_variant:
+                        #    continue  # Attribute not used for variant
+
                         terms = line.term_ids
-                        if len(terms) != 1:
+                        if line.used_in_variant and len(terms) != 1:
                             _logger.error(
                                 'More than one terms for variant attributes')
                             continue
@@ -213,25 +214,26 @@ class ProductTemplate(models.Model):
                         if key not in options:
                             options[key] = []
 
-                        term_name = terms[0].name
-                        if term_name not in options[key]:
-                            options[key].append(term_name)
+                        for term in terms:
+                            term_name = term.name
+                            if term_name not in options[key]:
+                                options[key].append(term_name)
 
                 if options:
                     attributes = []
                     for key in options:
-                        attribute_id, name = key
+                        attribute_id, name, used_in_variant = key
                         attributes.append({
                             'id': attribute_id,
                             'name': name,
                             'position': 0,
-                            'visible': True,
+                            'visible': used_in_variant,
                             'variation': True,
                             'options': options[key],
                         })
                     data['attributes'] = attributes
 
-                # 2. Detault attributes
+                # 2. Default attributes
 
             wp_id = product.wp_id_out
 
@@ -338,8 +340,8 @@ class ProductTemplate(models.Model):
                 attributes = []
                 for line in variation.wp_attribute_ids:
                     attribute_id = line.attribute_id.wp_out_id
-                    if not line.used_in_variant:
-                        continue  # Attribute not used for variant
+                    # if not line.used_in_variant:
+                    #    continue  # Attribute not used for variant
                     if not attribute_id:
                         _logger.error(
                             'Need update attribute before product!')
@@ -347,15 +349,16 @@ class ProductTemplate(models.Model):
                     # visible management?
 
                     terms = line.term_ids
-                    if len(terms) != 1:
+                    if line.used_in_variant and len(terms) != 1:
                         _logger.error(
                             'More than one terms for variant attributes')
                         continue
 
-                    attributes.append({
-                        'id': attribute_id,
-                        'option': terms[0].name,
-                    })
+                    for term in terms:
+                        attributes.append({
+                            'id': attribute_id,
+                            'option': term.name,
+                        })
                 data['attributes'] = attributes
 
                 wp_id = variation.wp_id_out
