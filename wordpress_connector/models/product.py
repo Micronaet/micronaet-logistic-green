@@ -225,6 +225,8 @@ class ProductTemplate(models.Model):
                             'option': options[attribute_id],
                         }
                     data['attributes'] = attributes
+                    print(data)
+                    pdb.set_trace()
 
                 # 2. Detault attributes
 
@@ -368,7 +370,6 @@ class ProductTemplate(models.Model):
                 variation_sku = record['sku']
                 variation = created_terms.get(variation_sku)
                 if not variation:  # Never happen!
-                    pdb.set_trace()
                     _logger.error(
                         'Variation %s in WP but no ref. odoo' % variation_sku)
 
