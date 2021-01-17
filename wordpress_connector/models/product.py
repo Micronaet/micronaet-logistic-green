@@ -183,9 +183,12 @@ class ProductTemplate(models.Model):
                 # TODO Extra description
             }
 
+            # -----------------------------------------------------------------
             # Product Variant extra data:
+            # -----------------------------------------------------------------
             if product.wp_type:
-                attributes = []
+                # 1. Attributes:
+                options = {}
                 for variant in product.wp_slave_ids:
                     for line in variant.wp_attribute_ids:
                         attribute_id = line.attribute_id.wp_out_id
@@ -196,22 +199,34 @@ class ProductTemplate(models.Model):
                             _logger.error(
                                 'Need update attribute before product!')
                             break
+
                         terms = line.term_ids
                         if len(terms) != 1:
                             _logger.error(
                                 'More than one terms for variant attributes')
                             continue
 
-                        # Append only once:
-                        attribute_data = {
+                        # Append options for this attribute (once)
+                        if attribute_id not in options:
+                            options[attribute_id] = []
+
+                        term_name = terms[0].name
+                        if term_name not in options[attribute_id]:
+                            options[attribute_id].append(term_name)
+
+                if options:
+                    attributes = {}
+                    for attribute_id in options:
+                        attributes[attribute_id] = {
                             'id': attribute_id,
-                            'option': terms[0].name,
+                            'position': 0,
+                            'visible': True,
+                            'variation': True,
+                            'option': options[attribute_id],
                         }
-                        if attribute_data not in attributes:
-                            attributes.append(attribute_data)
-                if attributes:
-                    pdb.set_trace()
                     data['attributes'] = attributes
+
+                # 2. Detault attributes
 
             wp_id = product.wp_id_out
 
@@ -249,7 +264,6 @@ class ProductTemplate(models.Model):
             product_sku = record['sku']
             product = created_products.get(product_sku)
             if not product:  # Never happen!
-                pdb.set_trace()
                 _logger.error(
                     'Product %s in WP but no ref. in odoo' % product_sku)
 
@@ -487,7 +501,6 @@ class ProductTemplate(models.Model):
                 create_mode = False if products else True
                 if len(products) > 1:
                     _logger.error('Multi ID or SKU present: %s' % sku)
-                    pdb.set_trace()
                     # TODO use only first?
                     # products = product[0]
 
@@ -659,7 +672,6 @@ class ProductTemplate(models.Model):
                                     _logger.error('Double variant found %s' % (
                                         variant_sku,
                                     ))
-                                    pdb.set_trace()
                                     odoo_variants = odoo_variants[0]
 
                                 odoo_variants.write(variant_data)
