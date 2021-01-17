@@ -382,6 +382,8 @@ class ProductTemplate(models.Model):
                     'regular_price': '%s' % variation.list_price,
                     # sale_price
                     # price
+                    # >> 'stock_quantity': variation.qty_available,
+
                 }
 
                 # -------------------------------------------------------------
