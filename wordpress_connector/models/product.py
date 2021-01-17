@@ -196,7 +196,6 @@ class ProductTemplate(models.Model):
                 'name_scientific': product.wp_scientific_name or '',
                 'description': product.wp_description or '',
                 # 'sale_price': product.short_description or '',
-                # 'downloads': [],
                 # 'menu_order': 0,
                 'origin': product.wp_origin or '',
                 'flowering_height': product.wp_flowering_height or '',
@@ -213,25 +212,33 @@ class ProductTemplate(models.Model):
                 'regular_price': '%s' % product.list_price,
                 'cultivation_care': product.wp_care or '',
                 'stock_quantity': product.qty_available,
-                """
-                'propagation': product.short_description or '',
-                # '_links': {},
-                # 'catalog_visibility': 'visible',
+                'propagation': product.propagation or '',
                 'manage_stock': True,
-                'species': product.short_description or '',
-                'genre': product.short_description or '',
-                'tags': [],
-                'family': product.short_description or '',
-                'size_width': product.short_description or '',
-                'pests_diseases': product.short_description or '',
+
+                'species': product.wp_specie or '',
+                'genre': product.wp_genre or '',
+                'family': product.wp_family or '',
+                # 'catalog_visibility': 'visible',
+                # 'size_width': product.short_description or '',
+                'pests_diseases': product.wp_biologic or '',
                 # 'price_html': product.short_description or '',
-                'name_vulgar': product.short_description or '',
-                'flowering_type': product.short_description or '',
-                'sale_trunk': product.short_description or '',
-                'shipping_class': product.short_description or '',
-                'rusticity': product.short_description or ''
-                """
-                }
+                'name_vulgar': product.wp_vulgar_name or '',
+                'flowering_type': product.wp_flowering_type or '',
+                'sale_trunk': product.wp_sale_trunk or '',
+                # 'shipping_class': product.short_description or '',
+                'rusticity': product.wp_rusticity or ''
+            }
+            # 'downloads': [],
+            # 'tags': [],
+
+            # Category:
+            categories = []
+            for category in product.wp_category_ids:
+                categories.append({
+                    'id': category.wp_id,
+                })
+            if categories:
+                data['categories'] = categories
 
             # -----------------------------------------------------------------
             # Product Variant extra data:
@@ -305,7 +312,6 @@ class ProductTemplate(models.Model):
         # ---------------------------------------------------------------------
         # Update ODOO with created ID:
         # ---------------------------------------------------------------------
-        pdb.set_trace()
         for record in wp_reply.get('create', []):
             if 'sku' not in record:
                 _logger.error('Product not created: %s' % (record, ))
