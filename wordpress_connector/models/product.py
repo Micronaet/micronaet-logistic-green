@@ -154,6 +154,8 @@ class ProductTemplate(models.Model):
             'update': [],
             }
 
+        # =====================================================================
+        # TODO: Test mode:
         # products = self.search([
         #    '&',
         #    ('wp_connector_out_id', '=', connector.id),
@@ -161,10 +163,10 @@ class ProductTemplate(models.Model):
         #    ('wp_master', '=', True),  # variable - master
         #    ('wp_type', '=', 'simple'),  # simple
         # ])
-        products = self.browse([18218])[0]  # TODO Demo
+        products = self.browse([22567, 18218])  # TODO Test mode master, simple
+        # =====================================================================
 
         created_products = {}  # Used for link wp create ID to ODOO
-        pdb.set_trace()
         for product in products:  # Attribute name must be unique
             product_sku = self.get_odoo_sku(product)
             data = {
@@ -180,6 +182,37 @@ class ProductTemplate(models.Model):
 
                 # TODO Extra description
             }
+
+            # Product Variant extra data:
+            if product.wp_type:
+                attributes = []
+                for variant in product.wp_slave_ids:
+                    for line in variant.wp_attribute_ids:
+                        attribute_id = line.attribute_id.wp_out_id
+                        pdb.set_trace()
+                        if not line.used_in_variant:
+                            continue  # Attribute not used for variant
+
+                        if not attribute_id:
+                            _logger.error(
+                                'Need update attribute before product!')
+                            break
+                        terms = line.term_ids
+                        if len(terms) != 1:
+                            _logger.error(
+                                'More than one terms for variant attributes')
+                            continue
+
+                        # Append only once:
+                        attribute_data = {
+                            'id': attribute_id,
+                            'option': terms[0].name,
+                        }
+                        if attribute_data not in attributes:
+                            attributes.append(attribute_data)
+                if attributes:
+                    data['attributes'] = attributes
+
             wp_id = product.wp_id_out
 
             # if no ID check also name for error during creation
@@ -197,14 +230,15 @@ class ProductTemplate(models.Model):
             else:
                 batch_data['create'].append(data)
                 created_products[product_sku] = product
+        # =====================================================================
         # TODO Demo: batch_data['delete'] = wordpress['id']
+        # =====================================================================
 
         # ---------------------------------------------------------------------
         # Call Wordpress (block of N records)
         # ---------------------------------------------------------------------
         wp_reply = connector.wordpress_batch_operation(
             batch_data, 'products/batch', max_block=100)
-        pdb.set_trace()
         # ---------------------------------------------------------------------
         # Update ODOO with created ID:
         # ---------------------------------------------------------------------
@@ -227,14 +261,14 @@ class ProductTemplate(models.Model):
                     product.id, record['id']))
         _logger.info('Product created # %s' % len(wp_reply.get('create', [])))
 
-        pdb.set_trace()
-        return self.publish_product_variant(connector, products.maps('id'))
+        return self.publish_product_variant(connector, products.mapped('id'))
 
     @api.model
     def publish_product_variant(self, connector, master_ids=False):
         """ Publish product variant from Wordpress
             if master_ids is passes update only that product
         """
+        pdb.set_trace()
         # Loop on every attribute sync (before)
         connector_out_id = connector.id
         domain = [
@@ -246,7 +280,7 @@ class ProductTemplate(models.Model):
             domain.append(('id', 'in', master_ids))
 
         masters = self.search(domain)
-        masters = masters[0:2]  # TODO Demo
+        # masters = masters[0:2]  # TODO Demo
         for master in masters:
             wp_master_id = master.wp_id_out
 
@@ -256,7 +290,7 @@ class ProductTemplate(models.Model):
             wordpress = {'sku': {}, 'id': []}  # Use to get WP record ID/name
             # Populate 2 database for sync operation:
             all_variants = connector.wordpress_read_all(
-                'products/products/%s/variations' % wp_master_id, per_page=50)
+                'products/%s/variations' % wp_master_id, per_page=50)
             _logger.info('Worpress current variants: # %s' % len(all_variants))
             for record in all_variants:
                 wordpress['sku'][self.get_sku(record)] = record['id']
