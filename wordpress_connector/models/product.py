@@ -177,11 +177,61 @@ class ProductTemplate(models.Model):
                 # TODO:
 
                 # TODO image
+                # 'images': [],
 
                 # TODO Linked product
+                # 'cross_sell_ids': [],
+                # 'upsell_ids': [],
+                # 'related_ids': []
 
                 # TODO Extra description
-            }
+                'sale_height': product.wp_sale_height or '',
+                'sale_width': product.wp_sale_width or '',
+                # 'purchase_note': product.purchase_note or '',
+                'perfume_notes': product.wp_scent_note or '',
+                # 'variety_cultivar': product.variety_cultivar or '',
+                # 'short_description': product.short_description or '',
+                # 'pruning': [''], wp_prining
+
+                'name_scientific': product.wp_scientific_name or '',
+                'description': product.wp_description or '',
+                # 'sale_price': product.short_description or '',
+                # 'downloads': [],
+                # 'menu_order': 0,
+                'origin': product.wp_origin or '',
+                'flowering_height': product.wp_flowering_height or '',
+                # 'price': product.short_description or '',
+                # 'dimensions': {
+                #    'length': product.short_description or '',
+                #    'height': product.short_description or '',
+                #    'width': product.short_description or ''
+                # },
+                # 'size_flower': product.wp_flowering_height or '',
+                # 'grouped_products': [],
+                # 'default_attributes': [],
+                'weight': product.weight or '',
+                'regular_price': '%s' % product.list_price,
+                'cultivation_care': product.wp_care or '',
+                'stock_quantity': product.qty_available,
+                """
+                'propagation': product.short_description or '',
+                # '_links': {},
+                # 'catalog_visibility': 'visible',
+                'manage_stock': True,
+                'species': product.short_description or '',
+                'genre': product.short_description or '',
+                'tags': [],
+                'family': product.short_description or '',
+                'size_width': product.short_description or '',
+                'pests_diseases': product.short_description or '',
+                # 'price_html': product.short_description or '',
+                'name_vulgar': product.short_description or '',
+                'flowering_type': product.short_description or '',
+                'sale_trunk': product.short_description or '',
+                'shipping_class': product.short_description or '',
+                'rusticity': product.short_description or ''
+                """
+                }
 
             # -----------------------------------------------------------------
             # Product Variant extra data:
@@ -201,20 +251,11 @@ class ProductTemplate(models.Model):
                                 'Need update attribute before product!')
                             break
 
-                        # if not line.used_in_variant:
-                        #    continue  # Attribute not used for variant
-
-                        terms = line.term_ids
-                        # if line.used_in_variant and len(terms) != 1:
-                        #    _logger.error(
-                        #        'More than one terms for variant attributes')
-                        #    continue
-
                         # Append options for this attribute (once)
                         if key not in options:
                             options[key] = []
 
-                        for term in terms:
+                        for term in line.term_ids:
                             term_name = term.name
                             if term_name not in options[key]:
                                 options[key].append(term_name)
@@ -264,6 +305,7 @@ class ProductTemplate(models.Model):
         # ---------------------------------------------------------------------
         # Update ODOO with created ID:
         # ---------------------------------------------------------------------
+        pdb.set_trace()
         for record in wp_reply.get('create', []):
             if 'sku' not in record:
                 _logger.error('Product not created: %s' % (record, ))
@@ -331,6 +373,9 @@ class ProductTemplate(models.Model):
                     # 'slug': 'pa_%s' % connector.slugify(attribute_name),
                     # 'menu_order',
                     # TODO
+                    'regular_price': '%s' % variation.list_price,
+                    # sale_price
+                    # price
                 }
 
                 # -------------------------------------------------------------
@@ -340,21 +385,12 @@ class ProductTemplate(models.Model):
                 attributes = []
                 for line in variation.wp_attribute_ids:
                     attribute_id = line.attribute_id.wp_out_id
-                    # if not line.used_in_variant:
-                    #    continue  # Attribute not used for variant
                     if not attribute_id:
                         _logger.error(
                             'Need update attribute before product!')
                         break
-                    # visible management?
 
-                    terms = line.term_ids
-                    # if line.used_in_variant and len(terms) != 1:
-                    #    _logger.error(
-                    #        'More than one terms for variant attributes')
-                    #    continue
-
-                    for term in terms:
+                    for term in line.term_ids:
                         attributes.append({
                             'id': attribute_id,
                             'option': term.name,
@@ -388,7 +424,7 @@ class ProductTemplate(models.Model):
                 batch_data,
                 'products/%s/variations/batch' % wp_master_id,
                 max_block=100)
-
+            # print('%s' % (wp_reply, ))
             # TODO update default variation for product (if need)
 
             # -----------------------------------------------------------------
