@@ -142,8 +142,7 @@ class ProductTemplate(models.Model):
         # ---------------------------------------------------------------------
         wordpress = {'sku': {}, 'id': []}  # Use to get WP record by ID / name
         # Populate 2 database for sync operation:
-        all_products = connector.wordpress_read_all(
-            'products', per_page=50)
+        all_products = connector.wordpress_read_all('products', per_page=50)
         _logger.info('Worpress current product: # %s' % len(all_products))
         for record in all_products:
             wordpress['sku'][self.get_sku(record)] = record['id']
@@ -228,19 +227,25 @@ class ProductTemplate(models.Model):
                     product.id, record['id']))
         _logger.info('Product created # %s' % len(wp_reply.get('create', [])))
 
-        return self.publish_product_variant(connector)
+        pdb.set_trace()
+        return self.publish_product_variant(connector, products.maps('id'))
 
     @api.model
-    def publish_product_variant(self, connector):
+    def publish_product_variant(self, connector, master_ids=False):
         """ Publish product variant from Wordpress
+            if master_ids is passes update only that product
         """
         # Loop on every attribute sync (before)
         connector_out_id = connector.id
-        masters = self.search([
+        domain = [
             ('wp_connector_out_id', '=', connector_out_id),
             ('wp_master', '=', True),
             ('wp_type', '=', 'variable'),
-        ])
+        ]
+        if master_ids:
+            domain.append(('id', 'in', master_ids))
+
+        masters = self.search(domain)
         masters = masters[0:2]  # TODO Demo
         for master in masters:
             wp_master_id = master.wp_id_out
