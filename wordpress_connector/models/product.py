@@ -192,6 +192,9 @@ class ProductTemplate(models.Model):
                 for variant in product.wp_slave_ids:
                     for line in variant.wp_attribute_ids:
                         attribute_id = line.attribute_id.wp_out_id
+                        attribute_name = line.attribute_id.name
+                        key = attribute_id, attribute_name
+
                         if not line.used_in_variant:
                             continue  # Attribute not used for variant
 
@@ -207,26 +210,26 @@ class ProductTemplate(models.Model):
                             continue
 
                         # Append options for this attribute (once)
-                        if attribute_id not in options:
-                            options[attribute_id] = []
+                        if key not in options:
+                            options[key] = []
 
                         term_name = terms[0].name
-                        if term_name not in options[attribute_id]:
-                            options[attribute_id].append(term_name)
+                        if term_name not in options[key]:
+                            options[key].append(term_name)
 
                 if options:
                     attributes = []
-                    for attribute_id in options:
+                    for key in options:
+                        attribute_id, name = key
                         attributes.append({
                             'id': attribute_id,
+                            'name': name,
                             'position': 0,
                             'visible': True,
                             'variation': True,
-                            'options': options[attribute_id],
+                            'options': options[key],
                         })
                     data['attributes'] = attributes
-                    print(data)
-                    pdb.set_trace()
 
                 # 2. Detault attributes
 
@@ -284,7 +287,6 @@ class ProductTemplate(models.Model):
         """ Publish product variant from Wordpress
             if master_ids is passes update only that product
         """
-        pdb.set_trace()
         # Loop on every attribute sync (before)
         connector_out_id = connector.id
         domain = [
@@ -296,7 +298,6 @@ class ProductTemplate(models.Model):
             domain.append(('id', 'in', master_ids))
 
         masters = self.search(domain)
-        # masters = masters[0:2]  # TODO Demo
         for master in masters:
             wp_master_id = master.wp_id_out
 
@@ -329,8 +330,35 @@ class ProductTemplate(models.Model):
                     # 'menu_order',
                     # TODO
                 }
-                wp_id = variation.wp_id_out
 
+                # -------------------------------------------------------------
+                #                       EXTRA DATA:
+                # -------------------------------------------------------------
+                # A. Setup attribute for variant:
+                attributes = []
+                for line in variation.wp_attribute_ids:
+                    attribute_id = line.attribute_id.wp_out_id
+                    if not line.used_in_variant:
+                        continue  # Attribute not used for variant
+                    if not attribute_id:
+                        _logger.error(
+                            'Need update attribute before product!')
+                        break
+                    # visible management?
+
+                    terms = line.term_ids
+                    if len(terms) != 1:
+                        _logger.error(
+                            'More than one terms for variant attributes')
+                        continue
+
+                    attributes.append({
+                        'id': attribute_id,
+                        'option': terms[0].name,
+                    })
+                data['attributes'] = attributes
+
+                wp_id = variation.wp_id_out
                 # if no ID check also name for error during creation
                 if wp_id not in wordpress['id']:  # Check if exist
                     wp_id = 0
