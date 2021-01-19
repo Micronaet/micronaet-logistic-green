@@ -194,74 +194,108 @@ class ProductTemplate(models.Model):
                 'name': product.name,
                 'type': product.wp_type,
                 'status': product.wp_status,
+                'description': product.wp_description or '',
+                'short_description': product.wp_short_description or '',
 
                 # Extra description:
                 'sale_height': product.wp_sale_height or '',
                 'sale_width': product.wp_sale_width or '',
                 'perfume_notes': product.wp_scent_note or '',
+                'rootstocks': product.wp_graph_holder or '',
+                'variety_cultivar': product.wp_variety or '',
                 # 'purchase_note': product.purchase_note or '',
-                # 'variety_cultivar': product.variety_cultivar or '',
-                # 'short_description': product.short_description or '',
-                # 'sale_price': product.short_description or '',
                 # 'menu_order': 0,
 
                 'name_scientific': product.wp_scientific_name or '',
-                'description': product.wp_description or '',
                 'origin': product.wp_origin or '',
+                'parents': product.wp_ancestor or '',
                 'flowering_height': product.wp_flowering_height or '',
-                # 'price': product.short_description or '',
                 # 'dimensions': {
                 #    'length': product.short_description or '',
                 #    'height': product.short_description or '',
                 #    'width': product.short_description or ''
                 # },
-                # 'size_flower': product.wp_flowering_height or '',
                 'weight': product.weight or '',
-                'regular_price': '%s' % product.list_price,
+                'size_flower': product.wp_flower_dimension or '',
+                # 'price': product.short_description or '',
+                'sale_price': '%s' % product.wp_sale_price,
                 'cultivation_care': product.wp_care or '',
                 'stock_quantity': product.qty_available,
                 'propagation': product.wp_propagation or '',
                 'manage_stock': True,
 
                 'species': product.wp_specie or '',
-                'genre': product.wp_genre or '',
-                'family': product.wp_family or '',
-                'pests_diseases': product.wp_biologic or '',
+                'genre': product.wp_genre,
+                'family': product.wp_family,
                 'name_vulgar': product.wp_vulgar_name or '',
                 'flowering_type': product.wp_flowering_type or '',
                 'sale_trunk': product.wp_sale_trunk or '',
-                'rusticity': product.wp_rusticity or ''
+                'rusticity': product.wp_rusticity or '',
 
                 # 'catalog_visibility': 'visible',
-                # 'size_width': product.short_description or '',
                 # 'price_html': product.short_description or '',
                 # 'shipping_class': product.short_description or '',
 
-                # 'pruning': [''], wp_pruning
+                'pruning': product.wp_pruning,
+                'cultivation_care': product.wp_care,
+                'propagation': product.wp_propagation,
+                'pests_diseases': product.wp_disease,
+
+                # Attributes:
+                # wp_jar_id
+                # wp_format_id
+                # wp_dimension_height_id
+                # wp_color_id
+                # wp_finish_id
+                # wp_botanic_group_id
+                # wp_bearing_id
+                # wp_scent_id
+                # wp_leaf_type_id
+                # wp_leaf_color_id
+                # wp_leaf_persistence_id
+                # wp_flowering_color_id
+                # wp_flowering_period_id
+                # wp_time_transplant_id
+                # wp_time_sowing_id
+                # wp_time_roundup_id
+                # wp_dimension_height_id
+                # wp_exposition_id
+                # wp_frost_resistance_id
+                # wp_use_id
+                # wp_biologic_id
+                # wp_adversity_id
             }
 
             # 1. Category:
-            categories = []
+            data['categories'] = []
             for category in product.wp_category_ids:
-                categories.append({
+                data['categories'].append({
                     'id': category.wp_id,
                 })
-            if categories:
-                data['categories'] = categories
 
             # 2. Linked product:
-            # 'cross_sell_ids': [],
-            # 'upsell_ids': [],
-            # 'related_ids': []
+            data['cross_sell_ids'] = []
+            data['upsell_ids'] = []
+            data['related_ids'] = []
 
             # 3. image
             # 'images': [],
 
             # 4. Tags:
+            data['tags'] = []
+            for tag in product.wp_tag_ids:
+                data['tags'].append({
+                    'id': tag.wp_id,
+                })
+
             # 'tags': [],
 
             # 5. Default:
             # 'default_attributes': [],
+
+            # 6. Price
+            if product.list_price:
+                data['regular_price'] = '%s' % product.list_price
 
             # Remain:
             # 'downloads': [],
@@ -1168,17 +1202,18 @@ class ProductTemplate(models.Model):
     # Tassonomy:
     wp_vulgar_name = fields.Char(string='Vulgar name', size=50)
     wp_scientific_name = fields.Char(string='Scientific name', size=50)
-    wp_family = fields.Char(
-        string='Family', size=50,
+    wp_family = fields.Integer(
+        string='Family',
         help='Relation family, used ID.ID for link Tag Wiki of Wordpress')
-    wp_genre = fields.Char(
-        string='Genre', size=50,
+    wp_genre = fields.Integer(
+        string='Genre',
         help='Relation genre, used ID.ID for link Tag Wiki of Wordpress')
     # marchio collezione
     wp_specie = fields.Char(string='Species', size=50)
     wp_variety = fields.Char(string='Variety', size=50)
     wp_origin = fields.Char(string='Origin', size=50)
     wp_ancestor = fields.Char(string='Ancestors', size=50)
+    wp_short_description = fields.Char(string='Short description', size=50)
     wp_description = fields.Char(string='Description', size=50)
     # FOTO
 
@@ -1190,17 +1225,41 @@ class ProductTemplate(models.Model):
         domain="[('attribute_id.filter', '=', 'vaso')]",
         help='Show attribute terms with filter: vaso',
     )
+    wp_format_id = fields.Many2one(
+        comodel_name='wp.attribute.term',
+        string='Format',
+        domain="[('attribute_id.filter', '=', 'formato')]",
+        help='Show attribute terms with filter: formato',
+    )
+
     # Prezzo
+    wp_sale_price = fields.Float(string='Sale price')
+
     wp_sale_width = fields.Char(string='Sale width', size=20)
     wp_sale_height = fields.Char(string='Sale height', size=20)
     wp_sale_trunk = fields.Char(string='Sale trunk', size=50)
     wp_graph_holder = fields.Char(string='Graph holder', size=50)
-    wp_color = fields.Char(string='Color', size=50)
-    wp_finish = fields.Char(string='Finish', size=50)
+    wp_color_id = fields.Many2one(
+        comodel_name='wp.attribute.term',
+        string='Color',
+        domain="[('attribute_id.filter', '=', 'colore')]",
+        help='Show attribute terms with filter: colore',
+    )
+    wp_finish_id = fields.Many2one(
+        comodel_name='wp.attribute.term',
+        string='Finiture',
+        domain="[('attribute_id.filter', '=', 'finitura')]",
+        help='Show attribute terms with filter: finitura',
+    )
 
     # -------------------------------------------------------------------------
     # Botanic / Tech:
-    wp_botanic_group = fields.Char(string='Botanic group', size=50)
+    wp_botanic_group_id = fields.Many2one(
+        comodel_name='wp.attribute.term',
+        string='Botanic gorup',
+        domain="[('attribute_id.filter', '=', 'gruppo')]",
+        help='Show attribute terms with filter: gruppo',
+    )
     wp_bearing_id = fields.Many2one(
         comodel_name='wp.attribute.term',
         string='Bearing',
@@ -1227,7 +1286,12 @@ class ProductTemplate(models.Model):
         domain="[('attribute_id.filter', '=', 'colore_foglia')]",
         help='Show attribute terms with filter: colore_foglia',
     )
-    wp_leaf_persistence = fields.Char(string='Leaf persistence', size=50)
+    wp_leaf_persistence_id = fields.Many2one(
+        comodel_name='wp.attribute.term',
+        string='Persistence',
+        domain="[('attribute_id.filter', '=', 'persistenza')]",
+        help='Show attribute terms with filter: persistenza',
+    )
     wp_flowering_type = fields.Char(string='Flowering type', size=50)
     wp_flowering_color_id = fields.Many2one(
         comodel_name='wp.attribute.term',
@@ -1235,11 +1299,31 @@ class ProductTemplate(models.Model):
         domain="[('attribute_id.filter', '=', 'colore_fioritura')]",
         help='Show attribute terms with filter: colore_fioritura',
     )
-    wp_flowering_period = fields.Char(string='Flowering period', size=50)
+    wp_flowering_period_id = fields.Many2one(
+        comodel_name='wp.attribute.term',
+        string='Flowering perio',
+        domain="[('attribute_id.filter', '=', 'periodo_fioritura')]",
+        help='Show attribute terms with filter: periodo_fioritura',
+    )
     wp_flowering_height = fields.Char(string='Flowering height', size=50)
-    wp_time_transplant = fields.Char(string='Time transplant', size=50)
-    wp_time_sowing = fields.Char(string='Time sowing', size=50)
-    wp_time_roundup = fields.Char(string='Time round up', size=50)
+    wp_time_transplant_id = fields.Many2one(
+        comodel_name='wp.attribute.term',
+        string='Time transplant',
+        domain="[('attribute_id.filter', '=', 'trapianto')]",
+        help='Show attribute terms with filter: trapianto',
+    )
+    wp_time_sowing_id = fields.Many2one(
+        comodel_name='wp.attribute.term',
+        string='Time sowing',
+        domain="[('attribute_id.filter', '=', 'semina')]",
+        help='Show attribute terms with filter: semina',
+    )
+    wp_time_roundup_id = fields.Many2one(
+        comodel_name='wp.attribute.term',
+        string='Time round up',
+        domain="[('attribute_id.filter', '=', 'raccolta')]",
+        help='Show attribute terms with filter: Time round up',
+    )
     wp_dimension_width = fields.Char(string='Dimension width', size=30)
     wp_dimension_height_id = fields.Many2one(
         comodel_name='wp.attribute.term',
@@ -1253,13 +1337,12 @@ class ProductTemplate(models.Model):
         domain="[('attribute_id.filter', '=', 'esposizione')]",
         help='Show attribute terms with filter: esposizione',
     )
-    wp_frost_resistance = fields.Char(string='Frost resistance', size=50)
-    # wp_frost_resistance_id = fields.Many2one(
-    #    comodel_name='wp.attribute.term',
-    #    string='Frost resistance',
-    #    domain="[('attribute_id.filter', '=', 'gelo')]",
-    #    help = 'Show attribute terms with filter: gelo',
-    # )
+    wp_frost_resistance_id = fields.Many2one(
+        comodel_name='wp.attribute.term',
+        string='Frost resistance',
+        domain="[('attribute_id.filter', '=', 'gelo')]",
+        help='Show attribute terms with filter: gelo',
+     )
     wp_rusticity = fields.Char(string='Rusticity', size=50)
     wp_use_id = fields.Many2one(
         comodel_name='wp.attribute.term',
@@ -1267,25 +1350,35 @@ class ProductTemplate(models.Model):
         domain="[('attribute_id.filter', '=', 'utilizzo')]",
         help='Show attribute terms with filter: utilizzo',
     )
-    wp_biologic = fields.Char(string='Pet friendly / Biologic', size=50)
-    wp_adversity = fields.Char(string='Adversity', size=50)
+    wp_biologic_id = fields.Many2one(
+        comodel_name='wp.attribute.term',
+        string='Pet friendly / Biologic',
+        domain="[('attribute_id.filter', '=', 'biologico')]",
+        help='Show attribute terms with filter: biologico',
+    )
+    wp_adversity_id = fields.Many2one(
+        comodel_name='wp.attribute.term',
+        string='Adversity',
+        domain="[('attribute_id.filter', '=', 'avversità')]",
+        help='Show attribute terms with filter: avversità',
+    )
 
     # -------------------------------------------------------------------------
     # Care and cultivation
-    wp_pruning = fields.Char(
-        string='Pruning', size=50,
+    wp_pruning = fields.Integer(
+        string='Pruning',
         help='Relation pruning, used ID.ID for link Tag Wiki of Wordpress',
     )
-    wp_care = fields.Char(
-        string='Care and cultivation', size=50,
+    wp_care = fields.Integer(
+        string='Care and cultivation',
         help='Relation cultivation, used ID.ID for link Tag Wiki of Wordpress'
     )
-    wp_propagation = fields.Char(
-        string='Propagation', size=50,
+    wp_propagation = fields.Integer(
+        string='Propagation',
         help='Relation propagation, used ID.ID for link Tag Wiki of Wordpress'
     )
-    wp_disease = fields.Char(
-        string='Parasite and disease', size=50,
+    wp_disease = fields.Integer(
+        string='Parasite and disease',
         help='Relation disease, used ID.ID for link Tag Wiki of Wordpress'
     )
 

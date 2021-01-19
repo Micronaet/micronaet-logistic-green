@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 11.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-26 15:55+0000\n"
-"PO-Revision-Date: 2020-11-26 15:55+0000\n"
+"POT-Creation-Date: 2021-01-19 10:33+0000\n"
+"PO-Revision-Date: 2021-01-19 10:33+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -16,8 +16,8 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: wordpress_connector
-#: model:ir.model.fields,field_description:wordpress_connector.field_product_product_wp_adversity
-#: model:ir.model.fields,field_description:wordpress_connector.field_product_template_wp_adversity
+#: model:ir.model.fields,field_description:wordpress_connector.field_product_product_wp_adversity_id
+#: model:ir.model.fields,field_description:wordpress_connector.field_product_template_wp_adversity_id
 msgid "Adversity"
 msgstr "Avversità"
 
@@ -54,8 +54,8 @@ msgid "Attributes available"
 msgstr "Attributi disponibili"
 
 #. module: wordpress_connector
-#: model:ir.model.fields,field_description:wordpress_connector.field_product_product_wp_bearing
-#: model:ir.model.fields,field_description:wordpress_connector.field_product_template_wp_bearing
+#: model:ir.model.fields,field_description:wordpress_connector.field_product_product_wp_bearing_id
+#: model:ir.model.fields,field_description:wordpress_connector.field_product_template_wp_bearing_id
 msgid "Bearing"
 msgstr "Portamento"
 
@@ -80,10 +80,10 @@ msgid "Botanic / Tech"
 msgstr "Botanico/Tecnico"
 
 #. module: wordpress_connector
-#: model:ir.model.fields,field_description:wordpress_connector.field_product_product_wp_botanic_group
-#: model:ir.model.fields,field_description:wordpress_connector.field_product_template_wp_botanic_group
-msgid "Botanic group"
-msgstr "Gruppo botanic"
+#: model:ir.model.fields,field_description:wordpress_connector.field_product_product_wp_botanic_group_id
+#: model:ir.model.fields,field_description:wordpress_connector.field_product_template_wp_botanic_group_id
+msgid "Botanic gorup"
+msgstr "Botanic gorup"
 
 #. module: wordpress_connector
 #: model:ir.model.fields,field_description:wordpress_connector.field_product_product_wp_care
@@ -111,8 +111,8 @@ msgid "Child"
 msgstr "Figlio"
 
 #. module: wordpress_connector
-#: model:ir.model.fields,field_description:wordpress_connector.field_product_product_wp_color
-#: model:ir.model.fields,field_description:wordpress_connector.field_product_template_wp_color
+#: model:ir.model.fields,field_description:wordpress_connector.field_product_product_wp_color_id
+#: model:ir.model.fields,field_description:wordpress_connector.field_product_template_wp_color_id
 msgid "Color"
 msgstr "Colore"
 
@@ -141,10 +141,8 @@ msgstr "Connessione:"
 #: model:ir.model.fields,field_description:wordpress_connector.field_product_product_connector_id
 #: model:ir.model.fields,field_description:wordpress_connector.field_product_template_connector_id
 #: model:ir.model.fields,field_description:wordpress_connector.field_res_company_wp_connector_ids
-#: model:ir.model.fields,field_description:wordpress_connector.field_wp_attribute_connector_id
 #: model:ir.model.fields,field_description:wordpress_connector.field_wp_attribute_term_connector_id
 #: model:ir.model.fields,field_description:wordpress_connector.field_wp_connector_product_rel_connector_id
-#: model:ir.model.fields,field_description:wordpress_connector.field_wp_tag_connector_id
 #: model:ir.ui.menu,name:wordpress_connector.wordpress_configuration_connector
 msgid "Connector"
 msgstr "Connettore"
@@ -162,6 +160,18 @@ msgstr "Connector IN"
 #: model:ir.model.fields,field_description:wordpress_connector.field_res_company_wp_connector_out_id
 msgid "Connector OUT"
 msgstr "Connector OUT"
+
+#. module: wordpress_connector
+#: model:ir.model.fields,field_description:wordpress_connector.field_wp_attribute_connector_id
+#: model:ir.model.fields,field_description:wordpress_connector.field_wp_tag_connector_id
+msgid "Connector in"
+msgstr "Connector in"
+
+#. module: wordpress_connector
+#: model:ir.model.fields,field_description:wordpress_connector.field_wp_attribute_connector_out_id
+#: model:ir.model.fields,field_description:wordpress_connector.field_wp_tag_connector_out_id
+msgid "Connector out"
+msgstr "Connector out"
 
 #. module: wordpress_connector
 #: model:ir.model.fields,field_description:wordpress_connector.field_product_product_wp_connector_rel_ids
@@ -232,7 +242,7 @@ msgstr "Predefinito"
 #. module: wordpress_connector
 #: model:ir.model.fields,field_description:wordpress_connector.field_wp_connector_publish_default
 msgid "Default attribute"
-msgstr "Attributo predefinito"
+msgstr "Attributo di default"
 
 #. module: wordpress_connector
 #: model:ir.model.fields,field_description:wordpress_connector.field_product_product_wp_description
@@ -241,6 +251,18 @@ msgstr "Attributo predefinito"
 #: model:ir.ui.view,arch_db:wordpress_connector.view_wordpress_category_form
 msgid "Description"
 msgstr "Descrizione"
+
+#. module: wordpress_connector
+#: model:ir.model.fields,field_description:wordpress_connector.field_product_product_wp_dimension_height_id
+#: model:ir.model.fields,field_description:wordpress_connector.field_product_template_wp_dimension_height_id
+msgid "Dimension height"
+msgstr "Dimension height"
+
+#. module: wordpress_connector
+#: model:ir.model.fields,field_description:wordpress_connector.field_product_product_wp_dimension_width
+#: model:ir.model.fields,field_description:wordpress_connector.field_product_template_wp_dimension_width
+msgid "Dimension width"
+msgstr "Dimension width"
 
 #. module: wordpress_connector
 #: model:ir.model.fields,field_description:wordpress_connector.field_wp_attribute_display_name
@@ -253,8 +275,8 @@ msgid "Display Name"
 msgstr "Nome Completo"
 
 #. module: wordpress_connector
-#: model:ir.model.fields,field_description:wordpress_connector.field_product_product_wp_exposition
-#: model:ir.model.fields,field_description:wordpress_connector.field_product_template_wp_exposition
+#: model:ir.model.fields,field_description:wordpress_connector.field_product_product_wp_exposition_id
+#: model:ir.model.fields,field_description:wordpress_connector.field_product_template_wp_exposition_id
 msgid "Exposition"
 msgstr "Esposizione"
 
@@ -264,10 +286,21 @@ msgid "External product"
 msgstr "Prodotto esterno"
 
 #. module: wordpress_connector
-#: model:ir.model.fields,field_description:wordpress_connector.field_product_product_wp_finish
-#: model:ir.model.fields,field_description:wordpress_connector.field_product_template_wp_finish
-msgid "Finish"
-msgstr "Finitura"
+#: model:ir.model.fields,field_description:wordpress_connector.field_product_product_wp_family
+#: model:ir.model.fields,field_description:wordpress_connector.field_product_template_wp_family
+msgid "Family"
+msgstr "Family"
+
+#. module: wordpress_connector
+#: model:ir.model.fields,field_description:wordpress_connector.field_wp_attribute_filter
+msgid "Filter Name"
+msgstr "Nome Filtro"
+
+#. module: wordpress_connector
+#: model:ir.model.fields,field_description:wordpress_connector.field_product_product_wp_finish_id
+#: model:ir.model.fields,field_description:wordpress_connector.field_product_template_wp_finish_id
+msgid "Finiture"
+msgstr "Finiture"
 
 #. module: wordpress_connector
 #: model:ir.model.fields,field_description:wordpress_connector.field_product_product_wp_flower_dimension
@@ -276,8 +309,8 @@ msgid "Flower dimension"
 msgstr "Dimensione fiore"
 
 #. module: wordpress_connector
-#: model:ir.model.fields,field_description:wordpress_connector.field_product_product_wp_flowering_color
-#: model:ir.model.fields,field_description:wordpress_connector.field_product_template_wp_flowering_color
+#: model:ir.model.fields,field_description:wordpress_connector.field_product_product_wp_flowering_color_id
+#: model:ir.model.fields,field_description:wordpress_connector.field_product_template_wp_flowering_color_id
 msgid "Flowering color"
 msgstr "Colore fioritura"
 
@@ -288,10 +321,10 @@ msgid "Flowering height"
 msgstr "Altezza fioritura"
 
 #. module: wordpress_connector
-#: model:ir.model.fields,field_description:wordpress_connector.field_product_product_wp_flowering_period
-#: model:ir.model.fields,field_description:wordpress_connector.field_product_template_wp_flowering_period
-msgid "Flowering period"
-msgstr "Periodo fioritura"
+#: model:ir.model.fields,field_description:wordpress_connector.field_product_product_wp_flowering_period_id
+#: model:ir.model.fields,field_description:wordpress_connector.field_product_template_wp_flowering_period_id
+msgid "Flowering perio"
+msgstr "Flowering perio"
 
 #. module: wordpress_connector
 #: model:ir.model.fields,field_description:wordpress_connector.field_product_product_wp_flowering_type
@@ -300,10 +333,16 @@ msgid "Flowering type"
 msgstr "Tipologia fioritura"
 
 #. module: wordpress_connector
-#: model:ir.model.fields,field_description:wordpress_connector.field_product_product_wp_frost_resistance
-#: model:ir.model.fields,field_description:wordpress_connector.field_product_template_wp_frost_resistance
+#: model:ir.model.fields,field_description:wordpress_connector.field_product_product_wp_frost_resistance_id
+#: model:ir.model.fields,field_description:wordpress_connector.field_product_template_wp_frost_resistance_id
 msgid "Frost resistance"
 msgstr "Resistenza al gelo"
+
+#. module: wordpress_connector
+#: model:ir.model.fields,field_description:wordpress_connector.field_product_product_wp_genre
+#: model:ir.model.fields,field_description:wordpress_connector.field_product_template_wp_genre
+msgid "Genre"
+msgstr "Genre"
 
 #. module: wordpress_connector
 #: model:ir.model.fields,field_description:wordpress_connector.field_product_product_wp_graph_holder
@@ -380,8 +419,8 @@ msgid "Is slave"
 msgstr "E' variante"
 
 #. module: wordpress_connector
-#: model:ir.model.fields,field_description:wordpress_connector.field_product_product_wp_jar
-#: model:ir.model.fields,field_description:wordpress_connector.field_product_template_wp_jar
+#: model:ir.model.fields,field_description:wordpress_connector.field_product_product_wp_jar_id
+#: model:ir.model.fields,field_description:wordpress_connector.field_product_template_wp_jar_id
 msgid "Jar / Packaging"
 msgstr "Vaso/Confezione"
 
@@ -416,20 +455,14 @@ msgid "Last Updated on"
 msgstr "Ultima modifica il"
 
 #. module: wordpress_connector
-#: model:ir.model.fields,field_description:wordpress_connector.field_product_product_wp_leaf_color
-#: model:ir.model.fields,field_description:wordpress_connector.field_product_template_wp_leaf_color
+#: model:ir.model.fields,field_description:wordpress_connector.field_product_product_wp_leaf_color_id
+#: model:ir.model.fields,field_description:wordpress_connector.field_product_template_wp_leaf_color_id
 msgid "Leaf color"
 msgstr "Colore foglia"
 
 #. module: wordpress_connector
-#: model:ir.model.fields,field_description:wordpress_connector.field_product_product_wp_leaf_persistence
-#: model:ir.model.fields,field_description:wordpress_connector.field_product_template_wp_leaf_persistence
-msgid "Leaf persistence"
-msgstr "Persistenza foglia"
-
-#. module: wordpress_connector
-#: model:ir.model.fields,field_description:wordpress_connector.field_product_product_wp_leaf_type
-#: model:ir.model.fields,field_description:wordpress_connector.field_product_template_wp_leaf_type
+#: model:ir.model.fields,field_description:wordpress_connector.field_product_product_wp_leaf_type_id
+#: model:ir.model.fields,field_description:wordpress_connector.field_product_template_wp_leaf_type_id
 msgid "Leaf type"
 msgstr "Tipologia foglia"
 
@@ -529,8 +562,14 @@ msgid "Parasite and disease"
 msgstr "Parassiti e malattie"
 
 #. module: wordpress_connector
-#: model:ir.model.fields,field_description:wordpress_connector.field_product_product_wp_biologic
-#: model:ir.model.fields,field_description:wordpress_connector.field_product_template_wp_biologic
+#: model:ir.model.fields,field_description:wordpress_connector.field_product_product_wp_leaf_persistence_id
+#: model:ir.model.fields,field_description:wordpress_connector.field_product_template_wp_leaf_persistence_id
+msgid "Persistence"
+msgstr "Persistence"
+
+#. module: wordpress_connector
+#: model:ir.model.fields,field_description:wordpress_connector.field_product_product_wp_biologic_id
+#: model:ir.model.fields,field_description:wordpress_connector.field_product_template_wp_biologic_id
 msgid "Pet friendly / Biologic"
 msgstr "Pet friendly / Biologico"
 
@@ -621,6 +660,42 @@ msgid "Record part:"
 msgstr "Parte record:"
 
 #. module: wordpress_connector
+#: model:ir.model.fields,help:wordpress_connector.field_product_product_wp_care
+#: model:ir.model.fields,help:wordpress_connector.field_product_template_wp_care
+msgid "Relation cultivation, used ID.ID for link Tag Wiki of Wordpress"
+msgstr "Relation cultivation, used ID.ID for link Tag Wiki of Wordpress"
+
+#. module: wordpress_connector
+#: model:ir.model.fields,help:wordpress_connector.field_product_product_wp_disease
+#: model:ir.model.fields,help:wordpress_connector.field_product_template_wp_disease
+msgid "Relation disease, used ID.ID for link Tag Wiki of Wordpress"
+msgstr "Relation disease, used ID.ID for link Tag Wiki of Wordpress"
+
+#. module: wordpress_connector
+#: model:ir.model.fields,help:wordpress_connector.field_product_product_wp_family
+#: model:ir.model.fields,help:wordpress_connector.field_product_template_wp_family
+msgid "Relation family, used ID.ID for link Tag Wiki of Wordpress"
+msgstr "Relation family, used ID.ID for link Tag Wiki of Wordpress"
+
+#. module: wordpress_connector
+#: model:ir.model.fields,help:wordpress_connector.field_product_product_wp_genre
+#: model:ir.model.fields,help:wordpress_connector.field_product_template_wp_genre
+msgid "Relation genre, used ID.ID for link Tag Wiki of Wordpress"
+msgstr "Relation genre, used ID.ID for link Tag Wiki of Wordpress"
+
+#. module: wordpress_connector
+#: model:ir.model.fields,help:wordpress_connector.field_product_product_wp_propagation
+#: model:ir.model.fields,help:wordpress_connector.field_product_template_wp_propagation
+msgid "Relation propagation, used ID.ID for link Tag Wiki of Wordpress"
+msgstr "Relation propagation, used ID.ID for link Tag Wiki of Wordpress"
+
+#. module: wordpress_connector
+#: model:ir.model.fields,help:wordpress_connector.field_product_product_wp_pruning
+#: model:ir.model.fields,help:wordpress_connector.field_product_template_wp_pruning
+msgid "Relation pruning, used ID.ID for link Tag Wiki of Wordpress"
+msgstr "Relation pruning, used ID.ID for link Tag Wiki of Wordpress"
+
+#. module: wordpress_connector
 #: model:ir.ui.view,arch_db:wordpress_connector.product_product_view_form
 msgid "Relations"
 msgstr "Relazioni"
@@ -679,8 +754,8 @@ msgid "Sale width"
 msgstr "Larghezza vendita"
 
 #. module: wordpress_connector
-#: model:ir.model.fields,field_description:wordpress_connector.field_product_product_wp_scent
-#: model:ir.model.fields,field_description:wordpress_connector.field_product_template_wp_scent
+#: model:ir.model.fields,field_description:wordpress_connector.field_product_product_wp_scent_id
+#: model:ir.model.fields,field_description:wordpress_connector.field_product_template_wp_scent_id
 msgid "Scent"
 msgstr "Profumo"
 
@@ -705,6 +780,126 @@ msgstr "Seq."
 #: model:ir.model.fields,field_description:wordpress_connector.field_wp_product_attribute_show_product_page
 msgid "Show"
 msgstr "Mostra"
+
+#. module: wordpress_connector
+#: model:ir.model.fields,help:wordpress_connector.field_product_product_wp_time_roundup_id
+#: model:ir.model.fields,help:wordpress_connector.field_product_template_wp_time_roundup_id
+msgid "Show attribute terms with filter: Time round up"
+msgstr "Show attribute terms with filter: Time round up"
+
+#. module: wordpress_connector
+#: model:ir.model.fields,help:wordpress_connector.field_product_product_wp_dimension_height_id
+#: model:ir.model.fields,help:wordpress_connector.field_product_template_wp_dimension_height_id
+msgid "Show attribute terms with filter: altezza"
+msgstr "Show attribute terms with filter: altezza"
+
+#. module: wordpress_connector
+#: model:ir.model.fields,help:wordpress_connector.field_product_product_wp_adversity_id
+#: model:ir.model.fields,help:wordpress_connector.field_product_template_wp_adversity_id
+msgid "Show attribute terms with filter: avversità"
+msgstr "Show attribute terms with filter: avversità"
+
+#. module: wordpress_connector
+#: model:ir.model.fields,help:wordpress_connector.field_product_product_wp_biologic_id
+#: model:ir.model.fields,help:wordpress_connector.field_product_template_wp_biologic_id
+msgid "Show attribute terms with filter: biologico"
+msgstr "Show attribute terms with filter: biologico"
+
+#. module: wordpress_connector
+#: model:ir.model.fields,help:wordpress_connector.field_product_product_wp_color_id
+#: model:ir.model.fields,help:wordpress_connector.field_product_template_wp_color_id
+msgid "Show attribute terms with filter: colore"
+msgstr "Show attribute terms with filter: colore"
+
+#. module: wordpress_connector
+#: model:ir.model.fields,help:wordpress_connector.field_product_product_wp_flowering_color_id
+#: model:ir.model.fields,help:wordpress_connector.field_product_template_wp_flowering_color_id
+msgid "Show attribute terms with filter: colore_fioritura"
+msgstr "Show attribute terms with filter: colore_fioritura"
+
+#. module: wordpress_connector
+#: model:ir.model.fields,help:wordpress_connector.field_product_product_wp_leaf_color_id
+#: model:ir.model.fields,help:wordpress_connector.field_product_template_wp_leaf_color_id
+msgid "Show attribute terms with filter: colore_foglia"
+msgstr "Show attribute terms with filter: colore_foglia"
+
+#. module: wordpress_connector
+#: model:ir.model.fields,help:wordpress_connector.field_product_product_wp_exposition_id
+#: model:ir.model.fields,help:wordpress_connector.field_product_template_wp_exposition_id
+msgid "Show attribute terms with filter: esposizione"
+msgstr "Show attribute terms with filter: esposizione"
+
+#. module: wordpress_connector
+#: model:ir.model.fields,help:wordpress_connector.field_product_product_wp_finish_id
+#: model:ir.model.fields,help:wordpress_connector.field_product_template_wp_finish_id
+msgid "Show attribute terms with filter: finitura"
+msgstr "Show attribute terms with filter: finitura"
+
+#. module: wordpress_connector
+#: model:ir.model.fields,help:wordpress_connector.field_product_product_wp_frost_resistance_id
+#: model:ir.model.fields,help:wordpress_connector.field_product_template_wp_frost_resistance_id
+msgid "Show attribute terms with filter: gelo"
+msgstr "Show attribute terms with filter: gelo"
+
+#. module: wordpress_connector
+#: model:ir.model.fields,help:wordpress_connector.field_product_product_wp_botanic_group_id
+#: model:ir.model.fields,help:wordpress_connector.field_product_template_wp_botanic_group_id
+msgid "Show attribute terms with filter: gruppo"
+msgstr "Show attribute terms with filter: gruppo"
+
+#. module: wordpress_connector
+#: model:ir.model.fields,help:wordpress_connector.field_product_product_wp_flowering_period_id
+#: model:ir.model.fields,help:wordpress_connector.field_product_template_wp_flowering_period_id
+msgid "Show attribute terms with filter: periodo_fioritura"
+msgstr "Show attribute terms with filter: periodo_fioritura"
+
+#. module: wordpress_connector
+#: model:ir.model.fields,help:wordpress_connector.field_product_product_wp_leaf_persistence_id
+#: model:ir.model.fields,help:wordpress_connector.field_product_template_wp_leaf_persistence_id
+msgid "Show attribute terms with filter: persistenza"
+msgstr "Show attribute terms with filter: persistenza"
+
+#. module: wordpress_connector
+#: model:ir.model.fields,help:wordpress_connector.field_product_product_wp_bearing_id
+#: model:ir.model.fields,help:wordpress_connector.field_product_template_wp_bearing_id
+msgid "Show attribute terms with filter: portamento"
+msgstr "Show attribute terms with filter: portamento"
+
+#. module: wordpress_connector
+#: model:ir.model.fields,help:wordpress_connector.field_product_product_wp_scent_id
+#: model:ir.model.fields,help:wordpress_connector.field_product_template_wp_scent_id
+msgid "Show attribute terms with filter: profumo"
+msgstr "Show attribute terms with filter: profumo"
+
+#. module: wordpress_connector
+#: model:ir.model.fields,help:wordpress_connector.field_product_product_wp_time_sowing_id
+#: model:ir.model.fields,help:wordpress_connector.field_product_template_wp_time_sowing_id
+msgid "Show attribute terms with filter: semina"
+msgstr "Show attribute terms with filter: semina"
+
+#. module: wordpress_connector
+#: model:ir.model.fields,help:wordpress_connector.field_product_product_wp_leaf_type_id
+#: model:ir.model.fields,help:wordpress_connector.field_product_template_wp_leaf_type_id
+msgid "Show attribute terms with filter: tipologia_foglia"
+msgstr "Show attribute terms with filter: tipologia_foglia"
+
+#. module: wordpress_connector
+#: model:ir.model.fields,help:wordpress_connector.field_product_product_wp_time_transplant_id
+#: model:ir.model.fields,help:wordpress_connector.field_product_template_wp_time_transplant_id
+msgid "Show attribute terms with filter: trapianto"
+msgstr "Show attribute terms with filter: trapianto"
+
+#. module: wordpress_connector
+#: model:ir.model.fields,help:wordpress_connector.field_product_product_wp_use_id
+#: model:ir.model.fields,help:wordpress_connector.field_product_template_wp_use_id
+msgid "Show attribute terms with filter: utilizzo"
+msgstr "Show attribute terms with filter: utilizzo"
+
+#. module: wordpress_connector
+#: model:ir.model.fields,help:wordpress_connector.field_product_product_wp_jar_id
+#: model:ir.model.fields,help:wordpress_connector.field_product_template_wp_jar_id
+msgid "Show attribute terms with filter: vaso"
+msgstr "Show attribute terms with filter: vaso"
 
 #. module: wordpress_connector
 #: model:ir.model.fields,help:wordpress_connector.field_wp_product_attribute_show_product_page
@@ -821,20 +1016,20 @@ msgid "Text data"
 msgstr "Dato di testo"
 
 #. module: wordpress_connector
-#: model:ir.model.fields,field_description:wordpress_connector.field_product_product_wp_time_roundup
-#: model:ir.model.fields,field_description:wordpress_connector.field_product_template_wp_time_roundup
+#: model:ir.model.fields,field_description:wordpress_connector.field_product_product_wp_time_roundup_id
+#: model:ir.model.fields,field_description:wordpress_connector.field_product_template_wp_time_roundup_id
 msgid "Time round up"
 msgstr "Epoca raccolta"
 
 #. module: wordpress_connector
-#: model:ir.model.fields,field_description:wordpress_connector.field_product_product_wp_time_sowing
-#: model:ir.model.fields,field_description:wordpress_connector.field_product_template_wp_time_sowing
+#: model:ir.model.fields,field_description:wordpress_connector.field_product_product_wp_time_sowing_id
+#: model:ir.model.fields,field_description:wordpress_connector.field_product_template_wp_time_sowing_id
 msgid "Time sowing"
 msgstr "Epoca semina"
 
 #. module: wordpress_connector
-#: model:ir.model.fields,field_description:wordpress_connector.field_product_product_wp_time_transplant
-#: model:ir.model.fields,field_description:wordpress_connector.field_product_template_wp_time_transplant
+#: model:ir.model.fields,field_description:wordpress_connector.field_product_product_wp_time_transplant_id
+#: model:ir.model.fields,field_description:wordpress_connector.field_product_template_wp_time_transplant_id
 msgid "Time transplant"
 msgstr "Epoca trapianto"
 
@@ -866,6 +1061,11 @@ msgid "Up sell product"
 msgstr "Prodotto Up sell"
 
 #. module: wordpress_connector
+#: model:ir.ui.view,arch_db:wordpress_connector.product_product_view_form
+msgid "Update Wordpress"
+msgstr "Aggiorna Wordpress"
+
+#. module: wordpress_connector
 #: model:ir.model.fields,field_description:wordpress_connector.field_wp_connector_update_attribute
 msgid "Update attribute and terms"
 msgstr "Aggiorna termini e prodotti"
@@ -881,8 +1081,8 @@ msgid "Update tag"
 msgstr "Aggiorna tag"
 
 #. module: wordpress_connector
-#: model:ir.model.fields,field_description:wordpress_connector.field_product_product_wp_use
-#: model:ir.model.fields,field_description:wordpress_connector.field_product_template_wp_use
+#: model:ir.model.fields,field_description:wordpress_connector.field_product_product_wp_use_id
+#: model:ir.model.fields,field_description:wordpress_connector.field_product_template_wp_use_id
 msgid "Use"
 msgstr "Utilizzo"
 
@@ -890,6 +1090,11 @@ msgstr "Utilizzo"
 #: model:ir.ui.view,arch_db:wordpress_connector.view_wp_tag_search
 msgid "Used"
 msgstr "Utilizzato"
+
+#. module: wordpress_connector
+#: model:ir.model.fields,help:wordpress_connector.field_wp_attribute_filter
+msgid "Used for filter terms for fields in product"
+msgstr "Utilizzato per filtrare i termini per i campi prodotto"
 
 #. module: wordpress_connector
 #: model:ir.model.fields,help:wordpress_connector.field_wp_product_attribute_used_in_variant
@@ -1050,7 +1255,7 @@ msgstr "Wordpress Tag"
 #. module: wordpress_connector
 #: model:ir.model,name:wordpress_connector.model_wp_tag
 msgid "Wordpress Tags"
-msgstr "Wordpress Tags"
+msgstr "Wordpress Etichette"
 
 #. module: wordpress_connector
 #: model:ir.model,name:wordpress_connector.model_wp_attribute_term
@@ -1065,7 +1270,7 @@ msgstr "Wordpress connettore"
 #. module: wordpress_connector
 #: model:ir.ui.view,arch_db:wordpress_connector.product_product_view_form
 msgid "Wordpress link"
-msgstr "Wordpress link"
+msgstr "Wordpress collegamenti"
 
 #. module: wordpress_connector
 #: model:ir.model.fields,help:wordpress_connector.field_product_product_wp_master
@@ -1081,7 +1286,7 @@ msgstr "Wordpress categoria prodotto"
 #. module: wordpress_connector
 #: model:ir.ui.view,arch_db:wordpress_connector.wp_tag_view_tree
 msgid "Wordpress tags"
-msgstr "Wordpress tags"
+msgstr "Wordpress etichette"
 
 #. module: wordpress_connector
 #: model:ir.model.fields,field_description:wordpress_connector.field_product_product_wp_type
@@ -1108,6 +1313,9 @@ msgstr "Wp ID in"
 #. module: wordpress_connector
 #: model:ir.model.fields,field_description:wordpress_connector.field_product_product_wp_id_out
 #: model:ir.model.fields,field_description:wordpress_connector.field_product_template_wp_id_out
+#: model:ir.model.fields,field_description:wordpress_connector.field_wp_attribute_term_wp_out_id
+#: model:ir.model.fields,field_description:wordpress_connector.field_wp_attribute_wp_out_id
+#: model:ir.model.fields,field_description:wordpress_connector.field_wp_tag_wp_out_id
 msgid "Wp ID out"
 msgstr "Wp ID out"
 
