@@ -927,10 +927,6 @@ class WPAttribute(models.Model):
     #                                   COLUMNS:
     # -------------------------------------------------------------------------
     name = fields.Char('Name', size=64, required=True)
-    filter = fields.Char(
-        'Filter Name', size=30, index=True,
-        help='Used for filter terms for fields in product',
-    )
     connector_id = fields.Many2one('wp.connector', 'Connector in')
     connector_out_id = fields.Many2one('wp.connector', 'Connector out')
     wp_id = fields.Integer(string='Wp ID in', readonly=True)

@@ -1161,12 +1161,13 @@ class ProductTemplate(models.Model):
     # TODO --------------------------------------------------------------------
 
     # Link management:
+    # TODO remove?
     wp_linked_ids = fields.Many2many(
         comodel_name='product.template',
         relation='product_linked_rel',
         column1='template_id',
         column2='linked_id',
-        string='Linhed product',
+        string='Linked product',
         )
     wp_up_sell_ids = fields.Many2many(
         comodel_name='product.template',
@@ -1215,153 +1216,21 @@ class ProductTemplate(models.Model):
     wp_ancestor = fields.Char(string='Ancestors', size=50)
     wp_short_description = fields.Char(string='Short description', size=50)
     wp_description = fields.Char(string='Description', size=50)
+
     # FOTO
 
     # -------------------------------------------------------------------------
     # Sale characteristic:
-    wp_jar_id = fields.Many2one(
-        comodel_name='wp.attribute.term',
-        string='Jar / Packaging',
-        domain="[('attribute_id.filter', '=', 'vaso')]",
-        help='Show attribute terms with filter: vaso',
-    )
-    wp_format_id = fields.Many2one(
-        comodel_name='wp.attribute.term',
-        string='Format',
-        domain="[('attribute_id.filter', '=', 'formato')]",
-        help='Show attribute terms with filter: formato',
-    )
-
-    # Prezzo
     wp_sale_price = fields.Float(string='Sale price')
-
-    wp_sale_width = fields.Char(string='Sale width', size=20)
-    wp_sale_height = fields.Char(string='Sale height', size=20)
-    wp_sale_trunk = fields.Char(string='Sale trunk', size=50)
-    wp_graph_holder = fields.Char(string='Graph holder', size=50)
-    wp_color_id = fields.Many2one(
-        comodel_name='wp.attribute.term',
-        string='Color',
-        domain="[('attribute_id.filter', '=', 'colore')]",
-        help='Show attribute terms with filter: colore',
-    )
-    wp_finish_id = fields.Many2one(
-        comodel_name='wp.attribute.term',
-        string='Finiture',
-        domain="[('attribute_id.filter', '=', 'finitura')]",
-        help='Show attribute terms with filter: finitura',
-    )
 
     # -------------------------------------------------------------------------
     # Botanic / Tech:
-    wp_botanic_group_id = fields.Many2one(
-        comodel_name='wp.attribute.term',
-        string='Botanic gorup',
-        domain="[('attribute_id.filter', '=', 'gruppo')]",
-        help='Show attribute terms with filter: gruppo',
-    )
-    wp_bearing_id = fields.Many2one(
-        comodel_name='wp.attribute.term',
-        string='Bearing',
-        domain="[('attribute_id.filter', '=', 'portamento')]",
-        help='Show attribute terms with filter: portamento',
-    )
     wp_flower_dimension = fields.Char(string='Flower dimension', size=20)
-    wp_scent_id = fields.Many2one(
-        comodel_name='wp.attribute.term',
-        string='Scent',
-        domain="[('attribute_id.filter', '=', 'profumo')]",
-        help='Show attribute terms with filter: profumo',
-    )
     wp_scent_note = fields.Char(string='Scent note', size=50)
-    wp_leaf_type_id = fields.Many2one(
-        comodel_name='wp.attribute.term',
-        string='Leaf type',
-        domain="[('attribute_id.filter', '=', 'tipologia_foglia')]",
-        help='Show attribute terms with filter: tipologia_foglia',
-    )
-    wp_leaf_color_id = fields.Many2one(
-        comodel_name='wp.attribute.term',
-        string='Leaf color',
-        domain="[('attribute_id.filter', '=', 'colore_foglia')]",
-        help='Show attribute terms with filter: colore_foglia',
-    )
-    wp_leaf_persistence_id = fields.Many2one(
-        comodel_name='wp.attribute.term',
-        string='Persistence',
-        domain="[('attribute_id.filter', '=', 'persistenza')]",
-        help='Show attribute terms with filter: persistenza',
-    )
     wp_flowering_type = fields.Char(string='Flowering type', size=50)
-    wp_flowering_color_id = fields.Many2one(
-        comodel_name='wp.attribute.term',
-        string='Flowering color',
-        domain="[('attribute_id.filter', '=', 'colore_fioritura')]",
-        help='Show attribute terms with filter: colore_fioritura',
-    )
-    wp_flowering_period_id = fields.Many2one(
-        comodel_name='wp.attribute.term',
-        string='Flowering perio',
-        domain="[('attribute_id.filter', '=', 'periodo_fioritura')]",
-        help='Show attribute terms with filter: periodo_fioritura',
-    )
     wp_flowering_height = fields.Char(string='Flowering height', size=50)
-    wp_time_transplant_id = fields.Many2one(
-        comodel_name='wp.attribute.term',
-        string='Time transplant',
-        domain="[('attribute_id.filter', '=', 'trapianto')]",
-        help='Show attribute terms with filter: trapianto',
-    )
-    wp_time_sowing_id = fields.Many2one(
-        comodel_name='wp.attribute.term',
-        string='Time sowing',
-        domain="[('attribute_id.filter', '=', 'semina')]",
-        help='Show attribute terms with filter: semina',
-    )
-    wp_time_roundup_id = fields.Many2one(
-        comodel_name='wp.attribute.term',
-        string='Time round up',
-        domain="[('attribute_id.filter', '=', 'raccolta')]",
-        help='Show attribute terms with filter: Time round up',
-    )
     wp_dimension_width = fields.Char(string='Dimension width', size=30)
-    wp_dimension_height_id = fields.Many2one(
-        comodel_name='wp.attribute.term',
-        string='Dimension height',
-        domain="[('attribute_id.filter', '=', 'altezza')]",
-        help='Show attribute terms with filter: altezza',
-    )
-    wp_exposition_id = fields.Many2one(
-        comodel_name='wp.attribute.term',
-        string='Exposition',
-        domain="[('attribute_id.filter', '=', 'esposizione')]",
-        help='Show attribute terms with filter: esposizione',
-    )
-    wp_frost_resistance_id = fields.Many2one(
-        comodel_name='wp.attribute.term',
-        string='Frost resistance',
-        domain="[('attribute_id.filter', '=', 'gelo')]",
-        help='Show attribute terms with filter: gelo',
-     )
     wp_rusticity = fields.Char(string='Rusticity', size=50)
-    wp_use_id = fields.Many2one(
-        comodel_name='wp.attribute.term',
-        string='Use',
-        domain="[('attribute_id.filter', '=', 'utilizzo')]",
-        help='Show attribute terms with filter: utilizzo',
-    )
-    wp_biologic_id = fields.Many2one(
-        comodel_name='wp.attribute.term',
-        string='Pet friendly / Biologic',
-        domain="[('attribute_id.filter', '=', 'biologico')]",
-        help='Show attribute terms with filter: biologico',
-    )
-    wp_adversity_id = fields.Many2one(
-        comodel_name='wp.attribute.term',
-        string='Adversity',
-        domain="[('attribute_id.filter', '=', 'avversità')]",
-        help='Show attribute terms with filter: avversità',
-    )
 
     # -------------------------------------------------------------------------
     # Care and cultivation

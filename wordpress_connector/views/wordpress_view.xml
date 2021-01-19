@@ -237,7 +237,6 @@
                 <field name="connector_out_id"/>
                 <field name="wp_out_id"/>
                 <field name="name"/>
-                <field name="filter"/>
             </tree>
         </field>
     </record>
@@ -248,7 +247,6 @@
             <form string="Wordpress Attribute">
                 <group colspan="4" col="4">
                     <field name="name"/>
-                    <field name="filter"/>
                     <field name="connector_id"/>
                     <field name="wp_id"/>
                     <field name="connector_out_id"/>
@@ -321,79 +319,6 @@
             </field>
 
             <xpath expr="//notebook" postion="inside">
-                <page name="web_description" string="Web description">
-                    <notebook>
-                        <page name="web_description_tassonomy" string="Tassonomy">
-                            <group colspan="4" col="4">
-                                <field name="wp_vulgar_name"/>
-                                <field name="wp_scientific_name"/>
-                                <field name="wp_family"/>
-                                <field name="wp_genre"/>
-                                <field name="wp_specie"/>
-                                <field name="wp_variety"/>
-                                <field name="wp_origin"/>
-                                <field name="wp_ancestor"/>
-                                <field name="wp_short_description"/>
-                                <field name="wp_description"/>
-                                <!--picture-->
-                            </group>
-                        </page>
-                        <page name="web_description_sale" string="Sale characteristic">
-                            <group colspan="4" col="4">
-                                <field name="wp_jar_id"/>
-                                <field name="wp_format_id"/>
-
-                                <!--Sale price-->
-                                <field name="wp_sale_price"/>
-                                <field name="wp_sale_width"/>
-                                <field name="wp_sale_height"/>
-                                <field name="wp_sale_trunk"/>
-                                <field name="wp_graph_holder"/>
-                                <field name="wp_color_id"/>
-                                <field name="wp_finish_id"/>
-                            </group>
-                        </page>
-                        <page name="web_description_botanic" string="Botanic / Tech">
-                            <group colspan="4" col="4">
-                                <field name="wp_botanic_group_id"/>
-                                <field name="wp_bearing_id"/>
-                                <field name="wp_flower_dimension"/>
-                                <field name="wp_scent_id"/>
-                                <field name="wp_scent_note"/>
-                                <field name="wp_leaf_type_id"/>
-                                <field name="wp_leaf_color_id"/>
-                                <field name="wp_leaf_persistence_id"/>
-                                <field name="wp_flowering_type"/>
-                                <field name="wp_flowering_color_id"/>
-                                <field name="wp_flowering_period_id"/>
-                                <field name="wp_flowering_height"/>
-                                <field name="wp_time_transplant_id"/>
-                                <field name="wp_time_sowing_id"/>
-                                <field name="wp_time_roundup_id"/>
-                                <field name="wp_dimension_width"/>
-                                <field name="wp_dimension_height_id"/>
-                                <!--
-                                Width
-                                Height
-                                -->
-                                <field name="wp_exposition_id"/>
-                                <field name="wp_frost_resistance_id"/>
-                                <field name="wp_rusticity"/>
-                                <field name="wp_use_id"/>
-                                <field name="wp_biologic_id"/>
-                                <field name="wp_adversity_id"/>
-                            </group>
-                        </page>
-                        <page name="web_description_care" string="Care and cultivation">
-                            <group colspan="4" col="4">
-                                <field name="wp_pruning"/>
-                                <field name="wp_care"/>
-                                <field name="wp_propagation"/>
-                                <field name="wp_disease"/>
-                            </group>
-                        </page>
-                    </notebook>
-                </page>
                 <page name="Wordpress" string="Wordpress">
                     <group colspan="4" col="4">
                         <field name="wp_connector_in_id"/>
@@ -407,7 +332,9 @@
 
                         <field name="wp_published"/>
                         <field name="wp_type" />
+
                         <field name="wp_status" />
+                        <field name="wp_sale_price"/>
                     </group>
                     <notebook colspan="4">
                         <page string="Variants" attrs="{'invisible': ['|', ('wp_published', '=', False), ('wp_type', '!=', 'variable')]}">
@@ -430,7 +357,7 @@
                                 </field>
                             </group>
                         </page>
-                        <page string="Attribute">
+                        <page string="Attribute" attrs="{'invisible': [('wp_master', '=', False), ('wp_type', '!=', 'simple')]}">
                             <group colspan="4" col="4">
                                 <field name="wp_attribute_ids" colspan="4" nolabel="1">
                                      <tree string="Attributes available" editable="bottom" decoration-primary="used_in_variant==True">
@@ -448,6 +375,43 @@
                             <group colspan="4" col="4">
                                 <field name="wp_tag_ids" colspan="4" widget="many2many_tags"/>
                                 <field name="wp_category_ids" colspan="4" widget="many2many_tags"/>
+                            </group>
+                        </page>
+                        <page name="web_description_tassonomy" string="Tassonomy">
+                            <group colspan="4" col="4">
+                                <field name="wp_vulgar_name"/>
+                                <field name="wp_scientific_name"/>
+                                <field name="wp_family"/>
+                                <field name="wp_genre"/>
+                                <field name="wp_specie"/>
+                                <field name="wp_variety"/>
+                                <field name="wp_origin"/>
+                                <field name="wp_ancestor"/>
+                                <field name="wp_short_description"/>
+                                <field name="wp_description"/>
+                                <!--picture-->
+                            </group>
+                        </page>
+                        <page name="web_description_botanic" string="Botanic / Tech">
+                            <group colspan="4" col="4">
+                                <field name="wp_flower_dimension"/>
+                                <field name="wp_scent_note"/>
+                                <field name="wp_flowering_type"/>
+                                <field name="wp_flowering_height"/>
+                                <field name="wp_dimension_width"/>
+                                <field name="wp_rusticity"/>
+                                <!--
+                                Width
+                                Height
+                                -->
+                            </group>
+                        </page>
+                        <page name="web_description_care" string="Care and cultivation">
+                            <group colspan="4" col="4">
+                                <field name="wp_pruning"/>
+                                <field name="wp_care"/>
+                                <field name="wp_propagation"/>
+                                <field name="wp_disease"/>
                             </group>
                         </page>
                         <page string="Wordpress link">
