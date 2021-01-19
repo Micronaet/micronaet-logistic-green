@@ -190,6 +190,7 @@ class ProductTemplate(models.Model):
 
             # 0. Default data:
             data = {
+                # TODO Update also slug
                 'sku': product_sku,
                 'name': product.name,
                 'type': product.wp_type,
@@ -198,10 +199,7 @@ class ProductTemplate(models.Model):
                 'short_description': product.wp_short_description or '',
 
                 # Extra description:
-                'sale_height': product.wp_sale_height or '',
-                'sale_width': product.wp_sale_width or '',
                 'perfume_notes': product.wp_scent_note or '',
-                'rootstocks': product.wp_graph_holder or '',
                 'variety_cultivar': product.wp_variety or '',
                 # 'purchase_note': product.purchase_note or '',
                 # 'menu_order': 0,
@@ -217,19 +215,22 @@ class ProductTemplate(models.Model):
                 # },
                 'weight': product.weight or '',
                 'size_flower': product.wp_flower_dimension or '',
+                'regular_price': '%s' % product.list_price,
+                'sale_price': '%s' % (
+                    product.wp_sale_price or product.list_price),
                 # 'price': product.short_description or '',
-                'sale_price': '%s' % product.wp_sale_price,
                 'cultivation_care': product.wp_care or '',
                 'stock_quantity': product.qty_available,
                 'propagation': product.wp_propagation or '',
-                'manage_stock': True,
+                'manage_stock': product.wp_manage_stock,
+                'stock_status': product.wp_stock_status,
+                'backorders': product.wp_backorders,
 
                 'species': product.wp_specie or '',
                 'genre': product.wp_genre,
                 'family': product.wp_family,
                 'name_vulgar': product.wp_vulgar_name or '',
                 'flowering_type': product.wp_flowering_type or '',
-                'sale_trunk': product.wp_sale_trunk or '',
                 'rusticity': product.wp_rusticity or '',
 
                 # 'catalog_visibility': 'visible',
@@ -240,30 +241,6 @@ class ProductTemplate(models.Model):
                 'cultivation_care': product.wp_care,
                 'propagation': product.wp_propagation,
                 'pests_diseases': product.wp_disease,
-
-                # Attributes:
-                # wp_jar_id
-                # wp_format_id
-                # wp_dimension_height_id
-                # wp_color_id
-                # wp_finish_id
-                # wp_botanic_group_id
-                # wp_bearing_id
-                # wp_scent_id
-                # wp_leaf_type_id
-                # wp_leaf_color_id
-                # wp_leaf_persistence_id
-                # wp_flowering_color_id
-                # wp_flowering_period_id
-                # wp_time_transplant_id
-                # wp_time_sowing_id
-                # wp_time_roundup_id
-                # wp_dimension_height_id
-                # wp_exposition_id
-                # wp_frost_resistance_id
-                # wp_use_id
-                # wp_biologic_id
-                # wp_adversity_id
             }
 
             # 1. Category:
@@ -276,7 +253,6 @@ class ProductTemplate(models.Model):
             # 2. Linked product:
             data['cross_sell_ids'] = []
             data['upsell_ids'] = []
-            data['related_ids'] = []
 
             # 3. image
             # 'images': [],
@@ -288,14 +264,8 @@ class ProductTemplate(models.Model):
                     'id': tag.wp_id,
                 })
 
-            # 'tags': [],
-
-            # 5. Default:
+            # 5. Default: (not used):
             # 'default_attributes': [],
-
-            # 6. Price
-            if product.list_price:
-                data['regular_price'] = '%s' % product.list_price
 
             # Remain:
             # 'downloads': [],
@@ -307,8 +277,12 @@ class ProductTemplate(models.Model):
             if product.wp_type:
                 # V1. Attributes:
                 options = {}
-                for variant in product.wp_slave_ids:
-                    for line in variant.wp_attribute_ids:
+
+                # NOTE: Get attribute from master and slaves:
+                check_all = [element for element in product.wp_slave_ids]
+                check_all.append(product)
+                for template in check_all:  # product.wp_slave_ids:
+                    for line in template.wp_attribute_ids:
                         attribute_id = line.attribute_id.wp_out_id
                         attribute_name = line.attribute_id.name
                         key = (attribute_id, attribute_name,
@@ -441,7 +415,8 @@ class ProductTemplate(models.Model):
                     # 'menu_order',
                     # TODO
                     'regular_price': '%s' % variation.list_price,
-                    # sale_price
+                    'sale_price': '%s' % (
+                        variation.wp_sale_price or variation.list_price),
                     # price
                     # >> 'stock_quantity': variation.qty_available,
 
@@ -1070,6 +1045,24 @@ class ProductTemplate(models.Model):
     connector_id = fields.Many2one('wp.connector', 'Connector')
     wp_published = fields.Boolean(
         string='WP published', help='Product present on Wordpress site')
+
+    wp_manage_stock = fields.Boolean('Manage stock', default=True)
+    wp_stock_status = fields.Selection(
+        selection=[
+            ('instock', 'In stock'),
+            ('outstock', 'Out stock'),
+            ('onbackorder', 'On back order'),
+        ],
+        string='Stock status',
+        help='Controls the stock status of the product. Options',
+        default='instock',
+    )
+    wp_backorders = fields.Boolean(
+        'Backorders', default=True,
+        help='If managing stock, this controls if backorders are allowed. '
+             'Options: checked means notify.')
+
+
     # TODO remove: ------------------------------------------------------------
 
     wp_connector_rel_ids = fields.One2many(

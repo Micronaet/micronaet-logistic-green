@@ -231,7 +231,7 @@
         <field name="name">wp_attribute_view_tree</field>
         <field name="model">wp.attribute</field>
         <field name="arch" type="xml">
-            <tree string="Wordpress Attribute" decoration-primary="filter!=False">
+            <tree string="Wordpress Attribute">
                 <field name="connector_id"/>
                 <field name="wp_id"/>
                 <field name="connector_out_id"/>
@@ -357,7 +357,7 @@
                                 </field>
                             </group>
                         </page>
-                        <page string="Attribute" attrs="{'invisible': [('wp_master', '=', False), ('wp_type', '!=', 'simple')]}">
+                        <page string="Attribute">
                             <group colspan="4" col="4">
                                 <field name="wp_attribute_ids" colspan="4" nolabel="1">
                                      <tree string="Attributes available" editable="bottom" decoration-primary="used_in_variant==True">
@@ -365,7 +365,7 @@
                                           <field name="show_product_page" />
                                           <field name="used_in_variant" />
                                           <field name="product_id" invisible="1"/>
-                                          <field name="attribute_id" options="{'no_quick_create': True, 'no_create_edit': True}"/>
+                                          <field name="attribute_id" options="{'no_quick_create': True, 'no_create_edit': True}" domain="[('connector_out_id', '!=', False)]"/>
                                           <field name="term_ids" widget="many2many_tags" options="{'no_quick_create': True, 'no_create_edit': True}"/>
                                      </tree>
                                 </field>
@@ -375,6 +375,13 @@
                             <group colspan="4" col="4">
                                 <field name="wp_tag_ids" colspan="4" widget="many2many_tags"/>
                                 <field name="wp_category_ids" colspan="4" widget="many2many_tags"/>
+                            </group>
+                        </page>
+                        <page string="Stock">
+                            <group colspan="4" col="4">
+                                <field name="wp_manage_stock" />
+                                <field name="wp_stock_status" />
+                                <field name="wp_backorders" />
                             </group>
                         </page>
                         <page name="web_description_tassonomy" string="Tassonomy">
@@ -414,7 +421,7 @@
                                 <field name="wp_disease"/>
                             </group>
                         </page>
-                        <page string="Wordpress link">
+                        <page string="Link">
                             <group colspan="4" col="4">
                                 <separator string="Link info:" colspan="4"/>
                                 <field name="wp_connector_rel_ids" colspan="4" nolabel="1"/>
@@ -422,45 +429,23 @@
                         </page>
                     </notebook>
 
-                    <separator string="Relations" colspan="4"/>
-                    <notebook colspan="4">
-                        <page string="Linked product">
-                            <group colspan="4" col="4">
-                                <separator string="Linked product (auto)" colspan="4"/>
-                                <field name="wp_linked_ids" colspan="4" nolabel="1">
-                                     <tree string="Linked product" >
-                                         <field name="name" />
-                                         <field name="default_code" />
-                                         <field name="categ_id" />
-                                     </tree>
-                                </field>
-                            </group>
-                        </page>
-                        <page string="Up sell product">
-                            <group colspan="4" col="4">
-                                <separator string="Up sell" colspan="4"/>
-                                <field name="wp_up_sell_ids" colspan="4" nolabel="1">
-                                     <tree string="Up sell product" >
-                                         <field name="name" />
-                                         <field name="default_code" />
-                                         <field name="categ_id" />
-                                     </tree>
-                                </field>
-                            </group>
-                        </page>
-                        <page string="Cross sell product">
-                            <group colspan="4" col="4">
-                                <separator string="Cross sell" colspan="4"/>
-                                <field name="wp_cross_sell_ids" colspan="4" nolabel="1">
-                                     <tree string="Cross sell product">
-                                         <field name="name" />
-                                         <field name="default_code" />
-                                         <field name="categ_id" />
-                                     </tree>
-                                </field>
-                            </group>
-                        </page>
-                    </notebook>
+                    <group colspan="4" col="4">
+                        <separator string="Relationship:" colspan="4"/>
+                        <field name="wp_up_sell_ids" colspan="4" >
+                             <tree string="Up sell product" >
+                                 <field name="name" />
+                                 <field name="default_code" />
+                                 <field name="categ_id" />
+                             </tree>
+                        </field>
+                        <field name="wp_cross_sell_ids" colspan="4" >
+                             <tree string="Cross sell product">
+                                 <field name="name" />
+                                 <field name="default_code" />
+                                 <field name="categ_id" />
+                             </tree>
+                        </field>
+                    </group>
                 </page>
             </xpath>
         </field>
