@@ -183,7 +183,7 @@ class WPConnector(models.Model):
             # -----------------------------------------------------------------
             # Image download:
             # -----------------------------------------------------------------
-            if image_download:
+            if image_download and image_path:
                 if not sku:
                     print('   > Product %s without code!' % name)
                     continue  # No download image!
