@@ -620,6 +620,7 @@ class ProductTemplate(models.Model):
                 'wp_id_in': wp_id_in,
                 'default_code': sku,
                 'sku_in': sku,
+                'wp_slug': slug,
 
                 'wp_type': record['type'],
                 'wp_status': record['status'],
