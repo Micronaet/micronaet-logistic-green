@@ -155,7 +155,7 @@ class WPConnector(models.Model):
                 'name': name,
                 'wp_id_in': wp_id,
                 'default_code': default_code,
-                'wp_sku': sku,
+                'wp_sku_in': sku,
                 'lst_price': regular_price,
                 'description_sale': description,
                 'weight': weight,
@@ -164,11 +164,11 @@ class WPConnector(models.Model):
             # -----------------------------------------------------------------
             # Update ODOO:
             # -----------------------------------------------------------------
-            if sku:
+            if sku:  # First try with sku
                 product_ids = product_pool.search([
                     ('default_code', '=', default_code),
                 ])
-            else:
+            if not product_ids:  # Try with WP ID in
                 product_ids = product_pool.search([
                     ('wp_id_in', '=', wp_id),
                 ])
