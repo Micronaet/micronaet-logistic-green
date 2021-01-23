@@ -1062,7 +1062,6 @@ class ProductTemplate(models.Model):
         help='If managing stock, this controls if backorders are allowed. '
              'Options: checked means notify.')
 
-
     # TODO remove: ------------------------------------------------------------
 
     wp_connector_rel_ids = fields.One2many(
@@ -1162,6 +1161,7 @@ class ProductTemplate(models.Model):
         column2='linked_id',
         string='Linked product',
         )
+
     wp_up_sell_ids = fields.Many2many(
         comodel_name='product.template',
         relation='product_upsell_rel',
