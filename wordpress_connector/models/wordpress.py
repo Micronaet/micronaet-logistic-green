@@ -1,6 +1,7 @@
 # Copyright 2019  Micronaet SRL (<http://www.micronaet.it>).
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl.html).
 
+import os
 import sys
 import logging
 import woocommerce
@@ -67,9 +68,12 @@ class WPConnector(models.Model):
         return wp_records
 
     @api.model
-    def clean_code(self, sku):
+    def clean_code(self, record):
         """ Clean code
         """
+        sku = record['sku']
+        wp_id = record['id']
+
         sku = (sku or '').strip()
 
         if len(sku) == 13 and sku.isdigit():
@@ -99,6 +103,8 @@ class WPConnector(models.Model):
                 code,
                 ord(child) - 64,
             )
+        if not sku:
+            sku = 'WP.%s' % wp_id
         return sku, code, supplier, child, ean13
 
     @api.model
@@ -106,9 +112,12 @@ class WPConnector(models.Model):
         """ Import and sync product
         """
         import urllib
+        image_download = True
+        image_path = self.image_path
+
         product_pool = self.env['product.template']
         wp_records = self.browse(connector_id).wordpress_read_all('products')
-
+        pdb.set_trace()
         for record in wp_records:
             # -----------------------------------------------------------------
             # Extract data from record:
@@ -136,7 +145,7 @@ class WPConnector(models.Model):
             # -----------------------------------------------------------------
             # Clean sku for default_code
             # -----------------------------------------------------------------
-            sku, default_code, supplier, child, ean13 = self.clean_code(sku)
+            sku, default_code, supplier, child, ean13 = self.clean_code(record)
 
             # -----------------------------------------------------------------
             # Prepare data:
@@ -165,21 +174,18 @@ class WPConnector(models.Model):
                 ])
 
             if product_ids:
-                print
-                'Update product %s' % default_code
+                print('Update product %s' % default_code)
                 product_pool.write(product_ids, data)
             else:
-                print
-                'Create product %s' % default_code
+                print('Create product %s' % default_code)
                 product_pool.create(data)
 
-            # -------------------------------------------------------------------------
+            # -----------------------------------------------------------------
             # Image download:
-            # -------------------------------------------------------------------------
+            # -----------------------------------------------------------------
             if image_download:
                 if not sku:
-                    print
-                    '   > Product %s without code!' % name
+                    print('   > Product %s without code!' % name)
                     continue  # No download image!
 
                 counter = 0
