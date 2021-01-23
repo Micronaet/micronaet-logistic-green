@@ -34,11 +34,6 @@ class WPConnector(models.Model):
         return slug
 
     @api.model
-    def wordpress_read_all_id(self, connector_id, endpoint, per_page=50):
-        return self.browse(connector_id).wordpress_read_all(
-            endpoint, per_page=per_page)
-
-    @api.model
     def wordpress_read_all(self, endpoint, per_page=50):
         """ Read all table in Wordpress
             endpoint: url to get data
@@ -68,7 +63,139 @@ class WPConnector(models.Model):
             if not records or records[-1] in wp_records:
                 break
             wp_records.extend(records)
+            break # TODO remove!
         return wp_records
+
+    @api.model
+    def clean_code(self, sku):
+        """ Clean code
+        """
+        sku = (sku or '').strip()
+
+        if len(sku) == 13 and sku.isdigit():
+            ean13 = sku
+        else:
+            ean13 = ''
+
+        sku_part = sku.split('-')
+        code = sku_part[0]
+        supplier = ''
+        child = ''
+        if len(sku_part) > 1:
+            supplier = sku_part[1].upper()
+            if len(supplier) > 2:
+                if supplier[2:3].isalpha():
+                    child = supplier[2:]
+                    supplier = supplier[:2]
+                else:
+                    child = supplier[3:]
+                    supplier = supplier[:3]
+            else:
+                child = supplier[3:]
+                supplier = supplier[:3]
+
+        if child:
+            code = '%s_%02d' % (
+                code,
+                ord(child) - 64,
+            )
+        return sku, code, supplier, child, ean13
+
+    @api.model
+    def erppeek_launch_import_product(self, connector_id):
+        """ Import and sync product
+        """
+        import urllib
+        product_pool = self.env['product.template']
+        wp_records = self.browse(connector_id).wordpress_read_all('products')
+
+        for record in wp_records:
+            # -----------------------------------------------------------------
+            # Extract data from record:
+            # -----------------------------------------------------------------
+            wp_id = record['id']
+            sku = record['sku']
+            slug = record['slug']
+            name = record['name']
+            images = record['images']
+            price = record['price']
+            regular_price = record['regular_price']
+            sale_price = record['sale_price']
+            tags = record['tags']
+            weight = record['weight']
+            stock_status = record['stock_status']
+            product_type = record['type']
+            status = record['status']
+            description = record['description']
+            attributes = record['attributes']
+            categories = record['categories']
+            # upsell_ids = record['related_ids']
+            # cross_sell_ids = record['related_ids']
+            related_ids = record['related_ids']  # Not used
+
+            # -----------------------------------------------------------------
+            # Clean sku for default_code
+            # -----------------------------------------------------------------
+            sku, default_code, supplier, child, ean13 = self.clean_code(sku)
+
+            # -----------------------------------------------------------------
+            # Prepare data:
+            # -----------------------------------------------------------------
+            # A. Fixed data:
+            data = {
+                'name': name,
+                'wp_id': wp_id,
+                'default_code': default_code,
+                'wp_sku': sku,
+                'lst_price': regular_price,
+                'description_sale': description,
+                'weight': weight,
+            }
+
+            # -----------------------------------------------------------------
+            # Update ODOO:
+            # -----------------------------------------------------------------
+            if sku:
+                product_ids = product_pool.search([
+                    ('default_code', '=', default_code),
+                ])
+            else:
+                product_ids = product_pool.search([
+                    ('wp_id', '=', wp_id),
+                ])
+
+            if product_ids:
+                print
+                'Update product %s' % default_code
+                product_pool.write(product_ids, data)
+            else:
+                print
+                'Create product %s' % default_code
+                product_pool.create(data)
+
+            # -------------------------------------------------------------------------
+            # Image download:
+            # -------------------------------------------------------------------------
+            if image_download:
+                if not sku:
+                    print
+                    '   > Product %s without code!' % name
+                    continue  # No download image!
+
+                counter = 0
+                for image in images:
+                    image_src = urllib.quote(image['src'].encode('utf8'), ':/')
+                    # image_name = image['name']
+                    # image_id = image['id']
+
+                    urllib.urlretrieve(
+                        image_src,
+                        os.path.join(
+                            image_path,
+                            '%s.%03d.jpg' % (default_code, counter)))
+                    counter += 1
+            pass
+        return True
 
     @api.model
     def wordpress_batch_operation(self, batch_data, endpoint, max_block=100):
