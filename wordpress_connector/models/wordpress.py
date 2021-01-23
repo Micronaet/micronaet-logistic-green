@@ -117,7 +117,7 @@ class WPConnector(models.Model):
 
         product_pool = self.env['product.template']
         wp_records = self.browse(connector_id).wordpress_read_all(
-            'products', 20)
+            'products')
         pdb.set_trace()
         for record in wp_records:
             # -----------------------------------------------------------------
@@ -166,17 +166,17 @@ class WPConnector(models.Model):
             # Update ODOO:
             # -----------------------------------------------------------------
             if sku:  # First try with sku
-                product_ids = product_pool.search([
+                products = product_pool.search([
                     ('default_code', '=', default_code),
                 ])
-            if not product_ids:  # Try with WP ID in
-                product_ids = product_pool.search([
+            if not products:  # Try with WP ID in
+                products = product_pool.search([
                     ('wp_id_in', '=', wp_id),
                 ])
 
-            if product_ids:
+            if products:
                 print('Update product %s' % default_code)
-                product_pool.write(product_ids, data)
+                products.write(data)
             else:
                 print('Create product %s' % default_code)
                 product_pool.create(data)
