@@ -64,7 +64,7 @@ class WPConnector(models.Model):
             if not records or records[-1] in wp_records:
                 break
             wp_records.extend(records)
-            # break  # TODO remove!
+            break  # TODO remove!
         return wp_records
 
     """
