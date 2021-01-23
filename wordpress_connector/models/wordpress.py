@@ -64,7 +64,7 @@ class WPConnector(models.Model):
             if not records or records[-1] in wp_records:
                 break
             wp_records.extend(records)
-            break # TODO remove!
+            # break  # TODO remove!
         return wp_records
 
     @api.model
@@ -112,13 +112,31 @@ class WPConnector(models.Model):
         """ Import and sync product
         """
         import urllib
+        import pickle
+
+        pickle_reload = True
         image_download = True
         image_path = self.image_path
 
         product_pool = self.env['product.template']
-        wp_records = self.browse(connector_id).wordpress_read_all(
-            'products')
+        pickle_filename = os.path.expanduser('~/wordpress.pickle')
+
+        # ---------------------------------------------------------------------
+        # Dump in pickle file:
+        # ---------------------------------------------------------------------
         pdb.set_trace()
+        if pickle_reload:
+            wp_records = self.browse(connector_id).wordpress_read_all(
+                'products')
+            pickle.dump(
+                wp_records,
+                open(pickle_filename, 'wb'),
+            )
+            _logger.info('Pickle stored, procedure end: %s' % pickle_filename)
+            return True
+        else:
+            wp_records = pickle.load(pickle_filename, 'rb')
+
         for record in wp_records:
             # -----------------------------------------------------------------
             # Extract data from record:
@@ -135,6 +153,8 @@ class WPConnector(models.Model):
             weight = record['weight']
             stock_status = record['stock_status']
             product_type = record['type']
+            if product_type != 'simple':
+                pdb.set_trace()
             status = record['status']
             description = record['description']
             attributes = record['attributes']
@@ -176,6 +196,9 @@ class WPConnector(models.Model):
 
             if products:
                 print('Update product %s' % default_code)
+                if len(products) > 1:
+                    _logger.error('Found more than one SKU')
+                    pdb.set_trace()
                 products.write(data)
             else:
                 print('Create product %s' % default_code)
