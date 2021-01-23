@@ -718,7 +718,6 @@ class ProductTemplate(models.Model):
             if parameters['publish']['linked'] and variations:
                 wp_variants = connector.wordpress_read_all(
                     'products/%s/variations' % wp_id_in)
-                pdb.set_trace()
                 for variant in wp_variants:
                     variant_id = variant['id']
                     variant_sku = variant['sku']
