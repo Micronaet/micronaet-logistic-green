@@ -67,50 +67,10 @@ class WPConnector(models.Model):
             # break  # TODO remove!
         return wp_records
 
-    @api.model
-    def clean_code(self, record):
-        """ Clean code
-        """
-        sku = record['sku']
-        wp_id = record['id']
-
-        sku = (sku or '').strip()
-        if not sku:
-            sku = 'WP%s' % wp_id
-
-        if len(sku) == 13 and sku.isdigit():
-            ean13 = sku
-        else:
-            ean13 = ''
-
-        sku_part = sku.split('-')
-        code = sku_part[0]
-        supplier = ''
-        child = ''
-        if len(sku_part) > 1:
-            supplier = sku_part[1].upper()
-            if len(supplier) > 2:
-                if supplier[2:3].isalpha():
-                    child = supplier[2:]
-                    supplier = supplier[:2]
-                else:
-                    child = supplier[3:]
-                    supplier = supplier[:3]
-            else:
-                child = supplier[3:]
-                supplier = supplier[:3]
-
-        if child:
-            code = '%s_%02d' % (
-                code,
-                ord(child) - 64,
-            )
-        return sku, code, supplier, child, ean13
-
-    @api.model
+    """
     def erppeek_launch_import_product(self, connector_id):
-        """ Import and sync product
-        """
+        ''' Import and sync product
+        '''
         import urllib
         import pickle
 
@@ -142,31 +102,31 @@ class WPConnector(models.Model):
             # Extract data from record:
             # -----------------------------------------------------------------
             wp_id = record['id']
-            sku = record['sku']
             slug = record['slug']
             name = record['name']
             images = record['images']
-            price = record['price']
             regular_price = record['regular_price']
+            price = record['price']
             sale_price = record['sale_price']
-            tags = record['tags']
             weight = record['weight']
-            stock_status = record['stock_status']
             product_type = record['type']
             if product_type != 'simple':
-                pdb.set_trace()
-            status = record['status']
+                pdb.set_trace()  # TODO debug problem
             description = record['description']
+            stock_status = record['stock_status']
+            status = record['status']
+            tags = record['tags']
             attributes = record['attributes']
             categories = record['categories']
-            # upsell_ids = record['related_ids']
-            # cross_sell_ids = record['related_ids']
+            upsell_ids = record['upsell_ids']
+            cross_sell_ids = record['cross_sell_ids']
             related_ids = record['related_ids']  # Not used
 
             # -----------------------------------------------------------------
             # Clean sku for default_code
             # -----------------------------------------------------------------
-            sku, default_code, supplier, child, ean13 = self.clean_code(record)
+            sku, default_code, supplier, child, ean13 = \
+                self.clean_code_record(record)
 
             # -----------------------------------------------------------------
             # Prepare data:
@@ -174,6 +134,7 @@ class WPConnector(models.Model):
             # A. Fixed data:
             data = {
                 'name': name,
+                'wp_slug': slug,
                 'wp_id_in': wp_id,
                 'default_code': default_code,
                 'wp_sku_in': sku,
@@ -226,6 +187,7 @@ class WPConnector(models.Model):
                     counter += 1
             pass
         return True
+        """
 
     @api.model
     def wordpress_batch_operation(self, batch_data, endpoint, max_block=100):

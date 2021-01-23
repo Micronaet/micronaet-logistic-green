@@ -2,6 +2,7 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl.html).
 
 import os
+import pickle
 import sys
 import logging
 import base64
@@ -47,7 +48,7 @@ class ProductTemplate(models.Model):
     #                               UTILITY:
     # -------------------------------------------------------------------------
     @api.model
-    def clean_code(self, sku):
+    def clean_code(self, sku, wp_id=''):
         """ Split and Clean code extracting from original sky
         """
         sku = (sku or '').strip()
@@ -56,6 +57,9 @@ class ProductTemplate(models.Model):
             ean13 = sku
         else:
             ean13 = ''
+
+        if not sku and wp_id:  # Generic SKU with Wordpress ID
+            sku = 'WP%s' % wp_id
 
         sku_part = sku.split('-')
         code = sku_part[0]
@@ -100,8 +104,8 @@ class ProductTemplate(models.Model):
         # ---------------------------------------------------------------------
         # Update supplier for product:
         # ---------------------------------------------------------------------
-        sku = self.sku_in
-        sku, code, supplier, child, ean13 = self.clean_code(sku)
+        sku, code, supplier, child, ean13 = self.clean_code(
+            self.sku_in, self.wp_id_in)
         if not sku or not supplier:
             _logger.error('Supplier not update, missed sku or supplier [%s]!' %
                           self.name)
@@ -510,31 +514,36 @@ class ProductTemplate(models.Model):
         connector_id = connector.id
         parameters = connector.get_publish_parameters()
 
-        # Wordpress parameters:
-        wcapi = connector.get_connector()
-        # Product:
-        params = {
-            'per_page': parameters['block']['product'],
-            'page': 1,
-        }
-        # Variation:
-        variation_param = {
-            'per_page': parameters['block']['variant'],
-            'page': 1,
-        }
+        # TODO put in parameter:
+        pickle_reload = True
 
         # ---------------------------------------------------------------------
-        # Preload:
+        # Dump in pickle file from Wordpress:
+        # ---------------------------------------------------------------------
+        pickle_filename = os.path.expanduser('~/wordpress.pickle')
+        if pickle_reload:
+            wp_records = connector.wordpress_read_all('products')
+            pickle.dump(
+                wp_records,
+                open(pickle_filename, 'wb'),
+            )
+            _logger.info('Pickle stored, procedure end: %s' % pickle_filename)
+            return True
+        else:
+            wp_records = pickle.load(pickle_filename, 'rb')
+
+        # ---------------------------------------------------------------------
+        # Preload from ODOO:
         # ---------------------------------------------------------------------
         # NOTE: No preload parameters for get (only for publish):
-        # Tag:
+        # A. Tag:
         tag_list = {}
         for tag in self.env['wp.tag'].search([
                 ('connector_id', '=', connector_id),
                 ]):
             tag_list[tag.name] = tag.id
 
-        # Category:
+        # B. Category:
         category_list = {}
         for category in self.env['product.category'].search([
                 ('connector_id', '=', connector_id),
@@ -542,6 +551,7 @@ class ProductTemplate(models.Model):
                 ]):
             category_list[category.wp_id] = category.id
 
+        # C. Attribute:
         attribute_list = {}
         for attribute in self.env['wp.attribute'].search([
                 ('connector_id', '=', connector_id),
@@ -556,266 +566,231 @@ class ProductTemplate(models.Model):
 
         # Linked relation:
         product_connection = {
-            'wp_linked_ids': [],
+            # 'wp_linked_ids': [],
             'wp_up_sell_ids': [],
             'wp_cross_sell_ids': [],
             }
-        pdb.set_trace()
-        while True:
-            reply = wcapi.get('products', params=params)
-            _logger.info('Page %s, Record: %s' % (
-                params['page'], params['page'] * params['per_page']))
-            params['page'] += 1
 
-            # Loop stop check:
-            if not reply.ok:
-                _logger.error('Error getting product list %s' % (reply, ))
-                break
-            records = reply.json()
-            if not records:
-                break
+        # Loop all master product:
+        for record in wp_records:
+            # Extract data from record:
+            wp_id_in = record['id']
+            real_sku = record['sku']
+            name = record['name']
+            slug = record['slug']
+            stock_status = record['stock_status']
 
-            # Loop all master product:
-            for record in records:
-                # Extract data from record:
-                wp_id_in = record['id']
-                real_sku = record['sku']
-                name = record['name']
-                # slug = record['slug']
-                # stock_status = record['stock_status']
+            images = record['images']
+            variations = record['variations']
 
-                images = record['images']
-                variations = record['variations']
+            # related_ids = record['related_ids']
+            up_sell_ids = record['upsell_ids']
+            cross_sell_ids = record['cross_sell_ids']
 
-                related_ids = record['related_ids']
-                up_sell_ids = record['upsell_ids']
-                cross_sell_ids = record['cross_sell_ids']
+            tags = record['tags']
+            categories = record['categories']
 
-                tags = record['tags']
-                categories = record['categories']
+            attributes = record['attributes']
+            default_attributes = record['default_attributes']
 
-                attributes = record['attributes']
-                default_attributes = record['default_attributes']
+            # Clean sku for default_code
+            sku, default_code, supplier, child, barcode = \
+                self.clean_code(real_sku, wp_id_in)
 
-                # Clean sku for default_code
-                sku, default_code, supplier, child, barcode = \
-                    self.clean_code(real_sku)
+            # ODOO search:
+            # TODO save original sku?
+            products = self.search([
+                # TODO sku is not saved in default_code!!! 0001-02 >> 0001
+                # ('connector_id', '=', connector_id),  # Used Company IN
+                '|',
+                ('wp_id_in', '=', wp_id_in),
+                ('default_code', '=', sku),
+                ])
+            create_mode = False if products else True
+            if len(products) > 1:
+                _logger.error('Multi ID or SKU present: %s' % sku)
+                pdb.set_trace()
+                # Use only first?
+                products = products[0]
 
-                # ODOO search:
-                # TODO save original sku?
-                products = self.search([
-                    # TODO sku is not saved in default_code!!! 0001-02 >> 0001
-                    # ('connector_id', '=', connector_id),  # Used Company IN
-                    '|',
-                    ('wp_id_in', '=', wp_id_in),
-                    ('default_code', '=', sku),
-                    ])
-                create_mode = False if products else True
-                if len(products) > 1:
-                    _logger.error('Multi ID or SKU present: %s' % sku)
-                    # TODO use only first?
-                    # products = product[0]
+            # -------------------------------------------------------------
+            # Prepare data (use publish setup):
+            # -------------------------------------------------------------
+            data = {
+                'wp_published': True,  # TODO remove from here
+                'wp_id_in': wp_id_in,
+                'default_code': sku,
+                'sku_in': sku,
 
-                # -------------------------------------------------------------
-                # Prepare data (use publish setup):
-                # -------------------------------------------------------------
-                data = {
-                    # 'connector_id': connector_id,  # Not used
-                    # 'wp_sku': sku,
-                    'wp_published': True,  # TODO remove from here
-                    'wp_id_in': wp_id_in,
-                    'default_code': sku,
-                    'sku_in': sku,
+                'wp_type': record['type'],
+                'wp_status': record['status'],
+            }
 
-                    'wp_type': record['type'],
-                    'wp_status': record['status'],
-                }
+            if create_mode or parameters['publish']['text']:
+                data.update({
+                    'name': name,
+                    'description_sale': record['description'],
+                })
 
-                if create_mode or parameters['publish']['text']:
-                    data.update({
+            if create_mode or parameters['publish']['numeric']:
+                data.update({
+                    'weight': record['weight'],
+                })
+
+            if create_mode or parameters['publish']['price']:
+                data.update({
+                    'lst_price': record['regular_price'],
+                })
+
+            if barcode:
+                data['barcode'] = barcode
+
+            if variations:
+                data['wp_master'] = True
+            else:
+                data['wp_master'] = False
+
+            # Relation / Complex fields:
+            if (create_mode or parameters['publish']['tag']) and tags:
+                data['wp_tag_ids'] = [(6, 0, [])]
+                for tag in tags:
+                    if tag['name'] in tag_list:
+                        data['wp_tag_ids'][0][2].append(
+                            tag_list[tag['name']])
+
+            if (create_mode or parameters['publish']['category']) and \
+                    categories:
+                data['wp_category_ids'] = [(6, 0, [])]
+                for category in categories:
+                    data['wp_category_ids'][0][2].append(
+                        category_list[category['id']])
+
+            if create_mode:
+                _logger.info(
+                    'Create product %s [%s]' % (default_code, sku))
+                products = self.create(data)
+            else:
+                _logger.info(
+                    'Update product %s [%s]' % (default_code, sku))
+                products.write(data)
+            product_id = products[0].id
+            products.update_product_supplier()
+
+            # -------------------------------------------------------------
+            # Complex fields:
+            # -------------------------------------------------------------
+            # Attributes:
+            if (create_mode or parameters['publish']['attribute']) and \
+                    attributes:
+                wp_attribute_ids = []
+                products.write({'wp_attribute_ids': [(5, 0, 0)]})
+                for attribute in attributes:
+                    attribute_odoo_id, attribute_odoo_terms = \
+                        attribute_list[attribute['id']]
+
+                    current_term_ids = [attribute_odoo_terms[option]
+                                        for option in attribute['options']
+                                        if option in attribute_odoo_terms]
+                    wp_attribute_ids.append((0, 0, {
+                        'attribute_id': attribute_odoo_id,
+                        'term_ids': [(6, 0, current_term_ids)],
+                        'show_product_page': attribute['visible'],
+                        'used_in_variant': attribute['variation'],
+                        'position': attribute['position']
+                        }))
+                products.write({'wp_attribute_ids': wp_attribute_ids})
+
+            if parameters['publish']['image']:
+                image_list.append((product_id, images))
+
+            if parameters['publish']['linked']:
+                if up_sell_ids:
+                    product_connection['wp_up_sell_ids'].append(
+                        (products[0], up_sell_ids))
+
+                if cross_sell_ids:
+                    product_connection['wp_cross_sell_ids'].append(
+                        (products[0], cross_sell_ids))
+
+            # -------------------------------------------------------------
+            #                        VARIATIONS
+            # -------------------------------------------------------------
+            if parameters['publish']['linked'] and variations:
+                wp_variants = connector.wordpress_read_all(
+                    'products/%s/variations' % wp_id_in)
+                for variant in wp_variants:
+                    variant_id = variant['id']
+                    variant_sku = variant['sku']
+                    variant_images = variant['image']
+                    variant_attributes = variant['attributes']
+                    stock_status = variant['stock_status']
+                    product_type = variant['type']
+                    status = variant['status']
+
+                    if parameters['publish']['image'] and \
+                            variant_images:
+                        # Usually one:
+                        image_list.append(
+                            (variant.id, [variant_images]))
+
+                    variant_data = {
+                        'wp_type': 'variable',
+                        'wp_published': True,
                         'name': name,
-                        'description_sale': record['description'],
-                    })
+                        'wp_id_in': variant['id'],
+                        'sku_in': variant_sku,
+                        'default_code': variant_sku,
+                        'lst_price': variant['regular_price'],
+                        'description_sale': variant['description'],
+                        'weight': variant['weight'],
+                        'wp_master_id': product_id,
+                        }
 
-                if create_mode or parameters['publish']['numeric']:
-                    data.update({
-                        'weight': record['weight'],
-                    })
+                    # TODO Publish block also here!
+                    odoo_variants = self.search([
+                        '|',
+                        ('wp_id_in', '=', variant_id),  # never overlap
+                        ('default_code', '=', variant_sku),
+                        ])
 
-                if create_mode or parameters['publish']['price']:
-                    data.update({
-                        'lst_price': record['regular_price'],
-                    })
+                    if odoo_variants:
+                        if len(odoo_variants) > 1:
+                            _logger.error('Double variant found %s' % (
+                                variant_sku,
+                            ))
+                            pdb.set_trace()
+                            odoo_variants = odoo_variants[0]
 
-                if barcode:
-                    data['barcode'] = barcode
+                        odoo_variants.write(variant_data)
+                        _logger.info(
+                            '   >> Update %s variants' % variant_sku)
+                    else:
+                        odoo_variants = self.create(variant_data)
+                        _logger.info(
+                            '   >> Create %s variants' % variant_sku)
+                    odoo_variants.update_product_supplier()
 
-                if variations:
-                    data['wp_master'] = True
-                else:
-                    data['wp_master'] = False
+                    # -------------------------------------------------
+                    # Update Variant attributes:
+                    # -------------------------------------------------
+                    print(products.default_code, '\n\n\n\n')
 
-                # Relation / Complex fields:
-                if (create_mode or parameters['publish']['tag']) and tags:
-                    data['wp_tag_ids'] = [(6, 0, [])]
-                    for tag in tags:
-                        if tag['name'] in tag_list:
-                            data['wp_tag_ids'][0][2].append(
-                                tag_list[tag['name']])
+                    # Delete all previous:
+                    odoo_variants.write(
+                        {'wp_attribute_ids': [(5, 0, 0)]})
 
-                if (create_mode or parameters['publish']['category']) and \
-                        categories:
-                    data['wp_category_ids'] = [(6, 0, [])]
-                    for category in categories:
-                        data['wp_category_ids'][0][2].append(
-                            category_list[category['id']])
-
-                if create_mode:
-                    _logger.info(
-                        'Create product %s [%s]' % (default_code, sku))
-                    products = self.create(data)
-                else:
-                    _logger.info(
-                        'Update product %s [%s]' % (default_code, sku))
-                    products.write(data)
-                product_id = products[0].id
-                products.update_product_supplier()
-
-                # -------------------------------------------------------------
-                # Complex fields:
-                # -------------------------------------------------------------
-                # Attributes:
-                if (create_mode or parameters['publish']['attribute']) and \
-                        attributes:
                     wp_attribute_ids = []
-                    products.write({'wp_attribute_ids': [(5, 0, 0)]})
-                    for attribute in attributes:
+                    for item in variant_attributes:
                         attribute_odoo_id, attribute_odoo_terms = \
-                            attribute_list[attribute['id']]
-
-                        current_term_ids = [attribute_odoo_terms[option]
-                                            for option in attribute['options']
-                                            if option in attribute_odoo_terms]
+                            attribute_list[item['id']]
                         wp_attribute_ids.append((0, 0, {
                             'attribute_id': attribute_odoo_id,
-                            'term_ids': [(6, 0, current_term_ids)],
-                            'show_product_page': attribute['visible'],
-                            'used_in_variant': attribute['variation'],
-                            'position': attribute['position']
-                            }))
-                    products.write({'wp_attribute_ids': wp_attribute_ids})
-
-                if parameters['publish']['image']:
-                    image_list.append((product_id, images))
-
-                if parameters['publish']['linked']:
-                    if related_ids:
-                        product_connection['wp_linked_ids'].append(
-                            (products[0], related_ids))
-
-                    if up_sell_ids:
-                        product_connection['wp_up_sell_ids'].append(
-                            (products[0], up_sell_ids))
-
-                    if cross_sell_ids:
-                        product_connection['wp_cross_sell_ids'].append(
-                            (products[0], cross_sell_ids))
-
-                # -------------------------------------------------------------
-                #                        VARIATIONS
-                # -------------------------------------------------------------
-                if parameters['publish']['linked'] and variations:
-                    variation_param['page'] = 1
-                    while True:
-                        var_reply = wcapi.get(
-                            'products/%s/variations' % wp_id_in,
-                            params=variation_param,
-                            )
-                        variation_param['page'] += 1
-
-                        if not var_reply.ok:
-                            _logger.error(
-                                'Error getting category list', var_reply)
-                            break
-                        variants = var_reply.json()
-                        if not variants:
-                            break
-
-                        for variant in variants:
-                            variant_id = variant['id']
-                            variant_sku = variant['sku']
-                            variant_images = variant['image']
-                            variant_attributes = variant['attributes']
-                            # stock_status = variant['stock_status']
-                            # product_type = variant['type']
-                            # status = variant['status']
-
-                            if parameters['publish']['image'] and \
-                                    variant_images:
-                                # Usually one:
-                                image_list.append(
-                                    (variant.id, [variant_images]))
-
-                            variant_data = {
-                                # 'connector_id': connector_id,
-                                # 'wp_sku': variant_sku,
-                                'wp_type': 'variable',
-                                'wp_published': True,
-                                'name': name,
-                                'wp_id_in': variant['id'],
-                                'sku_in': variant_sku,
-                                'default_code': variant_sku,
-                                'lst_price': variant['regular_price'],
-                                'description_sale': variant['description'],
-                                'weight': variant['weight'],
-                                'wp_master_id': product_id,
-                                }
-
-                            # TODO Publish block also here!
-
-                            odoo_variants = self.search([
-                                '|',
-                                ('wp_id_in', '=', variant_id),  # never overlap
-                                ('default_code', '=', variant_sku),
-                                ])
-
-                            if odoo_variants:
-                                if len(odoo_variants) > 1:
-                                    _logger.error('Double variant found %s' % (
-                                        variant_sku,
-                                    ))
-                                    odoo_variants = odoo_variants[0]
-
-                                odoo_variants.write(variant_data)
-                                _logger.info(
-                                    '   >> Update %s variants' % variant_sku)
-                            else:
-                                odoo_variants = self.create(variant_data)
-                                _logger.info(
-                                    '   >> Create %s variants' % variant_sku)
-                            odoo_variants.update_product_supplier()
-
-                            # -------------------------------------------------
-                            # Update Variant attributes:
-                            # -------------------------------------------------
-                            print(products.default_code, '\n\n\n\n')
-                            # Delete all previous:
-                            odoo_variants.write(
-                                {'wp_attribute_ids': [(5, 0, 0)]})
-
-                            wp_attribute_ids = []
-                            for item in variant_attributes:
-                                attribute_odoo_id, attribute_odoo_terms = \
-                                    attribute_list[item['id']]
-                                wp_attribute_ids.append((0, 0, {
-                                    'attribute_id': attribute_odoo_id,
-                                    'term_ids': [
-                                        (6, 0, [attribute_odoo_terms[
-                                            item['option']]])],
-                                }))
-                            odoo_variants.write(
-                                {'wp_attribute_ids': wp_attribute_ids})
-            break  # TODO Test mode:
+                            'term_ids': [
+                                (6, 0, [attribute_odoo_terms[
+                                    item['option']]])],
+                        }))
+                    odoo_variants.write(
+                        {'wp_attribute_ids': wp_attribute_ids})
 
         # ---------------------------------------------------------------------
         # Image download:
@@ -1193,6 +1168,8 @@ class ProductTemplate(models.Model):
     # -------------------------------------------------------------------------
     # Fields for web:
     # -------------------------------------------------------------------------
+    wp_slug = fields.Char(string='Slug', size=80)
+
     # Tassonomy:
     wp_vulgar_name = fields.Char(string='Vulgar name', size=50)
     wp_scientific_name = fields.Char(string='Scientific name', size=50)
