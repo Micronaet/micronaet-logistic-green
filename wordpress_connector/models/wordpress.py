@@ -75,6 +75,8 @@ class WPConnector(models.Model):
         wp_id = record['id']
 
         sku = (sku or '').strip()
+        if not sku:
+            sku = 'WP.%s' % wp_id
 
         if len(sku) == 13 and sku.isdigit():
             ean13 = sku
@@ -103,8 +105,6 @@ class WPConnector(models.Model):
                 code,
                 ord(child) - 64,
             )
-        if not sku:
-            sku = 'WP.%s' % wp_id
         return sku, code, supplier, child, ean13
 
     @api.model
@@ -153,7 +153,7 @@ class WPConnector(models.Model):
             # A. Fixed data:
             data = {
                 'name': name,
-                'wp_id': wp_id,
+                'wp_id_in': wp_id,
                 'default_code': default_code,
                 'wp_sku': sku,
                 'lst_price': regular_price,
@@ -170,7 +170,7 @@ class WPConnector(models.Model):
                 ])
             else:
                 product_ids = product_pool.search([
-                    ('wp_id', '=', wp_id),
+                    ('wp_id_in', '=', wp_id),
                 ])
 
             if product_ids:
