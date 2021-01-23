@@ -531,7 +531,7 @@ class ProductTemplate(models.Model):
             return True
         else:
             wp_records = pickle.load(open(pickle_filename, 'rb'))
-        pdb.set_trace()
+
         # ---------------------------------------------------------------------
         # Preload from ODOO:
         # ---------------------------------------------------------------------
@@ -572,7 +572,6 @@ class ProductTemplate(models.Model):
             }
 
         # Loop all master product:
-        pdb.set_trace()
         for record in wp_records:
             # Extract data from record:
             wp_id_in = record['id']
@@ -610,8 +609,7 @@ class ProductTemplate(models.Model):
             create_mode = False if products else True
             if len(products) > 1:
                 _logger.error('Multi ID or SKU present: %s' % sku)
-                pdb.set_trace()
-                # Use only first?
+                # TODO Use only first?
                 products = products[0]
 
             # -------------------------------------------------------------
@@ -686,7 +684,6 @@ class ProductTemplate(models.Model):
                 wp_attribute_ids = []
                 products.write({'wp_attribute_ids': [(5, 0, 0)]})
                 for attribute in attributes:
-                    pdb.set_trace()
                     attribute_odoo_id, attribute_odoo_terms = \
                         attribute_list[attribute['id']]
 
@@ -720,6 +717,7 @@ class ProductTemplate(models.Model):
             if parameters['publish']['linked'] and variations:
                 wp_variants = connector.wordpress_read_all(
                     'products/%s/variations' % wp_id_in)
+                pdb.set_trace()
                 for variant in wp_variants:
                     variant_id = variant['id']
                     variant_sku = variant['sku']
@@ -760,7 +758,7 @@ class ProductTemplate(models.Model):
                             _logger.error('Double variant found %s' % (
                                 variant_sku,
                             ))
-                            pdb.set_trace()
+                            # TODO use only first:
                             odoo_variants = odoo_variants[0]
 
                         odoo_variants.write(variant_data)
