@@ -34,6 +34,11 @@ class WPConnector(models.Model):
         return slug
 
     @api.model
+    def wordpress_read_all_id(self, connector_id, endpoint, per_page=50):
+        return self.browse(connector_id).wordpress_read_all(
+            endpoint, per_page=per_page)
+
+    @api.model
     def wordpress_read_all(self, endpoint, per_page=50):
         """ Read all table in Wordpress
             endpoint: url to get data
