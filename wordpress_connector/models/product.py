@@ -572,6 +572,7 @@ class ProductTemplate(models.Model):
             }
 
         # Loop all master product:
+        pdb.set_trace()
         for record in wp_records:
             # Extract data from record:
             wp_id_in = record['id']
@@ -685,6 +686,7 @@ class ProductTemplate(models.Model):
                 wp_attribute_ids = []
                 products.write({'wp_attribute_ids': [(5, 0, 0)]})
                 for attribute in attributes:
+                    pdb.set_trace()
                     attribute_odoo_id, attribute_odoo_terms = \
                         attribute_list[attribute['id']]
 
