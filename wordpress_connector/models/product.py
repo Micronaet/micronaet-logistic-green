@@ -723,9 +723,9 @@ class ProductTemplate(models.Model):
                     variant_sku = variant['sku']
                     variant_images = variant['image']
                     variant_attributes = variant['attributes']
-                    stock_status = variant['stock_status']
-                    product_type = variant['type']
-                    status = variant['status']
+                    # stock_status = variant['stock_status']
+                    # product_type = variant['type']
+                    # status = variant['status']
 
                     if parameters['publish']['image'] and \
                             variant_images:
