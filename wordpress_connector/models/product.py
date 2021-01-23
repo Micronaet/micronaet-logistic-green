@@ -731,7 +731,7 @@ class ProductTemplate(models.Model):
                             variant_images:
                         # Usually one:
                         image_list.append(
-                            (variant.id, [variant_images]))
+                            (variant_id, [variant_images]))
 
                     variant_data = {
                         'wp_type': 'variable',
