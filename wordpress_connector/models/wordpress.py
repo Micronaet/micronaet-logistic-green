@@ -76,7 +76,7 @@ class WPConnector(models.Model):
 
         sku = (sku or '').strip()
         if not sku:
-            sku = 'WP.%s' % wp_id
+            sku = 'WP%s' % wp_id
 
         if len(sku) == 13 and sku.isdigit():
             ean13 = sku
