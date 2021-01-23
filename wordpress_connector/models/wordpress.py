@@ -116,7 +116,8 @@ class WPConnector(models.Model):
         image_path = self.image_path
 
         product_pool = self.env['product.template']
-        wp_records = self.browse(connector_id).wordpress_read_all('products')
+        wp_records = self.browse(connector_id).wordpress_read_all(
+            'products', 20)
         pdb.set_trace()
         for record in wp_records:
             # -----------------------------------------------------------------
