@@ -68,39 +68,6 @@ class WPConnector(models.Model):
         return wp_records
 
     """
-    def erppeek_launch_import_product(self, connector_id):
-        ''' Import and sync product
-        '''
-        import urllib
-        import pickle
-
-        pickle_reload = True
-        image_download = True
-        image_path = self.image_path
-
-        product_pool = self.env['product.template']
-        pickle_filename = os.path.expanduser('~/wordpress.pickle')
-
-        # ---------------------------------------------------------------------
-        # Dump in pickle file:
-        # ---------------------------------------------------------------------
-        pdb.set_trace()
-        if pickle_reload:
-            wp_records = self.browse(connector_id).wordpress_read_all(
-                'products')
-            pickle.dump(
-                wp_records,
-                open(pickle_filename, 'wb'),
-            )
-            _logger.info('Pickle stored, procedure end: %s' % pickle_filename)
-            return True
-        else:
-            wp_records = pickle.load(pickle_filename, 'rb')
-
-        for record in wp_records:
-            # -----------------------------------------------------------------
-            # Extract data from record:
-            # -----------------------------------------------------------------
             wp_id = record['id']
             slug = record['slug']
             name = record['name']
@@ -123,12 +90,6 @@ class WPConnector(models.Model):
             related_ids = record['related_ids']  # Not used
 
             # -----------------------------------------------------------------
-            # Clean sku for default_code
-            # -----------------------------------------------------------------
-            sku, default_code, supplier, child, ean13 = \
-                self.clean_code_record(record)
-
-            # -----------------------------------------------------------------
             # Prepare data:
             # -----------------------------------------------------------------
             # A. Fixed data:
@@ -142,28 +103,6 @@ class WPConnector(models.Model):
                 'description_sale': description,
                 'weight': weight,
             }
-
-            # -----------------------------------------------------------------
-            # Update ODOO:
-            # -----------------------------------------------------------------
-            if sku:  # First try with sku
-                products = product_pool.search([
-                    ('default_code', '=', default_code),
-                ])
-            if not products:  # Try with WP ID in
-                products = product_pool.search([
-                    ('wp_id_in', '=', wp_id),
-                ])
-
-            if products:
-                print('Update product %s' % default_code)
-                if len(products) > 1:
-                    _logger.error('Found more than one SKU')
-                    pdb.set_trace()
-                products.write(data)
-            else:
-                print('Create product %s' % default_code)
-                product_pool.create(data)
 
             # -----------------------------------------------------------------
             # Image download:
