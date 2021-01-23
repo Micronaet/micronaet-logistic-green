@@ -515,7 +515,7 @@ class ProductTemplate(models.Model):
         parameters = connector.get_publish_parameters()
 
         # TODO put in parameter:
-        pickle_reload = True
+        pickle_reload = False
 
         # ---------------------------------------------------------------------
         # Dump in pickle file from Wordpress:
@@ -530,8 +530,8 @@ class ProductTemplate(models.Model):
             _logger.info('Pickle stored, procedure end: %s' % pickle_filename)
             return True
         else:
-            wp_records = pickle.load(pickle_filename, 'rb')
-
+            wp_records = pickle.load(open(pickle_filename, 'rb'))
+        pdb.set_trace()
         # ---------------------------------------------------------------------
         # Preload from ODOO:
         # ---------------------------------------------------------------------
