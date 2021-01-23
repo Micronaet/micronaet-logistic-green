@@ -515,7 +515,7 @@ class ProductTemplate(models.Model):
         parameters = connector.get_publish_parameters()
 
         # TODO put in parameter:
-        pickle_reload = True
+        pickle_reload = False
 
         # ---------------------------------------------------------------------
         # Dump in pickle file from Wordpress:
