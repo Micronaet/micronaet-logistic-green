@@ -922,7 +922,7 @@ class WPAttribute(models.Model):
         terms_db = {}
         for attribute in attributes:
             wp_id = attribute.wp_id
-            attributes_db[wp_id] = attribute.id
+            attributes_db[wp_id] = attribute
             for term in attribute.term_ids:
                 terms_db[(wp_id, term.name)] = term.id
 
@@ -954,7 +954,7 @@ class WPAttribute(models.Model):
                 if wp_id in attributes_db:
                     _logger.info('Update: %s' % name)
                     attributes_db[wp_id].write(data)
-                    attribute_id = attributes_db[wp_id]
+                    attribute_id = attributes_db[wp_id].id
                 else:
                     _logger.info('Create: %s' % name)
                     attribute_id = self.create(data).id
