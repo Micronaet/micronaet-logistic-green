@@ -21,6 +21,12 @@ class WPConnector(models.Model):
     # -------------------------------------------------------------------------
     # Utility:
     # -------------------------------------------------------------------------
+    @api.multi
+    def import_image_folder(self):
+        """ Update image
+        """
+        return self.env['wp.image'].import_image_folder()
+
     @api.model
     def slugify(self, string):
         """ Slugify function
@@ -1037,3 +1043,119 @@ class WPAttributeRelations(models.Model):
         inverse_name='attribute_id',
         string='Terms',
         )
+
+
+class WPConnector(models.Model):
+    """ Model name: Wordpress Connector
+    """
+    _name = 'wp.image'
+    _description = 'Wordpress Image'
+    _order = 'name'
+
+    @api.model
+    def update_wordpress_media(self):
+        """ Update worpress image (use check for get list)
+        """
+        images = self.search([('update', '=', True)])
+
+        product_ids = []  # Product list to update
+        for image in images:
+            wp_id = image.wp_id
+            product_id = image.product_id.id
+            product_ids.append(product_id)
+
+            if wp_id:
+                pass  # Delete previous:
+
+            url = ''
+            image.write({
+                'update': False,
+                'wp_id': wp_id,
+                'url': url,
+            })
+
+        # TODO
+        # Update product selected in the images
+        return True
+
+    @api.multi
+    def import_image_folder(self):
+        """ Load image folder in connector param from all out connector
+        """
+        connector_pool = self.env['wp.connector']
+        connectors = self.search([('mode', '=', 'out')])
+        if not connectors:
+            _logger.error('No connector for out wordpress')
+            return False
+        pdb.set_trace()
+        for connector in connectors:
+            connector_id = connector.id
+            image_path = connector.image_path
+
+            for root, folders, files in os.path.walk(image_path):
+                for filename in files:
+                    fullname = os.path.join(root, filename)
+
+                    images = self.search([
+                        ('name', '=', filename),
+                        ('connector_id', '=', connector_id),
+                    ])
+                    product_id, version, extension = self.extract_data(
+                        filename)
+                    if images:  # only one!
+                        # Check timestamp
+                        modify_time = str(os.stat(fullname).st_mtime)
+                        if images[0].timestamp != modify_time:
+                            data = {
+                                'update': True,
+                                'timestamp': modify_time,
+                            }
+                            images.write(data)
+                    else:
+                        data = {
+                            'update': True,
+                            'name': filename,
+                            'product_id': product_id,
+                            'version': version,
+                            'connector_id': connector_id,
+                            'wp_id': False,
+                            'wp_url': False,
+                        }
+                        self.create(data)
+                break  # Only this
+        # return self.update_wordpress_media()
+        return True
+
+    @api.model
+    def extract_data(self, filename):
+        """ Extract data from filename
+        """
+        file_part = filename.split('.')
+        if len(file_part) != 3:
+            return False
+        else:
+            # template id, version, extension:
+            return int(file_part[0]), file_part[1], file_part[2]
+
+    @api.multi
+    def _get_fullname(self):
+        """ Extract fullname from connector and filename
+        """
+        for image in self:
+            image.fullname = os.path.join(
+                image.connector_id.image_path, image.name)
+
+    # Columns:
+    name = fields.Char(string='Name', required=True, size=80)
+    fullname = fields.Char(string='Name', size=280, compute='_get_fullname')
+
+    version = fields.Char(string='Version')
+    timestamp = fields.Char(string='Timestamp')
+    connector_id = fields.Many2one(
+        comodel_name='wp.connector',
+        string='Connector')
+    product_id = fields.Many2one(
+        comodel_name='product.template',
+        string='Product')
+    wp_id = fields.integer('WP ID')
+    wp_url = fields.Char('WP Url')

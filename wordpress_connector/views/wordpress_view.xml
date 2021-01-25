@@ -29,7 +29,7 @@
                     <button name="button_load_category" type="object" string="Syncro category" icon="fa-th-list fa-2x" help="In or out syncro depend on mode selected for this connection"/>
                     <button name="button_load_product_template_structure" type="object" string="Syncro product" icon="fa-th-list fa-2x" help="In or out syncro depend on mode selected for this connection"/>
                     <button name="extract_wordpress_published_report" type="object" string="Extract web product" icon="fa-print fa-2x" help="Extract total list of product for web"/>
-
+                    <button name="import_image_folder" type="object" string="Load image" icon="fa-picture-o fa-2x" help="Load image list form connector folder (all out connector)"/>
                 </header>
                 <sheet>
                     <group colspan="4" col="4">
