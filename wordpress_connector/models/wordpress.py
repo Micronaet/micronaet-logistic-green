@@ -1170,3 +1170,14 @@ class WPConnector(models.Model):
         string='Product')
     wp_id = fields.Integer('WP ID')
     wp_url = fields.Char('WP Url')
+
+
+class ProductTemplate(models.Model):
+    """ Model name: Product template
+    """
+    _inherit = 'product.template'
+
+    wp_image_ids = fields.One2many(
+        comodel_name='wp.image',
+        inverse_name='product_id',
+        string='Wordpress image')

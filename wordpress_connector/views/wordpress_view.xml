@@ -450,6 +450,12 @@
                                 <field name="wp_disease"/>
                             </group>
                         </page>
+                        <page string="Image">
+                            <group colspan="4" col="4">
+                                <separator string="Wordpress image:" colspan="4"/>
+                                <field name="wp_image_ids" colspan="4" nolabel="1"/>
+                            </group>
+                        </page>
                         <page string="Link">
                             <group colspan="4" col="4">
                                 <separator string="Link info:" colspan="4"/>
