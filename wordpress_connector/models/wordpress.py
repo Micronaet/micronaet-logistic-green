@@ -1079,7 +1079,6 @@ class WPConnector(models.Model):
             images = self.browse(update_this_id)
         else:
             images = self.search([('update', '=', True)])
-        pdb.set_trace()
         product_ids = []  # Product list to update
         for image in images:
             wp_id = image.wp_id
