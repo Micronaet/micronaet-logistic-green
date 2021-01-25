@@ -1068,7 +1068,8 @@ class WPConnector(models.Model):
     def update_this_wordpress_media(self):
         """ Update this
         """
-        self.with_context(update_this_id=self.id)
+        self.with_context(update_this_id=self.id).update_wordpress_media()
+
     @api.model
     def update_wordpress_media(self):
         """ Update worpress image (use check for get list)
@@ -1132,7 +1133,6 @@ class WPConnector(models.Model):
             # Open file in different ways:
             file_handler = open(fullname, 'rb')  # handler
             image_data = file_handler.read()  # binary data
-            # image_b64 = base64.b64encode(image_data) # Base 64 data
 
             reply = requests.post(
                 url,
@@ -1141,10 +1141,13 @@ class WPConnector(models.Model):
                 data=image_data,
                 auth=auth,
             )
-            _logger.info(reply.text)
-            wp_id = reply.json()['id']
+            try:
+                wp_id = reply.json()['id']
+            except:  # Error reply
+                _logger.error(reply.text)
+                continue
 
-            url = ''
+            url = ''  # TODO read from reply
             image.write({
                 'update': False,
                 'wp_id': wp_id,
