@@ -1092,7 +1092,7 @@ class WPConnector(models.Model):
             connector_id = connector.id
             image_path = connector.image_path
 
-            for root, folders, files in os.path.walk(image_path):
+            for root, folders, files in os.walk(image_path):
                 for filename in files:
                     fullname = os.path.join(root, filename)
 
@@ -1100,8 +1100,12 @@ class WPConnector(models.Model):
                         ('name', '=', filename),
                         ('connector_id', '=', connector_id),
                     ])
-                    product_id, version, extension = self.extract_data(
-                        filename)
+                    reply = self.extract_data(filename)
+                    if not reply:
+                        _logger.error('Format file error: %s' % fullname)
+                        return
+
+                    product_id, version, extension = reply
                     if images:  # only one!
                         # Check timestamp
                         modify_time = str(os.stat(fullname).st_mtime)
@@ -1118,6 +1122,7 @@ class WPConnector(models.Model):
                             'product_id': product_id,
                             'version': version,
                             'connector_id': connector_id,
+                            'timestamp': modify_time,
                             'wp_id': False,
                             'wp_url': False,
                         }
@@ -1148,6 +1153,7 @@ class WPConnector(models.Model):
     # Columns:
     name = fields.Char(string='Name', required=True, size=80)
     fullname = fields.Char(string='Name', size=280, compute='_get_fullname')
+    update = fields.Boolean('To update')
 
     version = fields.Char(string='Version')
     timestamp = fields.Char(string='Timestamp')
