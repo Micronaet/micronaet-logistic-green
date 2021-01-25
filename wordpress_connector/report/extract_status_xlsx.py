@@ -39,8 +39,8 @@ class WPConnector(models.Model):
         """ Extract list of published elements:
         """
         # Pool used:
-        excel_pool = self.pool.get('excel.writer')
-        product_pool = self.pool.get('product.product')
+        excel_pool = self.env['excel.writer']
+        product_pool = self.env['product.template']
 
         # ---------------------------------------------------------------------
         #                         Excel report:
@@ -71,45 +71,134 @@ class WPConnector(models.Model):
         # ---------------------------------------------------------------------
         # Width
         excel_pool.column_width(ws_name, [
-            5, 15, 20,
-            30, 70,
-            30, 70,
-            50, 10, 15, 15,
-            10, 10,
-            5, 20,
-            20,
-            40, 40,
+            15, 40,
             ])
 
         # Print header
         row = 0
         excel_pool.write_xls_line(
             ws_name, row, [
-            'Pubbl.', 'Codice', 'Colore',
-            'Nome', 'Descrizione',
-            '(Name)', '(Description)',
-            'Categorie', 'Mag.', 'Prezzo ODOO', 'Prezzo WP',
-            'Cat. Stat.', 'Peso',
-            'Mod. imb.', 'Imballo',
-            'Magazzino', 'Immagini', 'Link',
+                # Anagrafica:
+                'Codice', 'Nome',
+                'Descrizione breve', 'Descrizione'
+
+                # WP:
+                'Tipo', 'Stato', 'Slug',
+
+                # Master / Slave:
+                'Modo', 'Master',
+
+                # Prezzo:
+                'Prezzo', 'Scontato',
+
+                # Magazzino:
+                'Gest. mag.', 'Backorders', 'Stato Magazzino',
+
+                # Tassonomia:
+                'Nome volgare', 'Nome scientifico', 'Famiglia', 'Genere',
+                'Specie', u'Varietà', 'Origine', 'Progenitori',
+
+                # Botanico:
+                'Dimensione fiore', 'Note profumo', 'Tipologia fioritura',
+                'Altezza fioritura', 'Dimensione', u'Rusticità',
+
+                # Cura:
+                'Potatura', 'Cura e coltivazione', 'Propagazione',
+                'Parassiti e malattie',
+
+                # Immagini:
+                'Immagini'
+
+                # Link prodotti:
+                'Up sell', 'Cross sell',
+
+                # Anagrafiche collegate:
+                'Categorie', 'Tags', 'Attributi',
             ], default_format=excel_format['header'])
 
-        for product in sorted(
-                product_pool.search([]),
-                key=lambda x: (x.default_code, x.name)):
-            default_code = product.default_code or ''
-            color_format = excel_format['black']  # TODO color
+        products = product_pool.search([
+            '|',
+            ('wp_master', '=', True),
+            ('wp_type', '=', 'simple'),
+        ])
+        # [Master + Slaves] or [Simple only]
+        for wordpress_product in sorted(
+                products, key=lambda x: (x.default_code or '', x.name)):
+            product_list = [wordpress_product]
+            if wordpress_product.wp_master:
+                product_list.extend(
+                    [t for t in wordpress_product.wp_slave_ids])
+            for product in product_list:
+                row += 1
+                default_code = product.default_code or ''
+                color_format = excel_format['black']  # TODO color
 
-            excel_pool.write_xls_line(
-                ws_name, row, [
-                    default_code,
-                    '',
-                    '',
-                    ', '.join(tuple(
-                        [c.name for c in product.wp_categ_ids])),
+                if product.wp_master:
+                    mode = 'Padre'
+                elif product.wp_master_id:
+                    mode = 'Figlio'
+                else:
+                    mode = 'Semplice'
 
-                    product.weight,
-                    '%s x %s x %s' % (
-                        product.length, product.height, product.width),
+                excel_pool.write_xls_line(
+                    ws_name, row, [
+                        # Anagrafica:
+                        default_code or '',
+                        product.name or '',
+
+                        product.wp_short_description or '',
+                        product.wp_description or '',
+
+                        # WP:
+                        product.wp_type,
+                        product.wp_status,
+                        product.wp_slug,
+
+                        # Master / Slave:
+                        mode, product.wp_master_id.default_code or '',
+
+                        # Prezzo:
+                        product.list_price, product.wp_sale_price,
+
+                        # Magazzino:
+                        'X' if product.wp_manage_stock else '',
+                        'X' if product.wp_backorders else '',
+                        product.wp_stock_status,
+
+                        # Tassonomia:
+                        product.wp_vulgar_name or '',
+                        product.wp_scientific_name or '',
+                        product.wp_family or '',
+                        product.wp_genre or '',
+                        product.wp_specie or '',
+                        product.wp_variety or '',
+                        product.wp_origin or '',
+                        product.wp_ancestor or '',
+
+                        # Botanico:
+                        product.wp_flower_dimension or '',
+                        product.wp_scent_note or '',
+                        product.wp_flowering_type or '',
+                        product.wp_flowering_height or '',
+                        product.wp_dimension_width or '',
+                        product.wp_rusticity or '',
+
+                        # Cura:
+                        product.wp_pruning or '',
+                        product.wp_care or '',
+                        product.wp_propagation or '',
+                        product.wp_disease or '',
+
+                        # Immagini:
+                        '',
+
+                        # Link prodotti:
+                        '',
+                        '',
+
+                        # Anagrafiche collegate:
+                        '[]',
+                        '[]',
+                        '[]',
                     ], default_format=color_format['text'])
         return excel_pool.return_attachment('web_product')
