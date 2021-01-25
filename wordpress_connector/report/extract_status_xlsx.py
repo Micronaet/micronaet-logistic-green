@@ -41,6 +41,16 @@ class WPConnector(models.Model):
         # Pool used:
         excel_pool = self.env['excel.writer']
         product_pool = self.env['product.template']
+        attribute_pool = self.env['wp.attribute']
+
+        attributes = attribute_pool.search([
+            ('wp_connector_out_id', '!=', False),
+        ])
+        attribute_col = {}
+        counter = 0
+        for attribute in attributes:
+            attribute_col[attribute.name] = counter
+            counter += 1
 
         # ---------------------------------------------------------------------
         #                         Excel report:
@@ -97,45 +107,47 @@ class WPConnector(models.Model):
 
         # Print header
         row = 0
+        header = [
+            # Anagrafica:
+            'Codice', 'Nome',
+            'Descrizione breve', 'Descrizione',
+
+            # WP:
+            'Tipo', 'Stato', 'Slug',
+
+            # Master / Slave:
+            'Modo', 'Master',
+
+            # Prezzo:
+            'Prezzo', 'Scontato',
+
+            # Magazzino:
+            'Gest. mag.', 'Backorders', 'Stato Magazzino',
+
+            # Tassonomia:
+            'Nome volgare', 'Nome scientifico', 'Famiglia', 'Genere',
+            'Specie', u'Varietà', 'Origine', 'Progenitori',
+
+            # Botanico:
+            'Dimensione fiore', 'Note profumo', 'Tipologia fioritura',
+            'Altezza fioritura', 'Dimensione', u'Rusticità',
+
+            # Cura:
+            'Potatura', 'Cura e coltivazione', 'Propagazione',
+            'Parassiti e malattie',
+
+            # Immagini:
+            'Immagini',
+
+            # Link prodotti:
+            'Up sell', 'Cross sell',
+
+            # Anagrafiche collegate:
+            'Categorie', 'Tags', 'Attributi',
+            ]
         excel_pool.write_xls_line(
-            ws_name, row, [
-                # Anagrafica:
-                'Codice', 'Nome',
-                'Descrizione breve', 'Descrizione',
-
-                # WP:
-                'Tipo', 'Stato', 'Slug',
-
-                # Master / Slave:
-                'Modo', 'Master',
-
-                # Prezzo:
-                'Prezzo', 'Scontato',
-
-                # Magazzino:
-                'Gest. mag.', 'Backorders', 'Stato Magazzino',
-
-                # Tassonomia:
-                'Nome volgare', 'Nome scientifico', 'Famiglia', 'Genere',
-                'Specie', u'Varietà', 'Origine', 'Progenitori',
-
-                # Botanico:
-                'Dimensione fiore', 'Note profumo', 'Tipologia fioritura',
-                'Altezza fioritura', 'Dimensione', u'Rusticità',
-
-                # Cura:
-                'Potatura', 'Cura e coltivazione', 'Propagazione',
-                'Parassiti e malattie',
-
-                # Immagini:
-                'Immagini',
-
-                # Link prodotti:
-                'Up sell', 'Cross sell',
-
-                # Anagrafiche collegate:
-                'Categorie', 'Tags', 'Attributi',
-            ], default_format=excel_format['header'])
+            ws_name, row, header, default_format=excel_format['header'])
+        attribute_start = header.index('Attributi')
 
         products = product_pool.search([
             '&',
@@ -143,9 +155,9 @@ class WPConnector(models.Model):
             '|',
             ('wp_master', '=', True),
             ('wp_type', '=', 'simple'),
-        ])
+        ])[:10]
         # [Master + Slaves] or [Simple only]
-        # excel_pool.freeze_panes(ws_name, row+1, 2)
+        excel_pool.freeze_pane(ws_name, row+1, 2)
 
         for wordpress_product in sorted(
                 products, key=lambda x: (x.default_code or '', x.name)):
