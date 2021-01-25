@@ -1065,11 +1065,20 @@ class WPConnector(models.Model):
     _order = 'name'
 
     @api.model
+    def update_this_wordpress_media(self):
+        """ Update this
+        """
+        self.with_context(update_this_id=self.id)
+    @api.model
     def update_wordpress_media(self):
         """ Update worpress image (use check for get list)
         """
-        images = self.search([('update', '=', True)])
-
+        update_this_id = self.env.context.get('update_this_id')
+        if update_this_id:
+            images = self.browse(update_this_id)
+        else:
+            images = self.search([('update', '=', True)])
+        pdb.set_trace()
         product_ids = []  # Product list to update
         for image in images:
             wp_id = image.wp_id
