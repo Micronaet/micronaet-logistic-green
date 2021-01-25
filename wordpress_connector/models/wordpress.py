@@ -1105,9 +1105,9 @@ class WPConnector(models.Model):
                         return
 
                     product_id, version, extension = reply
+                    modify_time = str(os.stat(fullname).st_mtime)
                     if images:  # only one!
                         # Check timestamp
-                        modify_time = str(os.stat(fullname).st_mtime)
                         if images[0].timestamp != modify_time:
                             data = {
                                 'update': True,
