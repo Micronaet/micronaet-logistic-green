@@ -15,6 +15,7 @@
                 <field name="version"/>
                 <field name="timestamp"/>
                 <field name="fullname" colspan="4"/>
+                <button name="update_wordpress_media" type="object" string="Update wordpress" icon="fa-picture-o"/>
             </tree>
         </field>
     </record>

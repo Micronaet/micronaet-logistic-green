@@ -5,6 +5,7 @@ import os
 import sys
 import logging
 import woocommerce
+import requests
 from odoo import models, fields, api, exceptions
 import pdb
 
@@ -1074,9 +1075,65 @@ class WPConnector(models.Model):
             wp_id = image.wp_id
             product_id = image.product_id.id
             product_ids.append(product_id)
+            connector = image.connector_id
 
-            if wp_id:
-                pass  # Delete previous:
+            root_url = connector.url
+            username = connector.username
+            password = connector.password
+            author_id = connector.user_id
+            auth = (username, password)
+            url = '%s/wp-json/wp/v2/media' % root_url
+
+            # -----------------------------------------------------------------
+            # Delete old:
+            # -----------------------------------------------------------------
+            if wp_id:  # Delete previous:
+                delete_url = '%s/wp-json/wp/v2/media/%s' % (root_url, wp_id)
+                params = {
+                    'force': True,
+                }
+                reply = requests.delete(
+                    delete_url,
+                    # headers=headers
+                    params=params,
+                    auth=auth,
+                )
+                _logger.info(reply.text)
+
+            # -----------------------------------------------------------------
+            # Load new:
+            # -----------------------------------------------------------------
+            fullname = image.fullname
+
+            headers = {
+                'Content-Type': 'image/jpg',
+                'Content-Disposition': 'attachment; filename="%s"' % fullname,
+            }
+
+            params = {
+                'lang': 'it',
+                'title': image.name,
+                'status': 'publish',
+                'author': author_id,
+                'alt_text': image.product_id.name,
+                'caption': image.product_id.name,
+                'description': image.product_id.wp_description or '',
+            }
+
+            # Open file in different ways:
+            file_handler = open(fullname, 'rb')  # handler
+            image_data = file_handler.read()  # binary data
+            # image_b64 = base64.b64encode(image_data) # Base 64 data
+
+            reply = requests.post(
+                url,
+                headers=headers,
+                params=params,
+                data=image_data,
+                auth=auth,
+            )
+            _logger.info(reply.text)
+            wp_id = reply.json()['id']
 
             url = ''
             image.write({
@@ -1085,8 +1142,10 @@ class WPConnector(models.Model):
                 'url': url,
             })
 
-        # TODO
+        # ---------------------------------------------------------------------
         # Update product selected in the images
+        # ---------------------------------------------------------------------
+        # TODO
         return True
 
     @api.multi
