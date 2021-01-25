@@ -1,5 +1,32 @@
 <?xml version="1.0"?>
 <odoo>
+    <!--wp.image-->
+    <record id="wp_image_view_tree" model="ir.ui.view">
+        <field name="name">Wordpress images</field>
+        <field name="model">wp.image</field>
+        <field name="arch" type="xml">
+            <tree string="Wordpress image" editable="bottom">
+                <field name="name"/>
+                <field name="wp_id"/>
+                <field name="connector_id"/>
+                <field name="product_id"/>
+                <field name="wp_url"/>
+                <field name="update"/>
+                <field name="version"/>
+                <field name="timestamp"/>
+                <field name="fullname" colspan="4"/>
+            </tree>
+        </field>
+    </record>
+    <record id="wp_image_view_action" model="ir.actions.act_window">
+        <field name="name">Wordpress images</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">wp.image</field>
+        <field name="view_mode">tree</field>
+        <field name="context">{}</field>
+    </record>
+
+
     <!--wp.connector-->
     <record id="wp_connector_view_tree" model="ir.ui.view">
         <field name="name">wp_connector_view_tree</field>
@@ -543,4 +570,5 @@
             <menuitem id="wordpress_configuration_attribute" name="Attribute" parent="wordpress_configuration_root" action="wp_attribute_action" sequence="20"/>
             <menuitem id="wordpress_configuration_tags" name="Tags" parent="wordpress_configuration_root" action="wp_tag_action" sequence="30"/>
             <menuitem id="wordpress_configuration_category" name="Category" parent="wordpress_configuration_root" action="wp_product_category_parent_action" sequence="40"/>
+            <menuitem id="wordpress_image_menu" name="Images" parent="wordpress_configuration_root" action="wp_image_view_action" sequence="50"/>
 </odoo>
