@@ -6,15 +6,15 @@
         <field name="model">wp.image</field>
         <field name="arch" type="xml">
             <tree string="Wordpress image" editable="bottom">
-                <field name="name"/>
-                <field name="wp_id"/>
-                <field name="connector_id"/>
-                <field name="product_id"/>
-                <field name="wp_url"/>
-                <field name="update"/>
-                <field name="version"/>
-                <field name="timestamp"/>
-                <field name="fullname" colspan="4"/>
+                <field name="name" readonly="1"/>
+                <field name="wp_id" readonly="1"/>
+                <field name="connector_id" readonly="1"/>
+                <field name="product_id" readonly="1"/>
+                <field name="wp_url" readonly="1"/>
+                <field name="update" readonly="1"/>
+                <field name="version" readonly="1"/>
+                <field name="timestamp" readonly="1"/>
+                <field name="fullname" colspan="4" readonly="1"/>
                 <button name="update_this_wordpress_media" type="object" string="Update wordpress" icon="fa-picture-o"/>
             </tree>
         </field>
