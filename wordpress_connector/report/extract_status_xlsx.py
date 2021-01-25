@@ -24,6 +24,7 @@
 import os
 import sys
 import logging
+import pdb
 from odoo import models, fields, api, exceptions
 
 _logger = logging.getLogger(__name__)
@@ -44,11 +45,11 @@ class WPConnector(models.Model):
         attribute_pool = self.env['wp.attribute']
 
         attributes = attribute_pool.search([
-            ('wp_connector_out_id', '!=', False),
+            ('connector_out_id', '!=', False),
         ])
         attribute_col = {}
         counter = 0
-        for attribute in attributes:
+        for attribute in sorted(attributes, key=lambda x: x.name):
             attribute_col[attribute.name] = counter
             counter += 1
 
@@ -80,7 +81,7 @@ class WPConnector(models.Model):
         # Published product:
         # ---------------------------------------------------------------------
         # Width
-        excel_pool.column_width(ws_name, [
+        columns = [
             # Anagrafica:
             15, 40, 30, 40,
             # WP:
@@ -102,8 +103,10 @@ class WPConnector(models.Model):
             # Link prodotti:
             40, 40,
             # Anagrafiche collegate:
-            50, 50, 50,
-        ])
+            50, 50, 10,
+        ]
+        columns.extend([20 for i in range(len(attribute_col))])
+        excel_pool.column_width(ws_name, columns)
 
         # Print header
         row = 0
@@ -145,9 +148,11 @@ class WPConnector(models.Model):
             # Anagrafiche collegate:
             'Categorie', 'Tags', 'Attributi',
             ]
+        attribute_start = header.index('Attributi') + 1
+        header.extend(sorted(attribute_col.keys()))
+
         excel_pool.write_xls_line(
             ws_name, row, header, default_format=excel_format['header'])
-        attribute_start = header.index('Attributi')
 
         products = product_pool.search([
             '&',
@@ -155,9 +160,9 @@ class WPConnector(models.Model):
             '|',
             ('wp_master', '=', True),
             ('wp_type', '=', 'simple'),
-        ])[:10]
+        ])[:10]  # TODO debug mode
         # [Master + Slaves] or [Simple only]
-        excel_pool.freeze_pane(ws_name, row+1, 2)
+        # excel_pool.freeze_panes(ws_name, row+1, 2)
 
         for wordpress_product in sorted(
                 products, key=lambda x: (x.default_code or '', x.name)):
@@ -241,4 +246,17 @@ class WPConnector(models.Model):
                                   product.wp_cross_sell_ids]),
                         '[]',
                     ], default_format=color_format['text'])
+
+                # -------------------------------------------------------------
+                # Write attribute block if present:
+                # -------------------------------------------------------------
+                for line in product.wp_attribute_ids:
+                    attribute = line.attribute_id
+                    terms = ', '.join(
+                        [term.name for term in line.term_ids])
+                    col = attribute_start + attribute_col.get(attribute.name)
+                    excel_pool.write_xls_line(
+                        ws_name, row, [terms],
+                        default_format=color_format['text'], col=col)
+
         return excel_pool.return_attachment('web_product')
