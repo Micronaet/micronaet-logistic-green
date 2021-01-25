@@ -40,7 +40,7 @@ class WPConnector(models.Model):
         """ Extract list of published elements:
         """
         # Pool used:
-        excel_pool = self.env['excel.writer']
+        excel_pool = self.env['excel.report']
         product_pool = self.env['product.template']
         attribute_pool = self.env['wp.attribute']
 
@@ -57,25 +57,7 @@ class WPConnector(models.Model):
         #                         Excel report:
         # ---------------------------------------------------------------------
         ws_name = 'Prodotti wordpress'
-        excel_pool.create_worksheet(ws_name)
-
-        # Load formats:
-        excel_format = {
-            'title': excel_pool.get_format('title'),
-            'header': excel_pool.get_format('header'),
-            'black': {
-                'text': excel_pool.get_format('text'),
-                'number': excel_pool.get_format('number'),
-                },
-            'red': {
-                'text': excel_pool.get_format('bg_red'),
-                'number': excel_pool.get_format('bg_red_number'),
-                },
-            'yellow': {
-                'text': excel_pool.get_format('bg_yellow'),
-                'number': excel_pool.get_format('bg_yellow_number'),
-                },
-            }
+        excel_pool.create_worksheet(ws_name, format_code='DEFAULT')
 
         # ---------------------------------------------------------------------
         # Published product:
@@ -151,7 +133,7 @@ class WPConnector(models.Model):
         header.extend(sorted(attribute_col.keys()))
 
         excel_pool.write_xls_line(
-            ws_name, row, header, default_format=excel_format['header'])
+            ws_name, row, header, style_code='header')
 
         products = product_pool.search([
             '&',
@@ -173,7 +155,6 @@ class WPConnector(models.Model):
             for product in product_list:
                 row += 1
                 default_code = product.default_code or ''
-                color_format = excel_format['black']  # TODO color
 
                 if product.wp_master:
                     mode = 'Padre'
@@ -260,6 +241,6 @@ class WPConnector(models.Model):
                 # Write row:
                 excel_pool.write_xls_line(
                     ws_name, row, data,
-                    default_format=color_format['text'])
+                    style_code='text')
 
         return excel_pool.return_attachment('web_product')
