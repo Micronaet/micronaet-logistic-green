@@ -232,6 +232,9 @@ class WPConnector(models.Model):
                 attribute_data = empty[:]
                 for line in product.wp_attribute_ids:
                     attribute = line.attribute_id
+                    if not attribute.connector_out_id:
+                        continue  # Attribute not published, so not used
+
                     terms = ', '.join(
                         [term.name for term in line.term_ids])
                     col = attribute_col.get(attribute.name)
