@@ -1087,6 +1087,7 @@ class WPConnector(models.Model):
         if not connectors:
             _logger.error('No connector for out wordpress')
             return False
+        pdb.set_trace()
         for connector in connectors:
             connector_id = connector.id
             image_path = connector.image_path
