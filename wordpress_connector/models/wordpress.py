@@ -1136,6 +1136,7 @@ class WPConnector(models.Model):
                             ('id', '=', product_id)])
                         if template:
                             self.create(data)
+                            _logger.info('Product linked %s' % fullname)
                         else:
                             _logger.error('No product ID for %s' % fullname)
                 break  # Only this
