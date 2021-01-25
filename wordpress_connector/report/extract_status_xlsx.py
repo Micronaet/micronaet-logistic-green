@@ -235,7 +235,10 @@ class WPConnector(models.Model):
                     terms = ', '.join(
                         [term.name for term in line.term_ids])
                     col = attribute_col.get(attribute.name)
-                    attribute_data[col] = terms
+                    try:
+                        attribute_data[col] = terms
+                    except:
+                        pdb.set_trace()
                 data.extend(attribute_data)
 
                 # Write row:
