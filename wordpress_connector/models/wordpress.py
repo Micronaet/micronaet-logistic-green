@@ -1064,7 +1064,7 @@ class WPConnector(models.Model):
     _description = 'Wordpress Image'
     _order = 'name'
 
-    @api.model
+    @api.multi
     def update_this_wordpress_media(self):
         """ Update this
         """
