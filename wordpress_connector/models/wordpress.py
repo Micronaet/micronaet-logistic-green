@@ -1142,16 +1142,17 @@ class WPConnector(models.Model):
                 auth=auth,
             )
             try:
-                wp_id = reply.json()['id']
+                reply_json = reply.json()
+                wp_id = reply_json['id']
+                image_url = reply_json['source_url']
             except:  # Error reply
                 _logger.error(reply.text)
                 continue
 
-            url = ''  # TODO read from reply
             image.write({
                 'update': False,
                 'wp_id': wp_id,
-                'url': url,
+                'wp_url': image_url,
             })
 
         # ---------------------------------------------------------------------
@@ -1222,8 +1223,7 @@ class WPConnector(models.Model):
                         else:
                             _logger.error('No product ID for %s' % fullname)
                 break  # Only this
-        # return self.update_wordpress_media()
-        return True
+        return self.update_wordpress_media()
 
     @api.model
     def extract_data(self, filename):
