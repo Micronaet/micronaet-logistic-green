@@ -305,9 +305,20 @@ class WPConnector(models.Model):
              '(Order always vs ODOO)'
     )
 
+    # Woocommerce access:
     url = fields.Char('WP URL', size=180, required=True)
-    key = fields.Char('WP consumer key', size=180, required=True)
-    secret = fields.Char('WP consumer secret', size=180, required=True)
+    key = fields.Char(
+        'WP consumer key', size=180, required=True,
+        help='Woocommerce API key')
+    secret = fields.Char('WP consumer secret', size=180, required=True,
+         help='Woocommerce API secret')
+
+    # Normal API Access
+    username = fields.Char(
+        'WP username', size=80, help='Wordpress user access')
+    password = fields.Char(
+        'WP password', size=80, help='Wordpress user password')
+    user_id = fields.Integer('WP user ID', help='ID for create media user')
 
     api = fields.Boolean('WP API', default=True)
     version = fields.Char(
