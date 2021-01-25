@@ -145,6 +145,8 @@ class WPConnector(models.Model):
             ('wp_type', '=', 'simple'),
         ])
         # [Master + Slaves] or [Simple only]
+        excel_pool.freeze_panes(ws_name, row+1, 2)
+
         for wordpress_product in sorted(
                 products, key=lambda x: (x.default_code or '', x.name)):
             product_list = [wordpress_product]

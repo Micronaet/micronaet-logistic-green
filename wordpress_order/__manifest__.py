@@ -18,6 +18,7 @@
         # 'wordpress_order',
         'sale',
         'l10n_it_province',  # For city localization
+        # 'xlsxwriter_report',
     ],
     'data': [
         'views/order_view.xml',

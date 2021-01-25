@@ -15,6 +15,7 @@
     'depends': [
         'base',
         'product',
+        'xlsxwriter_report',
         ],
     'data': [
         'security/ir.model.access.csv',
