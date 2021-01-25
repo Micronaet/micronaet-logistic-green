@@ -59,6 +59,22 @@ class WPConnector(models.Model):
         ws_name = 'Prodotti wordpress'
         report_pool.create_worksheet(ws_name, format_code='DEFAULT')
 
+        style = {
+            'black': {
+                'text': 'text',
+                'number': 'number',
+            },
+            'yellow': {
+                'text': 'text_pending',
+                'number': 'number_pending',
+            },
+            'blue': {
+                'text': 'text_total',
+                'number': 'number_total',
+            },
+
+        }
+
         # ---------------------------------------------------------------------
         # Published product:
         # ---------------------------------------------------------------------
@@ -156,12 +172,17 @@ class WPConnector(models.Model):
                 row += 1
                 default_code = product.default_code or ''
 
+                # Color setup:
                 if product.wp_master:
                     mode = 'Padre'
+                    style_color = style['blue']
                 elif product.wp_master_id:
                     mode = 'Figlio'
+                    style_color = style['yellow']
                 else:
                     mode = 'Semplice'
+                    style_color = style['black']
+
 
                 data = [
                     # Anagrafica:
@@ -244,6 +265,6 @@ class WPConnector(models.Model):
                 # Write row:
                 report_pool.write_xls_line(
                     ws_name, row, data,
-                    style_code='text')
+                    style_code=style_color['text'])
 
         return report_pool.return_attachment('web_product')
