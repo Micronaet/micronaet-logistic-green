@@ -453,13 +453,7 @@
                         <page string="Image">
                             <group colspan="4" col="4">
                                 <separator string="Wordpress image:" colspan="4"/>
-                                <field name="wp_image_ids" colspan="4" nolabel="1"/>
-                            </group>
-                        </page>
-                        <page string="Link">
-                            <group colspan="4" col="4">
-                                <separator string="Link info:" colspan="4"/>
-                                <field name="wp_connector_rel_ids" colspan="4" nolabel="1">
+                                <field name="wp_image_ids" colspan="4" nolabel="1" readonly="1">
                                     <tree string="Image" editable="bottom" decoration-primary="update==True">
                                         <field name="name"/>
                                         <field name="version"/>
@@ -468,6 +462,12 @@
                                         <field name="update" invisible="1"/>
                                     </tree>
                                 </field>
+                            </group>
+                        </page>
+                        <page string="Link">
+                            <group colspan="4" col="4">
+                                <separator string="Link info:" colspan="4"/>
+                                <field name="wp_connector_rel_ids" colspan="4" nolabel="1"/>
                             </group>
                         </page>
                     </notebook>
