@@ -139,7 +139,7 @@ class WPConnector(models.Model):
 
         products = product_pool.search([
             '&',
-            ('wp_connector_out_id', '!=', False)
+            ('wp_connector_out_id', '!=', False),
             '|',
             ('wp_master', '=', True),
             ('wp_type', '=', 'simple'),
@@ -214,15 +214,17 @@ class WPConnector(models.Model):
                         product.wp_disease or '',
 
                         # Immagini:
-                        '',
+                        '[]',
 
                         # Link prodotti:
                         '',
                         '',
 
                         # Anagrafiche collegate:
-                        '[]',
-                        '[]',
+                        ', '.join([(t.default_code or t.name) for t in
+                                  product.wp_up_sell_ids]),
+                        ', '.join([(t.default_code or t.name) for t in
+                                  product.wp_cross_sell_ids]),
                         '[]',
                     ], default_format=color_format['text'])
         return excel_pool.return_attachment('web_product')
