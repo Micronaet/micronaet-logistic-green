@@ -71,8 +71,29 @@ class WPConnector(models.Model):
         # ---------------------------------------------------------------------
         # Width
         excel_pool.column_width(ws_name, [
-            15, 40,
-            ])
+            # Anagrafica:
+            15, 40, 30, 40,
+            # WP:
+            15, 15, 25,
+            # Master / Slave:
+            10, 12,
+            # Prezzo:
+            10, 10,
+            # Magazzino:
+            10, 10, 10,
+            # Tassonomia:
+            25, 25, 25, 25, 25, 25, 25, 25,
+            # Botanico:
+            25, 25, 25, 25, 25, 25,
+            # Cura:
+            15, 15, 15, 15,
+            # Immagini:
+            40,
+            # Link prodotti:
+            40, 40,
+            # Anagrafiche collegate:
+            50, 50, 50,
+        ])
 
         # Print header
         row = 0
@@ -80,7 +101,7 @@ class WPConnector(models.Model):
             ws_name, row, [
                 # Anagrafica:
                 'Codice', 'Nome',
-                'Descrizione breve', 'Descrizione'
+                'Descrizione breve', 'Descrizione',
 
                 # WP:
                 'Tipo', 'Stato', 'Slug',
@@ -107,7 +128,7 @@ class WPConnector(models.Model):
                 'Parassiti e malattie',
 
                 # Immagini:
-                'Immagini'
+                'Immagini',
 
                 # Link prodotti:
                 'Up sell', 'Cross sell',
@@ -117,6 +138,8 @@ class WPConnector(models.Model):
             ], default_format=excel_format['header'])
 
         products = product_pool.search([
+            '&',
+            ('wp_connector_out_id', '!=', False)
             '|',
             ('wp_master', '=', True),
             ('wp_type', '=', 'simple'),
@@ -155,7 +178,8 @@ class WPConnector(models.Model):
                         product.wp_slug,
 
                         # Master / Slave:
-                        mode, product.wp_master_id.default_code or '',
+                        mode,
+                        product.wp_master_id.default_code or '',
 
                         # Prezzo:
                         product.list_price, product.wp_sale_price,
