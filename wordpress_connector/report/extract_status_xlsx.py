@@ -40,7 +40,7 @@ class WPConnector(models.Model):
         """ Extract list of published elements:
         """
         # Pool used:
-        excel_pool = self.env['excel.report']
+        report_pool = self.env['excel.report']
         product_pool = self.env['product.template']
         attribute_pool = self.env['wp.attribute']
 
@@ -57,7 +57,7 @@ class WPConnector(models.Model):
         #                         Excel report:
         # ---------------------------------------------------------------------
         ws_name = 'Prodotti wordpress'
-        excel_pool.create_worksheet(ws_name, format_code='DEFAULT')
+        report_pool.create_worksheet(ws_name, format_code='DEFAULT')
 
         # ---------------------------------------------------------------------
         # Published product:
@@ -88,7 +88,7 @@ class WPConnector(models.Model):
             50, 50,
         ]
         columns.extend([20 for i in range(len(attribute_col))])
-        excel_pool.column_width(ws_name, columns)
+        report_pool.column_width(ws_name, columns)
 
         # Print header
         row = 0
@@ -132,7 +132,7 @@ class WPConnector(models.Model):
             ]
         header.extend(sorted(attribute_col.keys()))
 
-        excel_pool.write_xls_line(
+        report_pool.write_xls_line(
             ws_name, row, header, style_code='header')
 
         products = product_pool.search([
@@ -143,7 +143,7 @@ class WPConnector(models.Model):
             ('wp_type', '=', 'simple'),
         ])
         # [Master + Slaves] or [Simple only]
-        # excel_pool.freeze_panes(ws_name, row+1, 2)
+        # report_pool.freeze_panes(ws_name, row+1, 2)
 
         empty = ['' for i in range(len(attribute_col))]
         for wordpress_product in sorted(
@@ -239,8 +239,8 @@ class WPConnector(models.Model):
                 data.extend(attribute_data)
 
                 # Write row:
-                excel_pool.write_xls_line(
+                report_pool.write_xls_line(
                     ws_name, row, data,
                     style_code='text')
 
-        return excel_pool.return_attachment('web_product')
+        return report_pool.return_attachment('web_product')
