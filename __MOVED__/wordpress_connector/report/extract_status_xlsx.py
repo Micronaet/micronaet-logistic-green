@@ -336,4 +336,4 @@ class ConnectorServer(orm.Model):
                     ], default_format=excel_format['black']['text'])
 
         return excel_pool.return_attachment(cr, uid, 'web_product')
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
+        

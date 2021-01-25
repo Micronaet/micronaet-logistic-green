@@ -726,6 +726,7 @@ class ProductTemplate(models.Model):
                     # stock_status = variant['stock_status']
                     # product_type = variant['type']
                     # status = variant['status']
+                    # TODO slug!
 
                     if parameters['publish']['image'] and \
                             variant_images:
