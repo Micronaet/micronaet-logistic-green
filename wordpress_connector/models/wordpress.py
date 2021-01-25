@@ -1083,7 +1083,7 @@ class WPConnector(models.Model):
         """ Load image folder in connector param from all out connector
         """
         connector_pool = self.env['wp.connector']
-        connectors = self.search([('mode', '=', 'out')])
+        connectors = connector_pool.search([('mode', '=', 'out')])
         if not connectors:
             _logger.error('No connector for out wordpress')
             return False
