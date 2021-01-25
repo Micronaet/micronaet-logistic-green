@@ -1222,6 +1222,7 @@ class WPConnector(models.Model):
                             _logger.info('Product linked %s' % fullname)
                         else:
                             _logger.error('No product ID for %s' % fullname)
+                            # TODO move in unused folder?
                 break  # Only this
         return self.update_wordpress_media()
 
