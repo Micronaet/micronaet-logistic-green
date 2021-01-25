@@ -29,17 +29,15 @@ from odoo import models, fields, api, exceptions
 _logger = logging.getLogger(__name__)
 
 
-class ConnectorServer(models.Model):
-    """ Model name: ConnectorServer
+class WPConnector(models.Model):
+    """ Model name: Wordpress Connector
     """
-    _inherit = 'connector.server'
+    _inherit = 'wp.connector'
 
     @api.multi
     def extract_wordpress_published_report(self):
         """ Extract list of published elements:
         """
-        stock_status = True
-
         # Pool used:
         excel_pool = self.pool.get('excel.writer')
         product_pool = self.pool.get('product.product')
@@ -47,9 +45,6 @@ class ConnectorServer(models.Model):
         # ---------------------------------------------------------------------
         #                         Excel report:
         # ---------------------------------------------------------------------
-        connector = self
-        album_ids = []  # TODO not used for now
-
         ws_name = 'Prodotti wordpress'
         excel_pool.create_worksheet(ws_name)
 
@@ -103,15 +98,6 @@ class ConnectorServer(models.Model):
                 product_pool.search([]),
                 key=lambda x: (x.default_code, x.name)):
             default_code = product.default_code or ''
-
-            # -----------------------------------------------------------------
-            # Parameters:
-            # -----------------------------------------------------------------
-            # Images:
-            image = []
-
-            # Stock:
-            stock = 0.0  # int(product.mx_net_mrp_qty)
             color_format = excel_format['black']  # TODO color
 
             excel_pool.write_xls_line(
