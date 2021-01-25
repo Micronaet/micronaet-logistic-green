@@ -1157,5 +1157,5 @@ class WPConnector(models.Model):
     product_id = fields.Many2one(
         comodel_name='product.template',
         string='Product')
-    wp_id = fields.integer('WP ID')
+    wp_id = fields.Integer('WP ID')
     wp_url = fields.Char('WP Url')
