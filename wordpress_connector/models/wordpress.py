@@ -1113,7 +1113,12 @@ class WPConnector(models.Model):
                                 'update': True,
                                 'timestamp': modify_time,
                             }
-                            images.write(data)
+                            try:
+                                images.write(data)
+                            except:
+                                _logger.error(
+                                    'No product ID for upd. %s' % fullname)
+
                     else:
                         data = {
                             'update': True,
@@ -1129,7 +1134,6 @@ class WPConnector(models.Model):
                             self.create(data)
                         except:
                             _logger.error('No product ID for %s' % fullname)
-
                 break  # Only this
         # return self.update_wordpress_media()
         return True
