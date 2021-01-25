@@ -1083,11 +1083,12 @@ class WPConnector(models.Model):
         """ Load image folder in connector param from all out connector
         """
         connector_pool = self.env['wp.connector']
+        product_pool = self.env['product.template']
+
         connectors = connector_pool.search([('mode', '=', 'out')])
         if not connectors:
             _logger.error('No connector for out wordpress')
             return False
-        pdb.set_trace()
         for connector in connectors:
             connector_id = connector.id
             image_path = connector.image_path
@@ -1131,9 +1132,11 @@ class WPConnector(models.Model):
                             'wp_id': False,
                             'wp_url': False,
                         }
-                        try:
+                        template = product_pool.search([
+                            ('id', '=', product_id)])
+                        if template:
                             self.create(data)
-                        except:
+                        else:
                             _logger.error('No product ID for %s' % fullname)
                 break  # Only this
         # return self.update_wordpress_media()
