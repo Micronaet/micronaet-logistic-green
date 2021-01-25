@@ -1126,7 +1126,11 @@ class WPConnector(models.Model):
                             'wp_id': False,
                             'wp_url': False,
                         }
-                        self.create(data)
+                        try:
+                            self.create(data)
+                        except:
+                            _logger.error('No product ID for %s' % fullname)
+
                 break  # Only this
         # return self.update_wordpress_media()
         return True
@@ -1152,7 +1156,8 @@ class WPConnector(models.Model):
 
     # Columns:
     name = fields.Char(string='Name', required=True, size=80)
-    fullname = fields.Char(string='Name', size=280, compute='_get_fullname')
+    fullname = fields.Char(
+        string='Fullname', size=280, compute='_get_fullname')
     update = fields.Boolean('To update')
 
     version = fields.Char(string='Version')
