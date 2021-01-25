@@ -159,7 +159,7 @@ class WPConnector(models.Model):
             '|',
             ('wp_master', '=', True),
             ('wp_type', '=', 'simple'),
-        ])[:10]  # TODO debug mode
+        ])
         # [Master + Slaves] or [Simple only]
         # excel_pool.freeze_panes(ws_name, row+1, 2)
 
