@@ -1075,10 +1075,11 @@ class WPConnector(models.Model):
         """ Update worpress image (use check for get list)
         """
         update_this_id = self.env.context.get('update_this_id')
-        if update_this_id:
+        if update_this_id:  # Update forced:
             images = self.browse(update_this_id)
-        else:
+        else:  # Update all marked:
             images = self.search([('update', '=', True)])
+
         product_ids = []  # Product list to update
         for image in images:
             wp_id = image.wp_id
