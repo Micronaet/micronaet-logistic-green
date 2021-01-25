@@ -103,7 +103,7 @@ class WPConnector(models.Model):
             # Link prodotti:
             40, 40,
             # Anagrafiche collegate:
-            50, 50, 10,
+            50, 50,
         ]
         columns.extend([20 for i in range(len(attribute_col))])
         excel_pool.column_width(ws_name, columns)
@@ -146,9 +146,8 @@ class WPConnector(models.Model):
             'Up sell', 'Cross sell',
 
             # Anagrafiche collegate:
-            'Categorie', 'Tags', 'Attributi',
+            'Categorie', 'Tags',
             ]
-        attribute_start = header.index('Attributi') + 1
         header.extend(sorted(attribute_col.keys()))
 
         excel_pool.write_xls_line(
@@ -164,6 +163,7 @@ class WPConnector(models.Model):
         # [Master + Slaves] or [Simple only]
         # excel_pool.freeze_panes(ws_name, row+1, 2)
 
+        empty = ['' for i in range(len(attribute_col))]
         for wordpress_product in sorted(
                 products, key=lambda x: (x.default_code or '', x.name)):
             product_list = [wordpress_product]
@@ -182,81 +182,84 @@ class WPConnector(models.Model):
                 else:
                     mode = 'Semplice'
 
-                excel_pool.write_xls_line(
-                    ws_name, row, [
-                        # Anagrafica:
-                        default_code or '',
-                        product.name or '',
+                data = [
+                    # Anagrafica:
+                    default_code or '',
+                    product.name or '',
 
-                        product.wp_short_description or '',
-                        product.wp_description or '',
+                    product.wp_short_description or '',
+                    product.wp_description or '',
 
-                        # WP:
-                        product.wp_type,
-                        product.wp_status,
-                        product.wp_slug,
+                    # WP:
+                    product.wp_type,
+                    product.wp_status,
+                    product.wp_slug,
 
-                        # Master / Slave:
-                        mode,
-                        product.wp_master_id.default_code or '',
+                    # Master / Slave:
+                    mode,
+                    product.wp_master_id.default_code or '',
 
-                        # Prezzo:
-                        product.list_price, product.wp_sale_price,
+                    # Prezzo:
+                    product.list_price, product.wp_sale_price,
 
-                        # Magazzino:
-                        'X' if product.wp_manage_stock else '',
-                        'X' if product.wp_backorders else '',
-                        product.wp_stock_status,
+                    # Magazzino:
+                    'X' if product.wp_manage_stock else '',
+                    'X' if product.wp_backorders else '',
+                    product.wp_stock_status,
 
-                        # Tassonomia:
-                        product.wp_vulgar_name or '',
-                        product.wp_scientific_name or '',
-                        product.wp_family or '',
-                        product.wp_genre or '',
-                        product.wp_specie or '',
-                        product.wp_variety or '',
-                        product.wp_origin or '',
-                        product.wp_ancestor or '',
+                    # Tassonomia:
+                    product.wp_vulgar_name or '',
+                    product.wp_scientific_name or '',
+                    product.wp_family or '',
+                    product.wp_genre or '',
+                    product.wp_specie or '',
+                    product.wp_variety or '',
+                    product.wp_origin or '',
+                    product.wp_ancestor or '',
 
-                        # Botanico:
-                        product.wp_flower_dimension or '',
-                        product.wp_scent_note or '',
-                        product.wp_flowering_type or '',
-                        product.wp_flowering_height or '',
-                        product.wp_dimension_width or '',
-                        product.wp_rusticity or '',
+                    # Botanico:
+                    product.wp_flower_dimension or '',
+                    product.wp_scent_note or '',
+                    product.wp_flowering_type or '',
+                    product.wp_flowering_height or '',
+                    product.wp_dimension_width or '',
+                    product.wp_rusticity or '',
 
-                        # Cura:
-                        product.wp_pruning or '',
-                        product.wp_care or '',
-                        product.wp_propagation or '',
-                        product.wp_disease or '',
+                    # Cura:
+                    product.wp_pruning or '',
+                    product.wp_care or '',
+                    product.wp_propagation or '',
+                    product.wp_disease or '',
 
-                        # Immagini:
-                        '[]',
+                    # Immagini:
+                    '[]',
 
-                        # Link prodotti:
-                        '',
-                        '',
+                    # Link prodotti:
+                    '',
+                    '',
 
-                        # Anagrafiche collegate:
-                        ', '.join([(t.default_code or t.name) for t in
-                                  product.wp_up_sell_ids]),
-                        ', '.join([(t.default_code or t.name) for t in
-                                  product.wp_cross_sell_ids]),
-                        '[]',
-                    ], default_format=color_format['text'])
+                    # Anagrafiche collegate:
+                    ', '.join([(t.default_code or t.name) for t in
+                              product.wp_up_sell_ids]),
+                    ', '.join([(t.default_code or t.name) for t in
+                              product.wp_cross_sell_ids]),
+                    ]
 
                 # -------------------------------------------------------------
                 # Write attribute block if present:
                 # -------------------------------------------------------------
+                attribute_data = empty[:]
                 for line in product.wp_attribute_ids:
                     attribute = line.attribute_id
                     terms = ', '.join(
                         [term.name for term in line.term_ids])
-                    col = attribute_start + attribute_col.get(attribute.name)
-                    excel_pool.write_xls_line(
-                        ws_name, row, [terms],
-                        default_format=color_format['text'], col=col)
+                    col = attribute_col.get(attribute.name)
+                    attribute_data[col] = terms
+                data.extend(attribute_data)
+
+                # Write row:
+                excel_pool.write_xls_line(
+                    ws_name, row, data,
+                    default_format=color_format['text'])
 
         return excel_pool.return_attachment('web_product')
