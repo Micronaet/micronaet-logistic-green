@@ -14,6 +14,7 @@
                 <field name="update" readonly="1"/>
                 <field name="version" readonly="1"/>
                 <field name="timestamp" readonly="1"/>
+                <button name="open_wordpress_url" type="object" string="Download from wordpress" icon="fa-download"/>
                 <field name="fullname" colspan="4" readonly="1"/>
                 <button name="update_this_wordpress_media" type="object" string="Update wordpress" icon="fa-picture-o"/>
             </tree>

@@ -1065,6 +1065,16 @@ class WPConnector(models.Model):
     _order = 'name'
 
     @api.multi
+    def open_wordpress_url(self):
+        """ Download url and return in
+        """
+        return {
+            'type': 'ir.actions.act_url',
+            'url': self.wp_url,
+            'target': 'new',
+        }
+
+    @api.multi
     def update_this_wordpress_media(self):
         """ Update this
         """
