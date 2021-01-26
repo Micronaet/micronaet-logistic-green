@@ -1068,9 +1068,14 @@ class WPConnector(models.Model):
     def open_wordpress_url(self):
         """ Download url and return in
         """
+        url = self.wp_url
+        if not url:
+            _logger.error('URL not found!')
+            return False
+
         return {
             'type': 'ir.actions.act_url',
-            'url': self.wp_url,
+            'url': url,
             'target': 'new',
         }
 
